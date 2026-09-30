@@ -1,0 +1,17 @@
+{
+  "key": "6bb05ab49fd1910533b5a8dc4f2cad279bd8525a83483f005b9e33bc48765f48",
+  "sha256": "a76e7a0416d18e23bde0e7a977fa959730aafd6d2ebd1d26cb19d7361ec6d999",
+  "duration": 6.517333333333333,
+  "beats": [
+    {
+      "text": "Why do language models use tokens at all?",
+      "start": 0.0,
+      "end": 2.7826666666666666
+    },
+    {
+      "text": "Why not just process complete words or sentences directly?",
+      "start": 2.9026666666666667,
+      "end": 6.517333333333333
+    }
+  ]
+}

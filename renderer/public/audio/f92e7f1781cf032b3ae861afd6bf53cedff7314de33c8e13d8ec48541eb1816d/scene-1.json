@@ -1,0 +1,27 @@
+{
+  "key": "f92e7f1781cf032b3ae861afd6bf53cedff7314de33c8e13d8ec48541eb1816d",
+  "sha256": "ae81fa75a6e29b460cfb846fbd4020473788072dd130926e17979425b2c48aa6",
+  "duration": 17.34725,
+  "beats": [
+    {
+      "text": "Now a user asks: “What is our work-from-home policy?” The user's question is converted into an embedding.",
+      "start": 0.0,
+      "end": 6.420625
+    },
+    {
+      "text": "The system searches for document chunks whose embeddings are most similar to the query embedding.",
+      "start": 6.540625,
+      "end": 11.957291666666666
+    },
+    {
+      "text": "Maybe it finds three relevant chunks from the HR policy.",
+      "start": 12.077291666666667,
+      "end": 15.521291666666666
+    },
+    {
+      "text": "Those chunks are retrieved.",
+      "start": 15.641291666666667,
+      "end": 17.34725
+    }
+  ]
+}

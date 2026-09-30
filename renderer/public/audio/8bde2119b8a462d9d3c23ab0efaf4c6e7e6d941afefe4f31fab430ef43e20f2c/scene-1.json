@@ -1,0 +1,27 @@
+{
+  "key": "8bde2119b8a462d9d3c23ab0efaf4c6e7e6d941afefe4f31fab430ef43e20f2c",
+  "sha256": "c65fd99f722cdc1df2e7dda89988bb450b1a1d4927992a0bd3a04f03c263de8e",
+  "duration": 12.589916666666667,
+  "beats": [
+    {
+      "text": "First, the sun heats ocean water.",
+      "start": 0.0,
+      "end": 2.216666666666667
+    },
+    {
+      "text": "Next, water molecules gain energy and break free from the surface.",
+      "start": 2.3366666666666664,
+      "end": 6.506
+    },
+    {
+      "text": "Finally, they rise into the air as invisible water vapor.",
+      "start": 6.626,
+      "end": 10.401291666666667
+    },
+    {
+      "text": "This is how evaporation begins.",
+      "start": 10.521291666666666,
+      "end": 12.589916666666667
+    }
+  ]
+}

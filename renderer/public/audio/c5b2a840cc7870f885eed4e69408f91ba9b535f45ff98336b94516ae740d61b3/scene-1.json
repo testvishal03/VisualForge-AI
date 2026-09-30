@@ -1,0 +1,22 @@
+{
+  "key": "c5b2a840cc7870f885eed4e69408f91ba9b535f45ff98336b94516ae740d61b3",
+  "sha256": "dfe4a11a94e8b1a861e843244bcc93f83ed3f20ac6be5252a47e9fb25e23fcff",
+  "duration": 16.907958333333333,
+  "beats": [
+    {
+      "text": "A long email may lose early content if it exceeds the model’s context window.",
+      "start": 0.0,
+      "end": 4.926
+    },
+    {
+      "text": "For example, a 500-word message with a 200-token limit only lets the model see the last 200 words.",
+      "start": 5.046,
+      "end": 12.778
+    },
+    {
+      "text": "This means the beginning is ignored, and the model can’t remember it.",
+      "start": 12.898,
+      "end": 16.907958333333333
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "name": "visualforge-renderer",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "remotion studio",
+    "render": "remotion render VisualForgeVideo generated/demo-with-voice.mp4",
+    "generate:audio": "..\\backend\\.venv\\Scripts\\python.exe ..\\backend\\scripts\\generate_audio.py",
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types --test tests/timeline.test.ts"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.529",
+    "d3-scale": "^4.0.2",
+    "d3-shape": "^3.2.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "remotion": "4.0.529"
+  },
+  "devDependencies": {
+    "@types/d3-scale": "^4.0.9",
+    "@types/d3-shape": "^3.2.0",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "typescript": "^5.9.3"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true
+  }
+}

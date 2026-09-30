@@ -1,0 +1,142 @@
+{
+  "title": "Tokens and Context Windows - Illustrated Story Preview",
+  "topic": "Tokens and Context Windows",
+  "scenes": [
+    {
+      "id": 1,
+      "headline": "Text must become model input",
+      "body": "A tokenizer converts text into a sequence.",
+      "narration": "Start with input text, such as a question typed into a chat box. A tokenizer converts that input text into tokens. The resulting sequence is the representation the model receives before further numerical processing. Text that looks simple to us can therefore occupy several positions in that sequence.",
+      "audio": "audio/1d36e59357e262c914845b9b939db4366d128508052aa5954db68416d3798931/scene-1.wav",
+      "duration": 19.375208333333333,
+      "beats": [
+        {
+          "text": "Start with input text, such as a question typed into a chat box.",
+          "start": 0.0,
+          "end": 4.084
+        },
+        {
+          "text": "A tokenizer converts that input text into tokens.",
+          "start": 4.204,
+          "end": 7.7872916666666665
+        },
+        {
+          "text": "The resulting sequence is the representation the model receives before further numerical processing.",
+          "start": 7.907291666666667,
+          "end": 14.199916666666667
+        },
+        {
+          "text": "Text that looks simple to us can therefore occupy several positions in that sequence.",
+          "start": 14.319916666666666,
+          "end": 19.375208333333333
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "headline": "Tokens are not always words",
+      "body": "The vocabulary determines the pieces.",
+      "narration": "Tokens can represent whole words, word pieces, or punctuation. Spaces may also be included in a token piece. The boundaries depend on the tokenizer and its vocabulary, so counting words is not the same as counting tokens. There is no single universal conversion that works for every sentence and language.",
+      "audio": "audio/37e1e228fd91a009073c0a96cbb25e070dc7c5281ab6ac5a0b6c2f75a6725560/scene-1.wav",
+      "duration": 19.498,
+      "beats": [
+        {
+          "text": "Tokens can represent whole words, word pieces, or punctuation.",
+          "start": 0.0,
+          "end": 4.094
+        },
+        {
+          "text": "Spaces may also be included in a token piece.",
+          "start": 4.214,
+          "end": 7.241333333333333
+        },
+        {
+          "text": "The boundaries depend on the tokenizer and its vocabulary, so counting words is not the same as counting tokens.",
+          "start": 7.3613333333333335,
+          "end": 14.430666666666667
+        },
+        {
+          "text": "There is no single universal conversion that works for every sentence and language.",
+          "start": 14.550666666666666,
+          "end": 19.498
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "headline": "The context window",
+      "body": "Available context is finite.",
+      "narration": "The context window is the bounded amount of sequence information available to the model during a request. Instructions, conversation history, and the current question can all occupy that space. Our diagram shows categories inside a boundary, not their measured sizes. Equal spacing here does not mean equal token counts.",
+      "audio": "audio/d31a825988a0e9be2469da156dcfa0eb8b7d5b7b07570f201f6467b36dff3533/scene-1.wav",
+      "duration": 20.301291666666668,
+      "beats": [
+        {
+          "text": "The context window is the bounded amount of sequence information available to the model during a request.",
+          "start": 0.0,
+          "end": 6.558666666666666
+        },
+        {
+          "text": "Instructions, conversation history, and the current question can all occupy that space.",
+          "start": 6.6786666666666665,
+          "end": 12.106666666666667
+        },
+        {
+          "text": "Our diagram shows categories inside a boundary, not their measured sizes.",
+          "start": 12.226666666666667,
+          "end": 16.769958333333335
+        },
+        {
+          "text": "Equal spacing here does not mean equal token counts.",
+          "start": 16.889958333333333,
+          "end": 20.301291666666668
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "headline": "What goes into a request?",
+      "body": "The application assembles the model input.",
+      "narration": "Instructions tell the model how to respond. Conversation history supplies earlier exchanges, and the current question adds the immediate task. The application packages these parts into model input. Extra formatting and special tokens can contribute to the total, so the visible chat text may not be the entire input.",
+      "audio": "audio/84462ec5c966df9e94b57ac22c4b4ff81d229d2cbe360661b9fab6c2db01e8c7/scene-1.wav",
+      "duration": 19.887291666666666,
+      "beats": [
+        {
+          "text": "Instructions tell the model how to respond.",
+          "start": 0.0,
+          "end": 2.580625
+        },
+        {
+          "text": "Conversation history supplies earlier exchanges, and the current question adds the immediate task.",
+          "start": 2.700625,
+          "end": 8.704625
+        },
+        {
+          "text": "The application packages these parts into model input.",
+          "start": 8.824625,
+          "end": 12.419291666666666
+        },
+        {
+          "text": "Extra formatting and special tokens can contribute to the total, so the visible chat text may not be the entire input.",
+          "start": 12.539291666666667,
+          "end": 19.887291666666666
+        }
+      ]
+    }
+  ],
+  "tts": {
+    "engine": "kokoro-onnx",
+    "version": "0.6.1",
+    "voice": "af_sarah",
+    "seed": 0
+  },
+  "cache": {
+    "generated_scene_ids": [
+      1,
+      2,
+      4
+    ],
+    "reused_scene_ids": [
+      3
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "key": "f244dc9a57c81100d5e8157ec36c485ff8cb5577e3c33da90012bb7e69bf2f75",
+  "sha256": "b8d28832fc22563608f938a67e44271bc7cf23bc5a1fc7d547ebcc43befbfba8",
+  "duration": 7.117291666666667,
+  "beats": [
+    {
+      "text": "Tool results.",
+      "start": 0.0,
+      "end": 1.1626666666666667
+    },
+    {
+      "text": "And the response the model is currently generating.",
+      "start": 1.2826666666666666,
+      "end": 4.267333333333333
+    },
+    {
+      "text": "All of this information can consume tokens.",
+      "start": 4.387333333333333,
+      "end": 7.117291666666667
+    }
+  ]
+}

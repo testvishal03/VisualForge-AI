@@ -1,0 +1,17 @@
+{
+  "key": "33097b00eab666e7927376539312b7c30ebef8471511d97671823bf80426036b",
+  "sha256": "4221376136b5dfe6f81159aecaa51752bca9dbd39ee2234785889f5b109c0c49",
+  "duration": 8.289333333333333,
+  "beats": [
+    {
+      "text": "Those tokens are converted into numerical representations and processed by the model.",
+      "start": 0.0,
+      "end": 5.428
+    },
+    {
+      "text": "Different models can use different tokenizers.",
+      "start": 5.548,
+      "end": 8.289333333333333
+    }
+  ]
+}

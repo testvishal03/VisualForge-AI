@@ -1,0 +1,56 @@
+{
+  "key": "505e52a9187e2ea4d33ccab9d6c9bb2ee9ed8f072b749e51ffddf974cb0f9577",
+  "input": "The sky is",
+  "tokens": [
+    {
+      "id": 785,
+      "piece": "The"
+    },
+    {
+      "id": 12884,
+      "piece": " sky"
+    },
+    {
+      "id": 374,
+      "piece": " is"
+    }
+  ],
+  "continuation": " blue, the grass is green, and the flowers are red",
+  "prefixes": [
+    " blue",
+    " blue,",
+    " blue, the",
+    " blue, the grass",
+    " blue, the grass is",
+    " blue, the grass is green",
+    " blue, the grass is green,",
+    " blue, the grass is green, and",
+    " blue, the grass is green, and the",
+    " blue, the grass is green, and the flowers",
+    " blue, the grass is green, and the flowers are",
+    " blue, the grass is green, and the flowers are red"
+  ],
+  "generated_ids": [
+    6303,
+    11,
+    279,
+    16359,
+    374,
+    6176,
+    11,
+    323,
+    279,
+    19281,
+    525,
+    2518
+  ],
+  "model": {
+    "model": "Qwen3-4B-Instruct-2507-Q4_K_M.gguf",
+    "sha256": "3605803b982cb64aead44f6c1b2ae36e3acdb41d8e46c8a94c6533bc4c67e597",
+    "runtime": "b11206",
+    "size": 2497281120,
+    "modified": 1790488074393292100
+  },
+  "mode": "raw_completion",
+  "seed": 42
+}

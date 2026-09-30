@@ -1,0 +1,17 @@
+{
+  "key": "4f7304d5f8e6cb0f2a978de41156382727ea532816ffbfac8e2866d3dbf865c0",
+  "sha256": "2d5e5dc26a078b28964a765cc90e2ca5069dfcebe28e2794802594b535db2963",
+  "duration": 11.739958333333334,
+  "beats": [
+    {
+      "text": "A computer consists of a processor, memory, and storage.",
+      "start": 0.0,
+      "end": 3.578
+    },
+    {
+      "text": "The processor carries out instructions, memory holds active work, and storage keeps files available after the power is turned off.",
+      "start": 3.698,
+      "end": 11.739958333333334
+    }
+  ]
+}

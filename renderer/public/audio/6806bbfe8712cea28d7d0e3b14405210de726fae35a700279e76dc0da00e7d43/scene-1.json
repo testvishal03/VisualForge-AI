@@ -1,0 +1,22 @@
+{
+  "key": "6806bbfe8712cea28d7d0e3b14405210de726fae35a700279e76dc0da00e7d43",
+  "sha256": "a1d5b590bbf77b7b94aac2b0c4470b357a5db1eed964cb185ae76f6e0bf2dbf8",
+  "duration": 19.273333333333333,
+  "beats": [
+    {
+      "text": "A tokenizer may represent a familiar phrase compactly while splitting unusual text into more tokens.",
+      "start": 0.0,
+      "end": 6.366666666666666
+    },
+    {
+      "text": "Code, numbers, punctuation, and different languages can behave differently.",
+      "start": 6.486666666666666,
+      "end": 10.824
+    },
+    {
+      "text": "When planning a request, measure its complete formatted input with the correct tokenizer rather than relying only on the visible word count.",
+      "start": 10.944,
+      "end": 19.273333333333333
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "key": "01ad3d18678d47962cbf7bf1406d60f31f90ddbf74d99e6ec571e24e09e4e365",
+  "sha256": "32d976cb9e70a7d61bb0db704d2ad4a7ce83fef4ff6f6f6fcfa748481dbf0b37",
+  "duration": 10.260625,
+  "beats": [
+    {
+      "text": "“Tell me about Python.” Then later you ask: “Who created it?” Because the earlier message is still available in the context, the model can understand that “it” refers to Python.",
+      "start": 0.0,
+      "end": 10.260625
+    }
+  ]
+}

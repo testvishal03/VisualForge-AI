@@ -1,0 +1,27 @@
+{
+  "key": "f3332b80d47f8f4bb18123363fda9555849f40d06e46d8bfc83b5f66891baaa0",
+  "sha256": "2c94ce401a500711cf6b00956f856a1509cda09bff9bf8e69fc2fe45a4aebbbd",
+  "duration": 15.971916666666667,
+  "beats": [
+    {
+      "text": "Consider a fictional school garden with a three year plan.",
+      "start": 0.0,
+      "end": 3.113958333333333
+    },
+    {
+      "text": "In 2020, students prepare soil and plant the first seeds.",
+      "start": 3.2339583333333333,
+      "end": 7.478583333333333
+    },
+    {
+      "text": "In 2021, they add beds for vegetables.",
+      "start": 7.598583333333333,
+      "end": 11.127916666666666
+    },
+    {
+      "text": "In 2022, they build a compost area to reuse plant material.",
+      "start": 11.247916666666667,
+      "end": 15.971916666666667
+    }
+  ]
+}

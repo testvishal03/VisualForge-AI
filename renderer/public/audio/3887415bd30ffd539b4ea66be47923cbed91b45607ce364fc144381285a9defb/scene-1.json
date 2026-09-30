@@ -1,0 +1,17 @@
+{
+  "key": "3887415bd30ffd539b4ea66be47923cbed91b45607ce364fc144381285a9defb",
+  "sha256": "186411f9c58cdfe155ae96c39594da18c98e4082d1a8c30966d70d97082623d2",
+  "duration": 8.746,
+  "beats": [
+    {
+      "text": "Tokens and context windows.",
+      "start": 0.0,
+      "end": 2.046
+    },
+    {
+      "text": "When you type a sentence into an AI chatbot, the model does not see that sentence exactly the way you do.",
+      "start": 2.166,
+      "end": 8.746
+    }
+  ]
+}

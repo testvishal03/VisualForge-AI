@@ -1,0 +1,37 @@
+{
+  "key": "5d842fc9d4e7e73798e2b7da1f2cde4187be1b96d9c05750564a86dca625bc98",
+  "sha256": "0c08b30b36c8fd71b3c1cb99dc236d1d02c5c2dbfff249fa27e310b5681ea9b7",
+  "duration": 22.495208333333334,
+  "beats": [
+    {
+      "text": "Now let’s make the idea even simpler.",
+      "start": 0.0,
+      "end": 2.324625
+    },
+    {
+      "text": "Imagine a library.",
+      "start": 2.444625,
+      "end": 3.9059583333333334
+    },
+    {
+      "text": "Traditional search says: Find books containing these exact words.",
+      "start": 4.0259583333333335,
+      "end": 8.217958333333334
+    },
+    {
+      "text": "Embedding search says: Find books that mean something similar to my question.",
+      "start": 8.337958333333333,
+      "end": 12.859916666666667
+    },
+    {
+      "text": "That difference is huge.",
+      "start": 12.979916666666666,
+      "end": 14.557875
+    },
+    {
+      "text": "And it is one of the reasons modern AI systems can search information much more intelligently than simple keyword matching.",
+      "start": 14.677875,
+      "end": 22.495208333333334
+    }
+  ]
+}

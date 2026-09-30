@@ -1,0 +1,47 @@
+{
+  "key": "e0e0f41184f457616a9cfc40dcdff7acef5aad0bb60b7da777e33234c2c6706a",
+  "sha256": "238dd54525e6c62561f7c9bf08fd4d3b4d9e6c07a6aa8cab30eb893ea92f22d7",
+  "duration": 11.431333333333333,
+  "beats": [
+    {
+      "text": "Text.",
+      "start": 0.0,
+      "end": 0.8853333333333333
+    },
+    {
+      "text": "Tokenizer.",
+      "start": 1.0053333333333334,
+      "end": 2.1153333333333335
+    },
+    {
+      "text": "Tokens.",
+      "start": 2.235333333333333,
+      "end": 3.2046666666666668
+    },
+    {
+      "text": "Context window.",
+      "start": 3.324666666666667,
+      "end": 4.648
+    },
+    {
+      "text": "Language model.",
+      "start": 4.768,
+      "end": 6.037333333333334
+    },
+    {
+      "text": "Generated tokens.",
+      "start": 6.157333333333334,
+      "end": 7.63
+    },
+    {
+      "text": "Text response.",
+      "start": 7.75,
+      "end": 9.039333333333333
+    },
+    {
+      "text": "Now we have one more important question.",
+      "start": 9.159333333333333,
+      "end": 11.431333333333333
+    }
+  ]
+}

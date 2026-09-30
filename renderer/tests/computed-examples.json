@@ -1,0 +1,527 @@
+[
+  {
+    "id": 1,
+    "headline": "Example",
+    "body": "Computed result",
+    "narration": "A computed example demonstrates each operation.",
+    "duration": 10,
+    "audio": "audio/scene-1.wav",
+    "beats": [
+      {
+        "text": "A computed example demonstrates each operation.",
+        "start": 0,
+        "end": 10
+      }
+    ],
+    "demonstration": {
+      "spec": {
+        "kind": "python_variables",
+        "values": [
+          12,
+          25,
+          8
+        ],
+        "threshold": 15,
+        "sentence": 0
+      },
+      "provenance": "computed_example",
+      "steps": [
+        {
+          "line": 1,
+          "variables": {
+            "count": 12
+          },
+          "output": []
+        },
+        {
+          "line": 2,
+          "variables": {
+            "count": 37
+          },
+          "output": []
+        },
+        {
+          "line": 3,
+          "variables": {
+            "count": 37
+          },
+          "output": [
+            "37"
+          ]
+        }
+      ],
+      "code": [
+        "count = 12",
+        "count = count + 25",
+        "print(count)"
+      ],
+      "output": [
+        "37"
+      ],
+      "engine": "CPython fixed template",
+      "at": [
+        0.0,
+        0.5,
+        1.0
+      ]
+    }
+  },
+  {
+    "id": 2,
+    "headline": "Example",
+    "body": "Computed result",
+    "narration": "A computed example demonstrates each operation.",
+    "duration": 10,
+    "audio": "audio/scene-1.wav",
+    "beats": [
+      {
+        "text": "A computed example demonstrates each operation.",
+        "start": 0,
+        "end": 10
+      }
+    ],
+    "demonstration": {
+      "spec": {
+        "kind": "python_condition",
+        "values": [
+          12,
+          25,
+          8
+        ],
+        "threshold": 15,
+        "sentence": 0
+      },
+      "provenance": "computed_example",
+      "steps": [
+        {
+          "line": 1,
+          "variables": {
+            "score": 12
+          },
+          "output": []
+        },
+        {
+          "line": 2,
+          "variables": {
+            "score": 12
+          },
+          "output": []
+        },
+        {
+          "line": 5,
+          "variables": {
+            "score": 12,
+            "passed": false
+          },
+          "output": []
+        },
+        {
+          "line": 6,
+          "variables": {
+            "score": 12,
+            "passed": false
+          },
+          "output": [
+            "False"
+          ]
+        }
+      ],
+      "code": [
+        "score = 12",
+        "if score >= 15:",
+        "    passed = True",
+        "else:",
+        "    passed = False",
+        "print(passed)"
+      ],
+      "output": [
+        "False"
+      ],
+      "engine": "CPython fixed template",
+      "at": [
+        0.0,
+        0.5,
+        1.0,
+        1.5
+      ]
+    }
+  },
+  {
+    "id": 3,
+    "headline": "Example",
+    "body": "Computed result",
+    "narration": "A computed example demonstrates each operation.",
+    "duration": 10,
+    "audio": "audio/scene-1.wav",
+    "beats": [
+      {
+        "text": "A computed example demonstrates each operation.",
+        "start": 0,
+        "end": 10
+      }
+    ],
+    "demonstration": {
+      "spec": {
+        "kind": "python_loop",
+        "values": [
+          12,
+          25,
+          8
+        ],
+        "threshold": 15,
+        "sentence": 0
+      },
+      "provenance": "computed_example",
+      "steps": [
+        {
+          "line": 1,
+          "variables": {
+            "total": 0
+          },
+          "output": []
+        },
+        {
+          "line": 2,
+          "variables": {
+            "total": 0,
+            "amount": 12
+          },
+          "output": []
+        },
+        {
+          "line": 3,
+          "variables": {
+            "total": 12,
+            "amount": 12
+          },
+          "output": []
+        },
+        {
+          "line": 2,
+          "variables": {
+            "total": 12,
+            "amount": 25
+          },
+          "output": []
+        },
+        {
+          "line": 3,
+          "variables": {
+            "total": 37,
+            "amount": 25
+          },
+          "output": []
+        },
+        {
+          "line": 2,
+          "variables": {
+            "total": 37,
+            "amount": 8
+          },
+          "output": []
+        },
+        {
+          "line": 3,
+          "variables": {
+            "total": 45,
+            "amount": 8
+          },
+          "output": []
+        },
+        {
+          "line": 4,
+          "variables": {
+            "total": 45,
+            "amount": 8
+          },
+          "output": [
+            "45"
+          ]
+        }
+      ],
+      "code": [
+        "total = 0",
+        "for amount in [12, 25, 8]:",
+        "    total += amount",
+        "print(total)"
+      ],
+      "output": [
+        "45"
+      ],
+      "engine": "CPython fixed template",
+      "at": [
+        0.0,
+        0.5,
+        1.0,
+        1.5,
+        2.0,
+        2.5,
+        3.0,
+        3.5
+      ]
+    }
+  },
+  {
+    "id": 4,
+    "headline": "Example",
+    "body": "Computed result",
+    "narration": "A computed example demonstrates each operation.",
+    "duration": 10,
+    "audio": "audio/scene-1.wav",
+    "beats": [
+      {
+        "text": "A computed example demonstrates each operation.",
+        "start": 0,
+        "end": 10
+      }
+    ],
+    "demonstration": {
+      "spec": {
+        "kind": "sql_filter",
+        "values": [
+          12,
+          25,
+          8
+        ],
+        "threshold": 15,
+        "sentence": 0
+      },
+      "provenance": "computed_example",
+      "steps": [
+        {
+          "line": 3,
+          "order_id": 1,
+          "customer_id": null,
+          "rows": [],
+          "matched": false
+        },
+        {
+          "line": 3,
+          "order_id": 2,
+          "customer_id": null,
+          "rows": [
+            [
+              2,
+              25
+            ]
+          ],
+          "matched": true
+        },
+        {
+          "line": 3,
+          "order_id": 3,
+          "customer_id": null,
+          "rows": [
+            [
+              2,
+              25
+            ]
+          ],
+          "matched": false
+        }
+      ],
+      "code": [
+        "SELECT id, amount",
+        "FROM orders",
+        "WHERE amount >= 15",
+        "ORDER BY id;"
+      ],
+      "orders": [
+        [
+          1,
+          1,
+          12
+        ],
+        [
+          2,
+          2,
+          25
+        ],
+        [
+          3,
+          1,
+          8
+        ]
+      ],
+      "customers": [
+        [
+          1,
+          "Alice"
+        ],
+        [
+          2,
+          "Bob"
+        ],
+        [
+          3,
+          "Cara"
+        ]
+      ],
+      "columns": [
+        "id",
+        "amount"
+      ],
+      "rows": [
+        [
+          2,
+          25
+        ]
+      ],
+      "engine": "SQLite in-memory SELECT",
+      "at": [
+        0.0,
+        0.5,
+        1.0
+      ]
+    }
+  },
+  {
+    "id": 5,
+    "headline": "Example",
+    "body": "Computed result",
+    "narration": "A computed example demonstrates each operation.",
+    "duration": 10,
+    "audio": "audio/scene-1.wav",
+    "beats": [
+      {
+        "text": "A computed example demonstrates each operation.",
+        "start": 0,
+        "end": 10
+      }
+    ],
+    "demonstration": {
+      "spec": {
+        "kind": "sql_join",
+        "values": [
+          12,
+          25,
+          8
+        ],
+        "threshold": 15,
+        "sentence": 0
+      },
+      "provenance": "computed_example",
+      "steps": [
+        {
+          "line": 3,
+          "order_id": 1,
+          "customer_id": 1,
+          "rows": [
+            [
+              1,
+              "Alice",
+              12
+            ]
+          ],
+          "matched": true
+        },
+        {
+          "line": 3,
+          "order_id": 2,
+          "customer_id": 2,
+          "rows": [
+            [
+              1,
+              "Alice",
+              12
+            ],
+            [
+              2,
+              "Bob",
+              25
+            ]
+          ],
+          "matched": true
+        },
+        {
+          "line": 3,
+          "order_id": 3,
+          "customer_id": 1,
+          "rows": [
+            [
+              1,
+              "Alice",
+              12
+            ],
+            [
+              2,
+              "Bob",
+              25
+            ],
+            [
+              3,
+              "Alice",
+              8
+            ]
+          ],
+          "matched": true
+        }
+      ],
+      "code": [
+        "SELECT orders.id, customers.name, orders.amount",
+        "FROM orders INNER JOIN customers",
+        "ON orders.customer_id = customers.id",
+        "ORDER BY orders.id;"
+      ],
+      "orders": [
+        [
+          1,
+          1,
+          12
+        ],
+        [
+          2,
+          2,
+          25
+        ],
+        [
+          3,
+          1,
+          8
+        ]
+      ],
+      "customers": [
+        [
+          1,
+          "Alice"
+        ],
+        [
+          2,
+          "Bob"
+        ],
+        [
+          3,
+          "Cara"
+        ]
+      ],
+      "columns": [
+        "id",
+        "name",
+        "amount"
+      ],
+      "rows": [
+        [
+          1,
+          "Alice",
+          12
+        ],
+        [
+          2,
+          "Bob",
+          25
+        ],
+        [
+          3,
+          "Alice",
+          8
+        ]
+      ],
+      "engine": "SQLite in-memory SELECT",
+      "at": [
+        0.0,
+        0.5,
+        1.0
+      ]
+    }
+  }
+]

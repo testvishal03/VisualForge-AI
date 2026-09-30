@@ -1,0 +1,17 @@
+{
+  "key": "5874b469f413fd3fc6b94ae28353c23dd8c4cfbcd3816443ffc354d7af11f51d",
+  "sha256": "2510711e8f4e0499f8129fccf09ed7d409124ed742a15139ac7a20c50ae002b2",
+  "duration": 6.88,
+  "beats": [
+    {
+      "text": "The application may select only the most relevant information.",
+      "start": 0.0,
+      "end": 3.8493333333333335
+    },
+    {
+      "text": "Or the request may simply be too large and fail.",
+      "start": 3.969333333333333,
+      "end": 6.88
+    }
+  ]
+}

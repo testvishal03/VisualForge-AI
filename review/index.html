@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>VisualForge - Video studio</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script src="/app.js" defer></script>
+    <script src="/storyboard.js" defer></script>
+    <script src="/progress.js" defer></script>
+    <script src="/creator.js" defer></script>
+    <script src="/episode-review.js" defer></script>
+    <link rel="stylesheet" href="/creator.css" />
+  </head>
+  <body class="simple-mode is-loading">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brandmark">V<span>F</span></span
+        >VisualForge <span class="brand-sub">VIDEO STUDIO</span>
+      </div>
+      <span class="local"
+        ><i></i> <span id="model-status">Local workspace</span></span
+      >
+      <button id="creator-current" class="secondary" hidden>Return to generation</button>
+    </header>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="section-label">YOUR WORKSPACES</div>
+        <button id="new-space" class="secondary wide">
+          &#43; New workspace</button
+        ><button id="new-project" class="primary wide">＋ New video</button>
+        <nav id="projects" aria-label="Workspaces"></nav>
+        <button id="show-trash" class="text-button">Trash</button>
+        <div class="sidebar-bottom">
+          <span class="section-label">CONTINUE EXISTING WORK</span
+          ><label for="runs">Saved pipeline runs</label
+          ><select id="runs"></select
+          ><button id="import" class="secondary wide">
+            Open an editable copy
+          </button>
+          <p>Your original videos stay unchanged.</p>
+        </div>
+      </aside>
+      <main>
+        <div id="message" role="alert" hidden></div>
+        <div id="creator-loading" role="status"><strong>Opening your studio...</strong><p>Restoring your saved projects.</p></div>
+        <section id="job-panel" hidden aria-live="polite">
+          <div class="job-card">
+            <div class="job-card-header">
+              <div class="job-status-badge">
+                <span class="status-pulse"></span>
+                <strong id="job-title">Generating Video</strong>
+              </div>
+              <span id="job-phase" class="job-phase-tag">In progress...</span>
+              <button id="cancel" class="cancel-btn">Cancel task</button>
+            </div>
+
+            <div class="pipeline-stepper">
+              <div class="step-node active" id="step-script">
+                <span class="step-num">1</span
+                ><span class="step-label">Script & Outline</span>
+              </div>
+              <div class="step-line" id="line-1"></div>
+              <div class="step-node" id="step-quality">
+                <span class="step-num">2</span
+                ><span class="step-label">Editorial Checks</span>
+              </div>
+              <div class="step-line" id="line-2"></div>
+              <div class="step-node" id="step-audio">
+                <span class="step-num">3</span
+                ><span class="step-label">Voice Narration</span>
+              </div>
+              <div class="step-line" id="line-3"></div>
+              <div class="step-node" id="step-visuals">
+                <span class="step-num">4</span
+                ><span class="step-label">Visual Diagrams</span>
+              </div>
+              <div class="step-line" id="line-4"></div>
+              <div class="step-node" id="step-render">
+                <span class="step-num">5</span
+                ><span class="step-label">Video Render</span>
+              </div>
+            </div>
+
+            <div class="progress-bar-wrap">
+              <div id="job-progress-bar" class="progress-bar-fill"></div>
+            </div>
+            <div class="progress-meta">
+              <span id="job-result" class="job-result-text"
+                >Initializing local engine...</span
+              >
+              <span id="job-pct-text" class="job-pct">0%</span>
+            </div>
+
+            <details class="tech-log-details">
+              <summary>Technical Logs & Decode Metrics</summary>
+              <pre id="job-log"></pre>
+            </details>
+          </div>
+        </section>
+
+        <section id="welcome" class="creator-home">
+          <div class="creator-heading"><div class="eyebrow">YOUR IDEA. A VIDEO.</div><h1>What will you explain next?</h1><p>Create a lesson, preview its visuals, and refine it until you are happy.</p></div>
+          <div class="creator-compose">
+            <div class="creator-tabs" role="group" aria-label="Video input type"><button class="mode-tab active" data-mode="prompt" aria-pressed="true">Describe an idea</button><button class="mode-tab" data-mode="script" aria-pressed="false">Paste a script</button></div>
+            <div id="studio-prompt-group"><label for="studio-topic">Your video idea</label><textarea id="studio-topic" rows="6" maxlength="500" placeholder="Explain how large language models work, with a simple example of tokens, context, and predicting the next word."></textarea><div class="input-foot"><span>Include the audience and what they should learn.</span><span><span id="prompt-char-count">0</span>/500</span></div><div class="creator-suggestions"><button class="prompt-chip" data-prompt="Explain how large language models work for beginners, using a concrete example.">How LLMs work</button><button class="prompt-chip" data-prompt="Explain the water cycle through the journey of one drop of water.">The water cycle</button><button class="prompt-chip" data-prompt="Explain binary search with a step-by-step example for beginners.">Binary search</button></div></div>
+            <div id="studio-script-group" hidden><label for="studio-title">Video title <span class="helper">(optional)</span></label><input id="studio-title" maxlength="120" placeholder="AI can name your video"><div class="script-heading"><label for="studio-script">Your narration script</label><label class="file-picker">Load .txt<input type="file" id="studio-script-file" accept=".txt,.md,.text,text/plain"></label></div><textarea id="studio-script" rows="8" placeholder="Paste the words you want narrated. Separate teaching points with blank lines."></textarea><p id="script-stats" class="helper">Your narration is preserved. Long scripts become chapters automatically.</p></div>
+            <div class="auto-length"><span class="auto-spark" aria-hidden="true">&#10022;</span><div><strong>Automatic video length</strong><p id="auto-length-note">AI chooses a target length from the scope of your idea. No duration setting needed.</p></div><span class="auto-badge">AUTO</span></div>
+            <details class="creator-options" open><summary>Save location & quality</summary><div class="creator-options-grid"><label>Video quality<select id="studio-profile"><option value="draft">720p - Faster generation</option><option value="final">1080p - Final quality</option></select></label><label>Save to<select id="studio-workspace"><option value="">New single-video workspace</option></select></label></div></details>
+            <div id="playlist-suggestion" class="helper" hidden><span id="playlist-next-label"></span> <button id="playlist-use-next" class="secondary" type="button">Use suggested topic</button></div><div class="creator-submit"><p>Generated locally on your laptop.<br>Longer videos take more time to create.</p><button id="studio-generate-btn" class="primary">Prepare script <span aria-hidden="true">&rarr;</span></button></div>
+          </div>
+          <div class="creator-how"><span><b>01</b> Share your idea</span><span><b>02</b> Review & approve script</span><span><b>03</b> Generate, watch & download</span></div>
+        </section>
+        <section id="creator-result" hidden aria-label="Your generated video">
+          <div class="result-heading"><div><div class="eyebrow" id="creator-eyebrow">YOUR VIDEO</div><h1 id="creator-title"></h1><p id="creator-duration"></p></div><button id="creator-new" class="secondary">New video</button></div>
+          <div id="creator-progress" class="creator-progress" hidden aria-live="polite"><div class="progress-heading"><div><strong id="creator-phase">Preparing your video</strong><p id="creator-detail"></p></div><strong id="creator-percent">0%</strong></div><div id="creator-meter" role="progressbar" aria-label="Estimated video generation progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="creator-fill"></div></div><ol id="creator-stages"><li>Plan</li><li>Script</li><li>Visuals</li><li>Voice</li><li>Render</li><li>Check</li></ol><div class="progress-bottom"><span id="creator-elapsed">Estimated progress ? preparing</span><button id="creator-cancel" class="text-button">Cancel generation</button></div></div>
+          <details id="script-review" class="script-review" hidden open><summary>Script &amp; visual plan</summary><p id="script-review-summary"></p><p>Edit the narration, review the planned demonstrations, then preview or render.</p><div id="script-review-fields"></div><details class="visual-plan-details"><summary>Scene-by-scene visual plan</summary><div id="visual-plan-list"></div></details><button id="visual-preview-btn" class="secondary">Preview visuals</button><div id="visual-preview-area" hidden><p>Preview excerpts with complete scene narration; may skip between sections</p><video id="visual-preview-player" controls preload="metadata"></video></div><div class="result-actions"><button id="script-save" class="secondary">Save script edits</button><button id="script-expand" class="secondary" hidden>Request expanded draft</button><button id="script-approve" class="primary">Approve &amp; render video</button></div><p class="helper">Duration follows your narration. There is no minimum video length and no silence added to meet a target.</p></details><div id="creator-player-shell" class="creator-player-shell"><div id="creator-placeholder"><span aria-hidden="true">&#9655;</span><h2 id="creator-placeholder-title">Your video is taking shape</h2><p id="creator-placeholder-note">You can leave this page open while the local engine works.</p></div><video id="creator-player" controls playsinline preload="metadata" hidden aria-label="Generated video"></video></div>
+          <div id="creator-error" role="alert" hidden><p>The video could not finish. Your project is saved. Retry generation, or open the editor to adjust the content.</p><details><summary>Error details</summary><pre id="creator-error-detail"></pre></details></div><div class="result-actions"><button id="creator-finish" class="primary" hidden>Mark finished &amp; unlock next topic</button><button id="creator-revise" class="secondary" hidden>Revise this video</button><a id="creator-download" class="primary" download="visualforge.mp4" hidden>Download video</a><button id="creator-retry" class="primary" hidden>Retry generation</button><button id="creator-edit" class="secondary">Edit video</button><button id="creator-back" class="secondary" hidden>Back to video</button></div><p class="helper" id="creator-footnote">Your playlist advances only when you mark this video finished. This does not publish it to YouTube.</p><details class="creator-more"><summary>More options</summary><button id="creator-settings" class="secondary">Workspace settings</button><button id="creator-delete" class="danger">Permanently delete this video</button></details>
+        </section>
+        <section id="space-bar" hidden>
+          <div>
+            <div class="eyebrow" id="space-kind"></div>
+            <h2 id="space-name"></h2>
+            <p id="space-description" class="helper"></p>
+          </div>
+          <div class="space-actions">
+            <button id="edit-space" class="secondary">Workspace settings</button
+            ><button id="duplicate-space" class="secondary">Duplicate</button
+            ><button id="trash-space" class="secondary">Move to Trash</button>
+          </div>
+          <div id="episodes"></div>
+        </section>
+        <section id="long-workspace" hidden></section>
+        <section id="workspace" hidden>
+          <div class="project-heading">
+            <div>
+              <div class="eyebrow">STORYBOARD / REVIEW</div>
+              <input
+                id="video-title"
+                aria-label="Video title"
+                maxlength="120"
+              />
+              <p id="topic"></p>
+              <p id="duration-note" class="helper"></p>
+            </div>
+            <div class="project-actions">
+              <span id="save-state">Saved</span
+              ><button id="save" class="secondary">Save changes</button
+              ><button id="draft-render" class="secondary">720p draft</button
+              ><button id="render" class="primary">Export 1080p &#8599;</button>
+            </div>
+          </div>
+          <div id="draft-empty" hidden>
+            <h2 id="draft-empty-title">Your draft is on its way.</h2>
+            <p id="draft-empty-note">
+              Local generation can take several minutes. Progress appears below.
+            </p>
+            <button id="retry-draft" class="secondary">
+              Retry draft generation
+            </button>
+          </div>
+          <section id="storyboard-review"></section>
+          <div id="editor-grid" class="editor-grid">
+            <aside class="scene-panel">
+              <div class="scene-panel-heading">
+                <span class="section-label">SCENES</span
+                ><span id="scene-count"></span>
+              </div>
+              <div id="scenes"></div>
+              <button id="all-audio" class="text-button">
+                Prepare all narration
+              </button>
+            </aside>
+            <div class="scene-editor">
+              <div class="scene-toolbar">
+                <span id="scene-number" class="eyebrow"></span>
+                <div>
+                  <button
+                    id="move-up"
+                    class="icon-button"
+                    aria-label="Move scene up"
+                  >
+                    ↑</button
+                  ><button
+                    id="move-down"
+                    class="icon-button"
+                    aria-label="Move scene down"
+                  >
+                    ↓
+                  </button>
+                </div>
+              </div>
+              <label for="headline">Scene title</label
+              ><input id="headline" maxlength="80" />
+              <label for="body"
+                >On-screen explanation <span>Keep it concise</span></label
+              ><textarea id="body" rows="3" maxlength="180"></textarea>
+              <div class="field-heading">
+                <label for="narration">Narration</label
+                ><span id="word-count"></span>
+              </div>
+              <textarea id="narration" rows="7" maxlength="600"></textarea>
+              <div class="narration-footer">
+                <span>15–60 words · complete sentences</span
+                ><button id="audio" class="text-button">
+                  Generate scene audio
+                </button>
+              </div>
+              <audio id="audio-player" controls preload="none" hidden></audio>
+              <p id="audio-note" class="helper"></p>
+              <div class="divider"></div>
+              <label for="layout">Visual layout</label
+              ><select id="layout">
+                <option value="title">Title card</option>
+                <option value="explanation">Explanation</option>
+                <option value="process">Three-step process</option>
+                <option value="comparison">Comparison</option>
+                <option value="example">Example</option>
+                <option value="takeaway">Key takeaway</option>
+                <option value="relationship">Connected relationship</option>
+                <option value="cycle">Repeating cycle</option>
+                <option value="timeline">Timeline</option>
+                <option value="components">System parts</option>
+                <option value="chart">Percentage chart</option>
+                <option value="water_cycle">Water cycle illustration</option>
+                <option value="neural_net">Neural network diagram</option>
+                <option value="code">Code / algorithm block</option>
+                <option value="stat_card">Key metrics / stat cards</option>
+                <option value="quote">Quote card</option>
+                <option value="analogy">Analogy comparison</option></select
+              ><label for="composition">Composition</label
+              ><select id="composition">
+                <option value="0">Composition A</option>
+                <option value="1">Composition B</option></select
+              ><button id="replan" class="text-button">
+                Replan visuals for this scene
+              </button>
+              <div id="visual-items"></div>
+              <p id="direction-note" class="helper"></p>
+              <details class="regenerate">
+                <summary>Refine this scene with the local model</summary>
+                <label for="instructions">What should improve?</label
+                ><textarea id="instructions" rows="2" maxlength="1000">
+Make the explanation concrete and concise. Avoid hype.</textarea
+                ><button id="regenerate" class="secondary">
+                  Regenerate this scene
+                </button>
+                <p class="helper">
+                  Other scenes are preserved. Automatic projects replan visuals
+                  from the revised narration.
+                </p>
+              </details>
+            </div>
+            <aside class="preview-panel">
+              <div class="preview-heading">
+                <span class="section-label">SCENE PREVIEW</span
+                ><button id="preview" class="text-button">
+                  Render exact frame ↗
+                </button>
+              </div>
+              <div id="layout-sketch" class="layout-sketch"></div>
+              <img
+                id="exact-preview"
+                alt="Actual Remotion scene preview"
+                hidden
+              />
+              <p id="preview-note" class="helper">
+                Live layout sketch. Render an exact frame to check the final
+                design.
+              </p>
+              <div class="quality-box">
+                <div class="section-label">EDITORIAL CHECKS</div>
+                <div id="quality"></div>
+                <p class="helper">
+                  Checks help with structure and wording. They do not verify
+                  facts.
+                </p>
+              </div>
+              <div id="draft-result" hidden>
+                <div class="section-label">720P DRAFT</div>
+                <video id="draft-video" controls preload="metadata"></video
+                ><a
+                  id="draft-download"
+                  class="secondary"
+                  download="visualforge-draft.mp4"
+                  >Download draft &#8595;</a
+                >
+              </div>
+              <div id="final-result" hidden>
+                <div class="section-label">CHECKED VIDEO</div>
+                <video id="final-video" controls preload="metadata"></video
+                ><a id="download" class="secondary" download="visualforge.mp4"
+                  >Download MP4 ↓</a
+                >
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <footer>
+          Built locally. Your draft, narration, and video stay on this computer.
+        </footer>
+      </main>
+    </div>
+    <dialog id="new-dialog">
+      <form id="create-form">
+        <div class="eyebrow">ONE INPUT. A COMPLETE VIDEO.</div>
+        <h2>What would you like to explain?</h2>
+        <label for="new-workspace">Workspace</label
+        ><select id="new-workspace"></select
+        ><label for="input-mode">Start from</label
+        ><select id="input-mode">
+          <option value="prompt">A prompt or idea</option>
+          <option value="script">My written script</option>
+          <option value="long">Long video with chapters (7-30 min)</option>
+        </select>
+        <div id="script-title-field" hidden>
+          <label for="new-title">Video title (optional)</label
+          ><input
+            id="new-title"
+            maxlength="120"
+            placeholder="How a library works"
+          />
+        </div>
+        <label for="new-topic" id="input-label">Your prompt</label
+        ><textarea
+          id="new-topic"
+          required
+          rows="5"
+          maxlength="500"
+          placeholder="Explain how a library works for beginners, with a borrowing example."
+        ></textarea>
+        <div id="duration-field">
+          <label for="new-duration">Approximate target length</label
+          ><select id="new-duration">
+            <option value="0.5">30 seconds</option>
+            <option value="1" selected>1 minute</option>
+            <option value="2">2 minutes</option>
+            <option value="3">3 minutes</option>
+          </select>
+        </div>
+        <label for="new-profile">First export</label
+        ><select id="new-profile">
+          <option value="draft">720p draft - review first</option>
+          <option value="final">1080p final</option>
+        </select>
+        <p id="input-help" class="helper">
+          The local model writes the script. Visuals, narration, sentence-timed
+          reveals, transitions, and MP4 rendering follow automatically. CPU
+          generation can take several minutes.
+        </p>
+        <div class="dialog-actions">
+          <button type="button" id="close-dialog" class="secondary">
+            Cancel</button
+          ><button type="submit" id="create-submit" class="primary">
+            Generate video &rarr;
+          </button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="space-dialog">
+      <form id="space-form">
+        <div class="eyebrow">YOUR CHANNEL, ORGANIZED</div>
+        <h2 id="space-dialog-title">New workspace</h2><details><summary>Playlist topic sequence</summary><button id="playlist-preset" type="button" class="secondary">Use Generative AI Visualized preset</button><label>Topics in order (one per line)<textarea id="space-topics" rows="7"></textarea></label><label>Current topic (optional)<select id="space-current-topic"></select></label><p class="helper">Next suggestions follow this sequence and existing episodes. This does not mark any video as published to YouTube.</p></details>
+        <label for="space-title">Name</label
+        ><input id="space-title" required maxlength="120" /><label
+          for="space-type"
+          >Workspace type</label
+        ><select id="space-type">
+          <option value="single">One video</option>
+          <option value="series">Series / local playlist</option></select
+        ><label for="space-theme">Visual theme</label
+        ><select id="space-theme">
+          <option value="ocean">Ocean - teal and navy</option>
+          <option value="forest">Forest - green and sage</option>
+          <option value="sunset">Sunset - peach and plum</option></select
+        ><label for="space-brand">Channel label</label
+        ><input
+          id="space-brand"
+          required
+          maxlength="48"
+          value="VISUALFORGE / LEARN"
+        /><label for="space-audience">Audience for new scripts</label
+        ><input
+          id="space-audience"
+          required
+          maxlength="160"
+          value="beginners"
+        />
+        <p class="helper">
+          Shared narration voice: Kokoro Sarah (English). Theme and channel
+          label apply to every episode; changing them requires a new render.
+          Your scripts stay editable.
+        </p>
+        <div class="dialog-actions">
+          <button type="button" id="close-space" class="secondary">
+            Cancel</button
+          ><button class="primary">Save workspace</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="trash-dialog">
+      <h2>Workspace Trash</h2>
+      <p class="helper">
+        Videos and edits are retained. Restore a workspace to continue.
+      </p>
+      <div id="trash-list"></div>
+      <button id="close-trash" class="secondary">Close</button>
+    </dialog>
+  </body>
+</html>

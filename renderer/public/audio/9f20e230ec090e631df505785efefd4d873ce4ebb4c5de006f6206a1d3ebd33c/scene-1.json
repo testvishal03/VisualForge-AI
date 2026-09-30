@@ -1,0 +1,27 @@
+{
+  "key": "9f20e230ec090e631df505785efefd4d873ce4ebb4c5de006f6206a1d3ebd33c",
+  "sha256": "a3620f57fbf9b4fa65aa0f6866b71a9d70a690cb22cadcdebe3556d210e055f2",
+  "duration": 16.778625,
+  "beats": [
+    {
+      "text": "High, thin clouds like cirrus have tiny droplets that don’t fall.",
+      "start": 0.0,
+      "end": 4.0099583333333335
+    },
+    {
+      "text": "In contrast, thick, warm cumulonimbus clouds form heavy rain.",
+      "start": 4.129958333333334,
+      "end": 8.305291666666667
+    },
+    {
+      "text": "Drizzle happens in cooler, layered clouds.",
+      "start": 8.425291666666666,
+      "end": 10.995958333333334
+    },
+    {
+      "text": "Heavy downpours come from towering, warm clouds where droplets grow fast and fall quickly.",
+      "start": 11.115958333333333,
+      "end": 16.778625
+    }
+  ]
+}

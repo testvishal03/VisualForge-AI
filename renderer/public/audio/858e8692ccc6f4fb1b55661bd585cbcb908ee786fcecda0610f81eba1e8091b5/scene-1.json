@@ -1,0 +1,27 @@
+{
+  "key": "858e8692ccc6f4fb1b55661bd585cbcb908ee786fcecda0610f81eba1e8091b5",
+  "sha256": "f575698903075cabe5c415c974dcb329ee3ed6efd53d03a9913b45d994c65a02",
+  "duration": 15.788666666666666,
+  "beats": [
+    {
+      "text": "First, water vapor rises and cools in clouds.",
+      "start": 0.0,
+      "end": 3.06
+    },
+    {
+      "text": "Next, it condenses into tiny droplets that cluster together.",
+      "start": 3.18,
+      "end": 7.050666666666666
+    },
+    {
+      "text": "Finally, these droplets grow large enough to fall as rain.",
+      "start": 7.1706666666666665,
+      "end": 10.721333333333334
+    },
+    {
+      "text": "Whereas drizzle comes from small clusters, heavy rain forms in thick, dense clouds.",
+      "start": 10.841333333333333,
+      "end": 15.788666666666666
+    }
+  ]
+}

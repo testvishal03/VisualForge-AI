@@ -1,0 +1,27 @@
+{
+  "key": "5824bf7346aa4d58f87f7df58f723c925643b9eecd6502946db4aaf27708f678",
+  "sha256": "9607fc87741c162f7ebb90fdd2812c158ec533e67af3af436f02915891fa21d5",
+  "duration": 16.589333333333332,
+  "beats": [
+    {
+      "text": "The important point is not the individual numbers.",
+      "start": 0.0,
+      "end": 3.134
+    },
+    {
+      "text": "The important point is where that vector is positioned relative to other vectors.",
+      "start": 3.254,
+      "end": 8.030666666666667
+    },
+    {
+      "text": "Think of embeddings as points in a huge mathematical space.",
+      "start": 8.150666666666666,
+      "end": 11.829333333333333
+    },
+    {
+      "text": "If two concepts are similar in meaning, their vectors tend to be closer together.",
+      "start": 11.949333333333334,
+      "end": 16.589333333333332
+    }
+  ]
+}

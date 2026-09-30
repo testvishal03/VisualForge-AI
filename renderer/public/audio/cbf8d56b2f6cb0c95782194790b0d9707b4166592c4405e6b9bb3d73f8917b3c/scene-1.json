@@ -1,0 +1,17 @@
+{
+  "key": "cbf8d56b2f6cb0c95782194790b0d9707b4166592c4405e6b9bb3d73f8917b3c",
+  "sha256": "cc5326da6198af0dec9e6099c0bebcb400c1d2ec5a0fa418a0cb2ea416efcb40",
+  "duration": 10.241958333333333,
+  "beats": [
+    {
+      "text": "This leads to another important idea: More context is not always better.",
+      "start": 0.0,
+      "end": 4.810666666666667
+    },
+    {
+      "text": "Relevant context is often more useful than simply adding huge amounts of information.",
+      "start": 4.930666666666666,
+      "end": 10.241958333333333
+    }
+  ]
+}

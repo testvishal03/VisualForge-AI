@@ -1,0 +1,32 @@
+{
+  "key": "0a034e9801ac9698ee376d6f494e8120a3920a1b95f4e393e59ab78c6da05fc4",
+  "sha256": "dbd785dea93d25efc8455cc2691417853dec84dd9f2edb97e00d3b8cebfd8ac2",
+  "duration": 18.913291666666666,
+  "beats": [
+    {
+      "text": "First, water moves from soil to plant roots.",
+      "start": 0.0,
+      "end": 2.707333333333333
+    },
+    {
+      "text": "Next, it travels up through stems to leaves.",
+      "start": 2.8273333333333333,
+      "end": 5.416666666666667
+    },
+    {
+      "text": "Finally, water evaporates from leaf surfaces into the air.",
+      "start": 5.536666666666667,
+      "end": 9.077291666666667
+    },
+    {
+      "text": "Whereas evaporation comes from soil and surfaces, transpiration is water lost through plant leaves.",
+      "start": 9.197291666666667,
+      "end": 15.275291666666666
+    },
+    {
+      "text": "Both add moisture to the atmosphere, helping clouds form.",
+      "start": 15.395291666666667,
+      "end": 18.913291666666666
+    }
+  ]
+}

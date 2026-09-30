@@ -1,0 +1,17 @@
+{
+  "key": "32ada0a75137cf13913421811ba5da4060c694726b2d5e9a0c203c8a2bef49f3",
+  "sha256": "333b44f8c2eea40214d21b4adc2e58002cca417b2844590c719ea4fe8f8f63cb",
+  "duration": 5.452,
+  "beats": [
+    {
+      "text": "The flow looks like this: The user asks a question.",
+      "start": 0.0,
+      "end": 3.017333333333333
+    },
+    {
+      "text": "The system searches the knowledge base.",
+      "start": 3.1373333333333333,
+      "end": 5.452
+    }
+  ]
+}

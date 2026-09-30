@@ -1,0 +1,22 @@
+{
+  "key": "31f0e7a35ab762829335314b6de93becb5bc92643e3a2c95f2ce7aed22474914",
+  "sha256": "965087c478e3c5bb55c33048b690a6b32176645116e88e27cc3cfb589c5b019f",
+  "duration": 7.641958333333333,
+  "beats": [
+    {
+      "text": "Different systems handle this in different ways.",
+      "start": 0.0,
+      "end": 2.7413333333333334
+    },
+    {
+      "text": "Older messages may be removed.",
+      "start": 2.8613333333333335,
+      "end": 4.951291666666667
+    },
+    {
+      "text": "Parts of the conversation may be summarized.",
+      "start": 5.071291666666666,
+      "end": 7.641958333333333
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "key": "cc74b11d5a20ed920a34c14c0b8d40691a24de3da140fe5a0ae870b5221c9f07",
+  "sha256": "4b9b6d854e914185d8136bd9ec0b10de66134a3ab976e48ef355fcb760f9d57a",
+  "duration": 15.592625,
+  "beats": [
+    {
+      "text": "We cannot send every document to the language model whenever a user asks a question.",
+      "start": 0.0,
+      "end": 5.075333333333333
+    },
+    {
+      "text": "Instead, we can split those documents into smaller pieces, often called chunks.",
+      "start": 5.195333333333333,
+      "end": 10.043333333333333
+    },
+    {
+      "text": "Each chunk is converted into an embedding.",
+      "start": 10.163333333333334,
+      "end": 12.637291666666666
+    },
+    {
+      "text": "Those embeddings are stored in a vector database.",
+      "start": 12.757291666666667,
+      "end": 15.592625
+    }
+  ]
+}

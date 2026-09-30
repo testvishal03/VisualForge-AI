@@ -1,0 +1,17 @@
+{
+  "key": "e2818025665deb95f71a7b5476b09a2771048cee4bf3dffcf80523379498a796",
+  "sha256": "65f49efb420490b18fc2f0916217b12d5801e712d5f8b8435a08f4dc20bdeb1b",
+  "duration": 10.964625,
+  "beats": [
+    {
+      "text": "A library connects readers with books and reliable information.",
+      "start": 0.0,
+      "end": 3.8693333333333335
+    },
+    {
+      "text": "Its catalog helps visitors locate a title, while librarians can guide questions about unfamiliar subjects.",
+      "start": 3.989333333333333,
+      "end": 10.964625
+    }
+  ]
+}

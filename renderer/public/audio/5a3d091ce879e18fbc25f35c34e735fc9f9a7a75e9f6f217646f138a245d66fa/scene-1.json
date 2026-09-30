@@ -1,0 +1,27 @@
+{
+  "key": "5a3d091ce879e18fbc25f35c34e735fc9f9a7a75e9f6f217646f138a245d66fa",
+  "sha256": "8005aca4a0ff8280e258d172d63f4a0675f52a6f1379006fe5da8d78cddfe965",
+  "duration": 16.364583333333332,
+  "beats": [
+    {
+      "text": "Water droplets begin as tiny condensation nuclei—smaller than a grain of sand.",
+      "start": 0.0,
+      "end": 5.2472916666666665
+    },
+    {
+      "text": "First, water vapor condenses around these particles.",
+      "start": 5.367291666666667,
+      "end": 8.735958333333333
+    },
+    {
+      "text": "Next, droplets grow slowly by capturing more vapor.",
+      "start": 8.855958333333334,
+      "end": 12.332583333333334
+    },
+    {
+      "text": "Whereas in thick clouds, droplets grow faster, leading to rain.",
+      "start": 12.452583333333333,
+      "end": 16.364583333333332
+    }
+  ]
+}

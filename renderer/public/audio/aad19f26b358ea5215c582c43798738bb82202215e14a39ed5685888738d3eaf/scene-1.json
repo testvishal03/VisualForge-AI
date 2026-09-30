@@ -1,0 +1,17 @@
+{
+  "key": "aad19f26b358ea5215c582c43798738bb82202215e14a39ed5685888738d3eaf",
+  "sha256": "221423324a629af95c0f9738dcb969b6b58ff01ca350cf9ef9da1027b61205fe",
+  "duration": 9.237958333333333,
+  "beats": [
+    {
+      "text": "Libraries can help you find books you might not find at home.",
+      "start": 0.0,
+      "end": 3.38
+    },
+    {
+      "text": "They can also provide access to online databases and e-books, making learning more convenient.",
+      "start": 3.5,
+      "end": 9.237958333333333
+    }
+  ]
+}

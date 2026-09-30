@@ -1,0 +1,27 @@
+{
+  "key": "cda2203bf6153108c7337417406ffc82255dceec3f3ea11073b61e7714ff6441",
+  "sha256": "0db98665097fe2c6ce52527d48f6273188f6a7ef57573f47790359e45f2675ec",
+  "duration": 15.135958333333333,
+  "beats": [
+    {
+      "text": "First, runoff flows quickly from surfaces into streams.",
+      "start": 0.0,
+      "end": 3.508
+    },
+    {
+      "text": "Next, water soaks into soil, moving slowly underground.",
+      "start": 3.628,
+      "end": 7.197291666666667
+    },
+    {
+      "text": "Whereas runoff carries water to rivers, infiltration recharges groundwater.",
+      "start": 7.317291666666667,
+      "end": 11.998625
+    },
+    {
+      "text": "This slow movement helps supply wells and springs.",
+      "start": 12.118625,
+      "end": 15.135958333333333
+    }
+  ]
+}

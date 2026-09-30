@@ -1,0 +1,22 @@
+{
+  "key": "33257401d9ed1707267be513d13489fbdee36749edd8b9f49016dfd1b8f38379",
+  "sha256": "53a9c4dbf2ca6be02842843871b1a7efdfbbc40d117b8428e9460e6bdb050d2e",
+  "duration": 13.453291666666667,
+  "beats": [
+    {
+      "text": "A context window is the max tokens a model can see at once.",
+      "start": 0.0,
+      "end": 3.966
+    },
+    {
+      "text": "If you send 500 words, but the window is only 200, the model only sees the last 200.",
+      "start": 4.086,
+      "end": 10.816666666666666
+    },
+    {
+      "text": "This limits how much past info it can use.",
+      "start": 10.936666666666667,
+      "end": 13.453291666666667
+    }
+  ]
+}

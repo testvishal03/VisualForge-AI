@@ -1,0 +1,12 @@
+{
+  "key": "a8ab682808fe1daae9d8f054048791609d4153c858175f35f97cf88d7f07cd51",
+  "sha256": "dc1d9d5537487da24988bee0fb239ff49a574004c6505a4b9b3cad443c2f6d30",
+  "duration": 7.999291666666666,
+  "beats": [
+    {
+      "text": "So a simplified way to think about it is: Input tokens plus output tokens must fit within the model’s supported context limit.",
+      "start": 0.0,
+      "end": 7.999291666666666
+    }
+  ]
+}

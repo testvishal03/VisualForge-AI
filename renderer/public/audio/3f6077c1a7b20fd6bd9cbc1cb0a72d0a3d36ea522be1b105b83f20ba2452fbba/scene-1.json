@@ -1,0 +1,17 @@
+{
+  "key": "3f6077c1a7b20fd6bd9cbc1cb0a72d0a3d36ea522be1b105b83f20ba2452fbba",
+  "sha256": "13f7abc9dc0a0da6ceb7d9c8975d69a3faac434e035a3fd082f1db61cac90a8e",
+  "duration": 12.607333333333333,
+  "beats": [
+    {
+      "text": "Using a library can provide access to a vast array of books, magazines, and digital resources.",
+      "start": 0.0,
+      "end": 6.196
+    },
+    {
+      "text": "However, it may not be accessible to everyone due to geographical barriers or financial limitations.",
+      "start": 6.316,
+      "end": 12.607333333333333
+    }
+  ]
+}

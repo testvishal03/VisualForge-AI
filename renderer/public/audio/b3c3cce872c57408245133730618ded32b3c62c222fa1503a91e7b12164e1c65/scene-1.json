@@ -1,0 +1,22 @@
+{
+  "key": "b3c3cce872c57408245133730618ded32b3c62c222fa1503a91e7b12164e1c65",
+  "sha256": "a7a93c8c33174cc35a9671df13b957923992273313662cf1064b860b21743774",
+  "duration": 11.607291666666667,
+  "beats": [
+    {
+      "text": "Sunlight warms water at the surface of a lake.",
+      "start": 0.0,
+      "end": 2.708625
+    },
+    {
+      "text": "Some water molecules gain enough energy to escape into the air as water vapor.",
+      "start": 2.828625,
+      "end": 7.659291666666666
+    },
+    {
+      "text": "This change from liquid water to gas is called evaporation.",
+      "start": 7.7792916666666665,
+      "end": 11.607291666666667
+    }
+  ]
+}

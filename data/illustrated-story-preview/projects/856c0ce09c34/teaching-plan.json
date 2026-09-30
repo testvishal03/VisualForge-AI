@@ -1,0 +1,129 @@
+{
+  "document_key": "68f620a81eb1bfdc78c95add86c08ce144431b39763c27764e3422c3460d7e52",
+  "scenes": [
+    {
+      "uid": "7cc9c3299188",
+      "version": 1,
+      "component": "explanation",
+      "question": "What does this explain about Text must become model input?",
+      "objective": "A tokenizer converts text into a sequence.",
+      "takeaway": "Text that looks simple to us can therefore occupy several positions in that sequence.",
+      "evidence": "source",
+      "steps": [
+        {
+          "sentence": 0,
+          "action": "explain",
+          "label": "Start"
+        },
+        {
+          "sentence": 1,
+          "action": "explain",
+          "label": "tokenizer"
+        },
+        {
+          "sentence": 2,
+          "action": "explain",
+          "label": "The"
+        },
+        {
+          "sentence": 3,
+          "action": "explain",
+          "label": "Text"
+        }
+      ]
+    },
+    {
+      "uid": "953fad548ea9",
+      "version": 1,
+      "component": "explanation",
+      "question": "What does this explain about Tokens are not always words?",
+      "objective": "The vocabulary determines the pieces.",
+      "takeaway": "There is no single universal conversion that works for every sentence and language.",
+      "evidence": "source",
+      "steps": [
+        {
+          "sentence": 0,
+          "action": "explain",
+          "label": "Tokens"
+        },
+        {
+          "sentence": 1,
+          "action": "explain",
+          "label": "Spaces"
+        },
+        {
+          "sentence": 2,
+          "action": "explain",
+          "label": "The"
+        },
+        {
+          "sentence": 3,
+          "action": "explain",
+          "label": "There"
+        }
+      ]
+    },
+    {
+      "uid": "8b020eb8a4c9",
+      "version": 1,
+      "component": "explanation",
+      "question": "What does this explain about The context window?",
+      "objective": "Available context is finite.",
+      "takeaway": "Equal spacing here does not mean equal token counts.",
+      "evidence": "source",
+      "steps": [
+        {
+          "sentence": 0,
+          "action": "explain",
+          "label": "The"
+        },
+        {
+          "sentence": 1,
+          "action": "explain",
+          "label": "Instructions"
+        },
+        {
+          "sentence": 2,
+          "action": "explain",
+          "label": "Our"
+        },
+        {
+          "sentence": 3,
+          "action": "explain",
+          "label": "Equal"
+        }
+      ]
+    },
+    {
+      "uid": "f828a3223fb4",
+      "version": 1,
+      "component": "explanation",
+      "question": "What does this explain about What goes into a request?",
+      "objective": "The application assembles the model input.",
+      "takeaway": "Extra formatting and special tokens can contribute to the total, so the visible chat text may not be the entire input.",
+      "evidence": "source",
+      "steps": [
+        {
+          "sentence": 0,
+          "action": "explain",
+          "label": "Instructions"
+        },
+        {
+          "sentence": 1,
+          "action": "explain",
+          "label": "Conversation"
+        },
+        {
+          "sentence": 2,
+          "action": "explain",
+          "label": "The"
+        },
+        {
+          "sentence": 3,
+          "action": "explain",
+          "label": "Extra"
+        }
+      ]
+    }
+  ]
+}

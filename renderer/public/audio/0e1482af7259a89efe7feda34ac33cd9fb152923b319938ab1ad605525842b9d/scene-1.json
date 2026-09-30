@@ -1,0 +1,17 @@
+{
+  "key": "0e1482af7259a89efe7feda34ac33cd9fb152923b319938ab1ad605525842b9d",
+  "sha256": "92e1a1f059f2532eec519d0d41d167bc72e60aaa69cd961e572556b490ef9a77",
+  "duration": 6.261333333333333,
+  "beats": [
+    {
+      "text": "Now let’s recap everything.",
+      "start": 0.0,
+      "end": 1.8226666666666667
+    },
+    {
+      "text": "A token is a small unit of text that a language model processes.",
+      "start": 1.9426666666666668,
+      "end": 6.261333333333333
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "key": "1ae9cd60e3cb1742dd87063500d1b63e4a1afba92a9f9693d7e1f9f5bfc79ab4",
+  "sha256": "34d3e6ee7b8f6002ba6669f702157fd0f8ec5ef3791f1190626ab29c22726d4d",
+  "duration": 17.475291666666667,
+  "beats": [
+    {
+      "text": "Or: “This value represents whether the concept is an animal.” The meaning is distributed across the entire vector.",
+      "start": 0.0,
+      "end": 6.996625
+    },
+    {
+      "text": "What matters is the relationship between vectors.",
+      "start": 7.116625,
+      "end": 10.112625
+    },
+    {
+      "text": "This is why embeddings are powerful.",
+      "start": 10.232625,
+      "end": 12.396625
+    },
+    {
+      "text": "They create a numerical space where relationships between concepts can be compared.",
+      "start": 12.516625,
+      "end": 17.475291666666667
+    }
+  ]
+}

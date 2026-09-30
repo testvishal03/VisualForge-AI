@@ -1,0 +1,20 @@
+{
+  "id": "1ae6fbaccc2b",
+  "project": "e78449f10720",
+  "action": "generate",
+  "status": "failed",
+  "phase": "Failed",
+  "started": 1790479033.5080616,
+  "error": "Stage exited with code 1. See D:\\Personal Project\\VisualForge AI\\data\\editor\\e78449f10720\\logs\\draft.log",
+  "seconds": 316.735,
+  "progress": [
+    "Using CPU precision: torch.float32.",
+    "CPU model ready in 80.3s; generating text...",
+    "Validation failed: Duplicate JSON key: scenes",
+    "outline: attempt 2/3...",
+    "Validation failed: Duplicate JSON key: scenes",
+    "outline: attempt 3/3...",
+    "Validation failed: Duplicate JSON key: scenes",
+    "Script generation failed: No valid outline after 3 attempts. Existing output was preserved. Last error: Duplicate JSON key: scenes"
+  ]
+}

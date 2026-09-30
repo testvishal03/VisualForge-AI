@@ -1,0 +1,23 @@
+{
+  "title": "What is Generative AI?",
+  "scenes": [
+    {
+      "id": 1,
+      "headline": "What if computers could create?",
+      "body": "Not just calculate. Not just search. Actually create.",
+      "narration": "What if computers could create? Not just calculate and not just search, but actually create."
+    },
+    {
+      "id": 2,
+      "headline": "That's Generative AI",
+      "body": "It can create text, images, audio, video and code.",
+      "narration": "This is the idea behind generative AI. It can create text, images, audio, video, and even software code."
+    },
+    {
+      "id": 3,
+      "headline": "How does it work?",
+      "body": "Generative AI learns patterns from large amounts of existing data.",
+      "narration": "Generative AI learns patterns from large amounts of existing data, then uses those patterns to generate new content."
+    }
+  ]
+}

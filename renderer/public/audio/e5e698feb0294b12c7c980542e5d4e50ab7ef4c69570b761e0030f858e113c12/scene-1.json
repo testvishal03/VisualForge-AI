@@ -1,0 +1,17 @@
+{
+  "key": "e5e698feb0294b12c7c980542e5d4e50ab7ef4c69570b761e0030f858e113c12",
+  "sha256": "7c7feb62794679d8479c3b8e7e44d6300b7b9b1f49617c5e6648f5004fe412e4",
+  "duration": 12.564666666666668,
+  "beats": [
+    {
+      "text": "The application may manage the conversation by trimming, summarizing, or selecting important information.",
+      "start": 0.0,
+      "end": 6.9
+    },
+    {
+      "text": "So long conversation history does not automatically mean unlimited active context.",
+      "start": 7.02,
+      "end": 12.564666666666668
+    }
+  ]
+}

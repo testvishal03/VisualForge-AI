@@ -1,0 +1,12 @@
+{
+  "key": "43356daafc376a63d241576db0357218915f4487d481d422af9f282fcebb36b9",
+  "sha256": "2999a675593189ffa6be8b10c1a0457d0608571fa1c5eec2a7aa390a4e5f3fbd",
+  "duration": 5.9939583333333335,
+  "beats": [
+    {
+      "text": "In Python, a variable holds a value that later statements can read and update during execution.",
+      "start": 0.0,
+      "end": 5.9939583333333335
+    }
+  ]
+}

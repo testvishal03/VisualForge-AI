@@ -1,0 +1,22 @@
+{
+  "key": "51782aaa4dd66c9f5371d86f7a7772f569310905de07985c55ba73700a51141e",
+  "sha256": "daf4b12ebf514cc8f66b19d5cc16bd88ab35d8d45014d5572038f81bd9214a62",
+  "duration": 14.454666666666666,
+  "beats": [
+    {
+      "text": "Retrieval finds relevant documents for a question.",
+      "start": 0.0,
+      "end": 3.1666666666666665
+    },
+    {
+      "text": "The selected passages become context for the language model.",
+      "start": 3.2866666666666666,
+      "end": 6.965333333333334
+    },
+    {
+      "text": "The model generates an answer using those sources, but irrelevant or unreliable sources can still lead to mistakes.",
+      "start": 7.085333333333334,
+      "end": 14.454666666666666
+    }
+  ]
+}

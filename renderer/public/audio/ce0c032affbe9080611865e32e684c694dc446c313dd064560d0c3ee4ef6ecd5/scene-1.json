@@ -1,0 +1,32 @@
+{
+  "key": "ce0c032affbe9080611865e32e684c694dc446c313dd064560d0c3ee4ef6ecd5",
+  "sha256": "8556cbabbe0144ef33a0992687cfabf0242ab72f5987aca34e8e1ecb15a6f4ac",
+  "duration": 14.671958333333333,
+  "beats": [
+    {
+      "text": "Now let’s see how the comparison works.",
+      "start": 0.0,
+      "end": 2.175291666666667
+    },
+    {
+      "text": "Suppose we convert a user query into an embedding.",
+      "start": 2.2952916666666665,
+      "end": 5.504625
+    },
+    {
+      "text": "We also have embeddings for many documents.",
+      "start": 5.624625,
+      "end": 8.139958333333333
+    },
+    {
+      "text": "The system compares the query vector with all the document vectors.",
+      "start": 8.259958333333334,
+      "end": 12.109291666666667
+    },
+    {
+      "text": "It then measures which vectors are closest.",
+      "start": 12.229291666666667,
+      "end": 14.671958333333333
+    }
+  ]
+}

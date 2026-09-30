@@ -1,0 +1,17 @@
+{
+  "key": "299142da2f4efac3cb209e43d0dc79a072f9b2efd8ed84b45f874b020ee89e61",
+  "sha256": "446393d808f328369eda118f72ba5e0c3a52e2babeb115a1fea063cc5c910577",
+  "duration": 10.645958333333333,
+  "beats": [
+    {
+      "text": "Input and output both consume context capacity.",
+      "start": 0.0,
+      "end": 3.3272916666666665
+    },
+    {
+      "text": "If the context becomes too large, the application may trim, summarize, retrieve selectively, or reject the request.",
+      "start": 3.4472916666666666,
+      "end": 10.645958333333333
+    }
+  ]
+}

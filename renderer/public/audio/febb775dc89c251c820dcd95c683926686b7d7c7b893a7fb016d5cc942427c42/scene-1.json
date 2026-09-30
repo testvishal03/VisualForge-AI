@@ -1,0 +1,12 @@
+{
+  "key": "febb775dc89c251c820dcd95c683926686b7d7c7b893a7fb016d5cc942427c42",
+  "sha256": "5e9e92bdc34ed3ea60c3d79ea81d7bf98f5c8afa5cb2fa0f5fc2ef450da6c7b5",
+  "duration": 7.166,
+  "beats": [
+    {
+      "text": "Now there is another distinction that is very important: Context is not the same as the knowledge learned during training.",
+      "start": 0.0,
+      "end": 7.166
+    }
+  ]
+}

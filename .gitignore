@@ -1,0 +1,10 @@
+backend/.venv/
+backend/.python/
+backend/.bootstrap/
+backend/models/*
+!backend/models/.gitkeep
+__pycache__/
+*.pyc
+backend/.cache/
+data/runs/
+data/editor/

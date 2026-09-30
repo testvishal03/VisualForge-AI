@@ -1,0 +1,21 @@
+Verified cached llama-b11206-bin-win-cpu-x64.zip
+Downloading with Hugging Face Xet; HTTP chunks remain available with --http.
+Traceback (most recent call last):
+  File "D:\Personal Project\VisualForge AI\backend\scripts\setup_gguf.py", line 154, in <module>
+    main()
+  File "D:\Personal Project\VisualForge AI\backend\scripts\setup_gguf.py", line 134, in main
+    staged = Path(hf_hub_download('unsloth/Qwen3-4B-Instruct-2507-GGUF', MODEL_FILE,
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Personal Project\VisualForge AI\backend\.venv\Lib\site-packages\huggingface_hub\utils\_validators.py", line 114, in _inner_fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\Personal Project\VisualForge AI\backend\.venv\Lib\site-packages\huggingface_hub\file_download.py", line 994, in hf_hub_download
+    return _hf_hub_download_to_local_dir(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Personal Project\VisualForge AI\backend\.venv\Lib\site-packages\huggingface_hub\file_download.py", line 1304, in _hf_hub_download_to_local_dir
+    _download_to_tmp_and_move(
+  File "D:\Personal Project\VisualForge AI\backend\.venv\Lib\site-packages\huggingface_hub\file_download.py", line 1727, in _download_to_tmp_and_move
+    xet_get(
+  File "D:\Personal Project\VisualForge AI\backend\.venv\Lib\site-packages\huggingface_hub\file_download.py", line 633, in xet_get
+    download_files(
+OSError: I/O error: I/O error: error decoding response body

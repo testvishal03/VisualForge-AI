@@ -1,0 +1,17 @@
+{
+  "key": "c5c1edb8726a026b05563b90552fc68a04dd9fb09e0048eee8b13bb6dc7b1ff4",
+  "sha256": "abb620c06e00b97726b143948eda144040e89e74ef249c8170390af5d4b75dd5",
+  "duration": 6.453333333333333,
+  "beats": [
+    {
+      "text": "And context is different from the knowledge learned during training.",
+      "start": 0.0,
+      "end": 3.529333333333333
+    },
+    {
+      "text": "The model’s parameters contain learned patterns.",
+      "start": 3.6493333333333333,
+      "end": 6.453333333333333
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "key": "03138155323d02cc9d8f83cd1ba8666f73940b1ad36ae6b71e528052fe84c50a",
+  "sha256": "0050e11e674ac5595b7e4931fedaa4a7455cb24e238bf73571e1bb4814077cec",
+  "duration": 6.464625,
+  "beats": [
+    {
+      "text": "The reason is that AI models work with numbers.",
+      "start": 0.0,
+      "end": 2.8466666666666667
+    },
+    {
+      "text": "They do not directly understand raw text the way humans do.",
+      "start": 2.966666666666667,
+      "end": 6.464625
+    }
+  ]
+}

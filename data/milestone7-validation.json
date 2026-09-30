@@ -1,0 +1,882 @@
+[
+  {
+    "id": "769e98df5081",
+    "project": "47138aaf14db",
+    "action": "render_draft",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790478470.7410166,
+    "audio_cache": {
+      "generated_scene_ids": [],
+      "reused_scene_ids": [
+        1,
+        2
+      ]
+    },
+    "seconds": 88.252,
+    "progress": [
+      "      \"sourceCorrelation\": 0.9999654114391139,",
+      "      \"paddingRms\": 0.0,",
+      "      \"codecOffsetSeconds\": 0.0003333333333333333,",
+      "      \"sourcePeak\": 0.601593017578125",
+      "    }",
+      "  ],",
+      "  \"fullDecode\": \"passed\"",
+      "}"
+    ]
+  },
+  {
+    "id": "ac166b39b467",
+    "project": "47138aaf14db",
+    "action": "preview",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790478561.2288072,
+    "audio_cache": {
+      "generated_scene_ids": [],
+      "reused_scene_ids": [
+        1
+      ]
+    },
+    "seconds": 13.326,
+    "progress": [
+      "Getting composition",
+      "Composition          VisualForgeVideo",
+      "Format               png",
+      "Output               D:\\Personal Project\\VisualForge AI\\data\\editor\\47138aaf14db\\preview.pending.png",
+      "Rendered 0/1",
+      "Rendered 0/1",
+      "Rendered 1/1",
+      "+                    D:\\Personal Project\\VisualForge AI\\data\\editor\\47138aaf14db\\preview.pending.png"
+    ]
+  },
+  {
+    "id": "601e25b43285",
+    "project": "47138aaf14db",
+    "action": "render",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790478575.437941,
+    "audio_cache": {
+      "generated_scene_ids": [],
+      "reused_scene_ids": [
+        1,
+        2
+      ]
+    },
+    "seconds": 63.409,
+    "progress": [
+      "      \"sourceCorrelation\": 0.9999654114391139,",
+      "      \"paddingRms\": 0.0,",
+      "      \"codecOffsetSeconds\": 0.0003333333333333333,",
+      "      \"sourcePeak\": 0.601593017578125",
+      "    }",
+      "  ],",
+      "  \"fullDecode\": \"passed\"",
+      "}"
+    ]
+  },
+  {
+    "id": "8eefb02fc285",
+    "project": "47138aaf14db",
+    "action": "render",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790478640.4180338,
+    "message": "Reused the current verified output.",
+    "seconds": 0.028
+  },
+  {
+    "project": "47138aaf14db",
+    "title": "Water cycle in motion",
+    "duration": {
+      "estimated_seconds": 28.11,
+      "measured_seconds": 25.9,
+      "target_seconds": null,
+      "outside_target": false,
+      "words": 61
+    },
+    "layouts": [
+      "water_cycle",
+      "takeaway"
+    ],
+    "draft_url": "/media/47138aaf14db/draft?v=9a31eeccd25119bed01e1f6309ffd0705ba3e8b75e6e484c45ac75ab38710704",
+    "video_url": "/media/47138aaf14db/video?v=994a8ef33a429fb1968e76e41d3e6d80c920fe5cdbe6b88a6ca4b4b9d4d67650",
+    "quality": {
+      "status": "checks_passed",
+      "issues": [],
+      "fact_check": "not_performed",
+      "notice": "Heuristics cannot establish factual accuracy. Review before publishing."
+    }
+  },
+  {
+    "id": "8bd18cc8370d",
+    "project": "113f6495df20",
+    "action": "generate",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790478642.607976,
+    "audio_cache": {
+      "generated_scene_ids": [
+        1,
+        2
+      ],
+      "reused_scene_ids": []
+    },
+    "seconds": 69.63,
+    "progress": [
+      "      \"sourceCorrelation\": 0.9999724166808561,",
+      "      \"paddingRms\": 0.0,",
+      "      \"codecOffsetSeconds\": 0.0003333333333333333,",
+      "      \"sourcePeak\": 0.74957275390625",
+      "    }",
+      "  ],",
+      "  \"fullDecode\": \"passed\"",
+      "}"
+    ]
+  },
+  {
+    "id": "bd422e9169f7",
+    "project": "113f6495df20",
+    "action": "preview",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790478713.6405933,
+    "audio_cache": {
+      "generated_scene_ids": [],
+      "reused_scene_ids": [
+        1
+      ]
+    },
+    "seconds": 8.734,
+    "progress": [
+      "Getting composition",
+      "Composition          VisualForgeVideo",
+      "Format               png",
+      "Output               D:\\Personal Project\\VisualForge AI\\data\\editor\\113f6495df20\\preview.pending.png",
+      "Rendered 0/1",
+      "Rendered 0/1",
+      "Rendered 1/1",
+      "+                    D:\\Personal Project\\VisualForge AI\\data\\editor\\113f6495df20\\preview.pending.png"
+    ]
+  },
+  {
+    "project": "113f6495df20",
+    "title": "Inside a computer",
+    "duration": {
+      "estimated_seconds": 28.56,
+      "measured_seconds": 24.83,
+      "target_seconds": null,
+      "outside_target": false,
+      "words": 62
+    },
+    "layouts": [
+      "components",
+      "process"
+    ],
+    "draft_url": "/media/113f6495df20/draft?v=a6818be93f523d505f22aed0ca5a8571d61f8326cd57edb1d3b6a74d24bc2555",
+    "video_url": null,
+    "quality": {
+      "status": "checks_passed",
+      "issues": [],
+      "fact_check": "not_performed",
+      "notice": "Heuristics cannot establish factual accuracy. Review before publishing."
+    }
+  },
+  {
+    "id": "0253326071a0",
+    "project": "47138aaf14db",
+    "action": "render_draft",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790478801.6304011,
+    "message": "Reused the current verified output.",
+    "seconds": 0.01
+  },
+  {
+    "id": "86d6cc8d0d36",
+    "project": "47138aaf14db",
+    "action": "preview",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790478803.7394876,
+    "message": "Reused the current verified output.",
+    "seconds": 0.02
+  },
+  {
+    "id": "1d7054a6ac4e",
+    "project": "47138aaf14db",
+    "action": "render",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790478805.7835498,
+    "message": "Reused the current verified output.",
+    "seconds": 0.025
+  },
+  {
+    "id": "78ed6acb7b6f",
+    "project": "47138aaf14db",
+    "action": "render",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790478807.830922,
+    "message": "Reused the current verified output.",
+    "seconds": 0.024
+  },
+  {
+    "project": "47138aaf14db",
+    "title": "Water cycle in motion",
+    "duration": {
+      "estimated_seconds": 28.11,
+      "measured_seconds": 25.9,
+      "target_seconds": null,
+      "outside_target": false,
+      "words": 61
+    },
+    "layouts": [
+      "water_cycle",
+      "takeaway"
+    ],
+    "draft_url": "/media/47138aaf14db/draft?v=9a31eeccd25119bed01e1f6309ffd0705ba3e8b75e6e484c45ac75ab38710704",
+    "video_url": "/media/47138aaf14db/video?v=994a8ef33a429fb1968e76e41d3e6d80c920fe5cdbe6b88a6ca4b4b9d4d67650",
+    "quality": {
+      "status": "checks_passed",
+      "issues": [],
+      "fact_check": "not_performed",
+      "notice": "Heuristics cannot establish factual accuracy. Review before publishing."
+    }
+  },
+  {
+    "id": "baebbb34170f",
+    "project": "113f6495df20",
+    "action": "render_draft",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790478809.9721227,
+    "message": "Reused the current verified output.",
+    "seconds": 0.023
+  },
+  {
+    "id": "9d8b4c48c358",
+    "project": "113f6495df20",
+    "action": "preview",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790478812.064199,
+    "message": "Reused the current verified output.",
+    "seconds": 0.008
+  },
+  {
+    "project": "113f6495df20",
+    "title": "Inside a computer",
+    "duration": {
+      "estimated_seconds": 28.56,
+      "measured_seconds": 24.83,
+      "target_seconds": null,
+      "outside_target": false,
+      "words": 62
+    },
+    "layouts": [
+      "components",
+      "process"
+    ],
+    "draft_url": "/media/113f6495df20/draft?v=a6818be93f523d505f22aed0ca5a8571d61f8326cd57edb1d3b6a74d24bc2555",
+    "video_url": null,
+    "quality": {
+      "status": "checks_passed",
+      "issues": [],
+      "fact_check": "not_performed",
+      "notice": "Heuristics cannot establish factual accuracy. Review before publishing."
+    }
+  },
+  {
+    "id": "58fb9168c3ba",
+    "project": "0836fd4d87c4",
+    "action": "render_draft",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790478814.1755292,
+    "audio_cache": {
+      "generated_scene_ids": [
+        1,
+        2
+      ],
+      "reused_scene_ids": []
+    },
+    "seconds": 64.928,
+    "progress": [
+      "      \"sourceCorrelation\": 0.999972611796,",
+      "      \"paddingRms\": 0.0,",
+      "      \"codecOffsetSeconds\": 0.0,",
+      "      \"sourcePeak\": 0.63226318359375",
+      "    }",
+      "  ],",
+      "  \"fullDecode\": \"passed\"",
+      "}"
+    ]
+  },
+  {
+    "id": "a1862134e5a6",
+    "project": "0836fd4d87c4",
+    "action": "preview",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790478880.833804,
+    "audio_cache": {
+      "generated_scene_ids": [],
+      "reused_scene_ids": [
+        1
+      ]
+    },
+    "seconds": 6.503,
+    "progress": [
+      "Getting composition",
+      "Composition          VisualForgeVideo",
+      "Format               png",
+      "Output               D:\\Personal Project\\VisualForge AI\\data\\editor\\0836fd4d87c4\\preview.pending.png",
+      "Rendered 0/1",
+      "Rendered 0/1",
+      "Rendered 1/1",
+      "+                    D:\\Personal Project\\VisualForge AI\\data\\editor\\0836fd4d87c4\\preview.pending.png"
+    ]
+  },
+  {
+    "project": "0836fd4d87c4",
+    "title": "A garden through time",
+    "duration": {
+      "estimated_seconds": 30.33,
+      "measured_seconds": 26.9,
+      "target_seconds": null,
+      "outside_target": false,
+      "words": 66
+    },
+    "layouts": [
+      "timeline",
+      "takeaway"
+    ],
+    "draft_url": "/media/0836fd4d87c4/draft?v=213821ac37dc050bc5bdba118dee0c1b12655e46aa2631473c969e3d5d272196",
+    "video_url": null,
+    "quality": {
+      "status": "checks_passed",
+      "issues": [],
+      "fact_check": "not_performed",
+      "notice": "Heuristics cannot establish factual accuracy. Review before publishing."
+    }
+  },
+  {
+    "id": "5fff5b3ecd29",
+    "project": "47138aaf14db",
+    "action": "render_draft",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790479352.4404402,
+    "audio_cache": {
+      "generated_scene_ids": [],
+      "reused_scene_ids": [
+        1,
+        2
+      ]
+    },
+    "seconds": 63.712,
+    "progress": [
+      "      \"sourceCorrelation\": 0.9999654114391139,",
+      "      \"paddingRms\": 0.0,",
+      "      \"codecOffsetSeconds\": 0.0003333333333333333,",
+      "      \"sourcePeak\": 0.601593017578125",
+      "    }",
+      "  ],",
+      "  \"fullDecode\": \"passed\"",
+      "}"
+    ]
+  },
+  {
+    "id": "e44c41f9b6df",
+    "project": "47138aaf14db",
+    "action": "preview",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790479417.1055017,
+    "audio_cache": {
+      "generated_scene_ids": [],
+      "reused_scene_ids": [
+        1
+      ]
+    },
+    "seconds": 6.096,
+    "progress": [
+      "Getting composition",
+      "Composition          VisualForgeVideo",
+      "Format               png",
+      "Output               D:\\Personal Project\\VisualForge AI\\data\\editor\\47138aaf14db\\preview.pending.png",
+      "Rendered 0/1",
+      "Rendered 0/1",
+      "Rendered 1/1",
+      "+                    D:\\Personal Project\\VisualForge AI\\data\\editor\\47138aaf14db\\preview.pending.png"
+    ]
+  },
+  {
+    "id": "5c50334cc18f",
+    "project": "47138aaf14db",
+    "action": "render",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790479425.195821,
+    "audio_cache": {
+      "generated_scene_ids": [],
+      "reused_scene_ids": [
+        1,
+        2
+      ]
+    },
+    "seconds": 49.369,
+    "progress": [
+      "      \"sourceCorrelation\": 0.9999654114391139,",
+      "      \"paddingRms\": 0.0,",
+      "      \"codecOffsetSeconds\": 0.0003333333333333333,",
+      "      \"sourcePeak\": 0.601593017578125",
+      "    }",
+      "  ],",
+      "  \"fullDecode\": \"passed\"",
+      "}"
+    ]
+  },
+  {
+    "id": "b11423187513",
+    "project": "47138aaf14db",
+    "action": "render",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790479476.0747614,
+    "message": "Reused the current verified output.",
+    "seconds": 0.01
+  },
+  {
+    "project": "47138aaf14db",
+    "title": "Water cycle in motion",
+    "duration": {
+      "estimated_seconds": 28.11,
+      "measured_seconds": 25.9,
+      "target_seconds": null,
+      "outside_target": false,
+      "words": 61
+    },
+    "layouts": [
+      "water_cycle",
+      "takeaway"
+    ],
+    "draft_url": "/media/47138aaf14db/draft?v=0ba6b4e8b15a0d84c6d43285fdf7a0a64dab0703d076e74053aa02b2b373e352",
+    "video_url": "/media/47138aaf14db/video?v=58c65ccc0e092af0586672477163288d174c3aae79258fdf9f1c993317afe17f",
+    "quality": {
+      "status": "checks_passed",
+      "issues": [],
+      "fact_check": "not_performed",
+      "notice": "Heuristics cannot establish factual accuracy. Review before publishing."
+    }
+  },
+  {
+    "id": "11ef21a1e368",
+    "project": "113f6495df20",
+    "action": "render_draft",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790479478.1938913,
+    "audio_cache": {
+      "generated_scene_ids": [],
+      "reused_scene_ids": [
+        1,
+        2
+      ]
+    },
+    "seconds": 34.885,
+    "progress": [
+      "      \"sourceCorrelation\": 0.9999724166808561,",
+      "      \"paddingRms\": 0.0,",
+      "      \"codecOffsetSeconds\": 0.0003333333333333333,",
+      "      \"sourcePeak\": 0.74957275390625",
+      "    }",
+      "  ],",
+      "  \"fullDecode\": \"passed\"",
+      "}"
+    ]
+  },
+  {
+    "id": "ec945820211a",
+    "project": "113f6495df20",
+    "action": "preview",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790479514.7789829,
+    "audio_cache": {
+      "generated_scene_ids": [],
+      "reused_scene_ids": [
+        1
+      ]
+    },
+    "seconds": 6.437,
+    "progress": [
+      "Getting composition",
+      "Composition          VisualForgeVideo",
+      "Format               png",
+      "Output               D:\\Personal Project\\VisualForge AI\\data\\editor\\113f6495df20\\preview.pending.png",
+      "Rendered 0/1",
+      "Rendered 0/1",
+      "Rendered 1/1",
+      "+                    D:\\Personal Project\\VisualForge AI\\data\\editor\\113f6495df20\\preview.pending.png"
+    ]
+  },
+  {
+    "project": "113f6495df20",
+    "title": "Inside a computer",
+    "duration": {
+      "estimated_seconds": 28.56,
+      "measured_seconds": 24.83,
+      "target_seconds": null,
+      "outside_target": false,
+      "words": 62
+    },
+    "layouts": [
+      "components",
+      "process"
+    ],
+    "draft_url": "/media/113f6495df20/draft?v=c54f8153f9bab92f19a3d8645eade2d341695b76344352cf8811ea882260d534",
+    "video_url": null,
+    "quality": {
+      "status": "checks_passed",
+      "issues": [],
+      "fact_check": "not_performed",
+      "notice": "Heuristics cannot establish factual accuracy. Review before publishing."
+    }
+  },
+  {
+    "id": "d7e29f5d362a",
+    "project": "0836fd4d87c4",
+    "action": "render_draft",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790479522.9776208,
+    "audio_cache": {
+      "generated_scene_ids": [],
+      "reused_scene_ids": [
+        1,
+        2
+      ]
+    },
+    "seconds": 36.696,
+    "progress": [
+      "      \"sourceCorrelation\": 0.999972611796,",
+      "      \"paddingRms\": 0.0,",
+      "      \"codecOffsetSeconds\": 0.0,",
+      "      \"sourcePeak\": 0.63226318359375",
+      "    }",
+      "  ],",
+      "  \"fullDecode\": \"passed\"",
+      "}"
+    ]
+  },
+  {
+    "id": "e889ddff9fbe",
+    "project": "0836fd4d87c4",
+    "action": "preview",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790479561.5064,
+    "audio_cache": {
+      "generated_scene_ids": [],
+      "reused_scene_ids": [
+        1
+      ]
+    },
+    "seconds": 5.955,
+    "progress": [
+      "Getting composition",
+      "Composition          VisualForgeVideo",
+      "Format               png",
+      "Output               D:\\Personal Project\\VisualForge AI\\data\\editor\\0836fd4d87c4\\preview.pending.png",
+      "Rendered 0/1",
+      "Rendered 0/1",
+      "Rendered 1/1",
+      "+                    D:\\Personal Project\\VisualForge AI\\data\\editor\\0836fd4d87c4\\preview.pending.png"
+    ]
+  },
+  {
+    "project": "0836fd4d87c4",
+    "title": "A garden through time",
+    "duration": {
+      "estimated_seconds": 30.33,
+      "measured_seconds": 26.9,
+      "target_seconds": null,
+      "outside_target": false,
+      "words": 66
+    },
+    "layouts": [
+      "timeline",
+      "takeaway"
+    ],
+    "draft_url": "/media/0836fd4d87c4/draft?v=6866976f36b5fe504097ab7e261ac1ab7048a9016fb2be159cb2edc9720465b7",
+    "video_url": null,
+    "quality": {
+      "status": "checks_passed",
+      "issues": [],
+      "fact_check": "not_performed",
+      "notice": "Heuristics cannot establish factual accuracy. Review before publishing."
+    }
+  },
+  {
+    "id": "9c1dc028e128",
+    "project": "47138aaf14db",
+    "action": "render_draft",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790480062.6735487,
+    "audio_cache": {
+      "generated_scene_ids": [],
+      "reused_scene_ids": [
+        1,
+        2
+      ]
+    },
+    "seconds": 59.828,
+    "progress": [
+      "      \"sourceCorrelation\": 0.9999654114391139,",
+      "      \"paddingRms\": 0.0,",
+      "      \"codecOffsetSeconds\": 0.0003333333333333333,",
+      "      \"sourcePeak\": 0.601593017578125",
+      "    }",
+      "  ],",
+      "  \"fullDecode\": \"passed\"",
+      "}"
+    ]
+  },
+  {
+    "id": "6ae8a4178816",
+    "project": "47138aaf14db",
+    "action": "preview",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790480123.8001113,
+    "audio_cache": {
+      "generated_scene_ids": [],
+      "reused_scene_ids": [
+        1
+      ]
+    },
+    "seconds": 6.098,
+    "progress": [
+      "Getting composition",
+      "Composition          VisualForgeVideo",
+      "Format               png",
+      "Output               D:\\Personal Project\\VisualForge AI\\data\\editor\\47138aaf14db\\preview.pending.png",
+      "Rendered 0/1",
+      "Rendered 0/1",
+      "Rendered 1/1",
+      "+                    D:\\Personal Project\\VisualForge AI\\data\\editor\\47138aaf14db\\preview.pending.png"
+    ]
+  },
+  {
+    "id": "0d91089f2bb0",
+    "project": "47138aaf14db",
+    "action": "render",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790480131.8750942,
+    "audio_cache": {
+      "generated_scene_ids": [],
+      "reused_scene_ids": [
+        1,
+        2
+      ]
+    },
+    "seconds": 47.107,
+    "progress": [
+      "      \"sourceCorrelation\": 0.9999654114391139,",
+      "      \"paddingRms\": 0.0,",
+      "      \"codecOffsetSeconds\": 0.0003333333333333333,",
+      "      \"sourcePeak\": 0.601593017578125",
+      "    }",
+      "  ],",
+      "  \"fullDecode\": \"passed\"",
+      "}"
+    ]
+  },
+  {
+    "id": "e9bf56df6e44",
+    "project": "47138aaf14db",
+    "action": "render",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790480179.1229098,
+    "message": "Reused the current verified output.",
+    "seconds": 0.017
+  },
+  {
+    "project": "47138aaf14db",
+    "title": "Water cycle in motion",
+    "duration": {
+      "estimated_seconds": 28.11,
+      "measured_seconds": 25.9,
+      "target_seconds": null,
+      "outside_target": false,
+      "words": 61
+    },
+    "layouts": [
+      "water_cycle",
+      "takeaway"
+    ],
+    "draft_url": "/media/47138aaf14db/draft?v=a7610cf4a5c83bfcfb1148403992d0e158b4cdaf0132fa3f413dfee36cbe3841",
+    "video_url": "/media/47138aaf14db/video?v=9fd781141c2d133a605668483f5d7a3e3339ae44469a8f050644aca61128ff43",
+    "quality": {
+      "status": "checks_passed",
+      "issues": [],
+      "fact_check": "not_performed",
+      "notice": "Heuristics cannot establish factual accuracy. Review before publishing."
+    }
+  },
+  {
+    "id": "8c55174353db",
+    "project": "113f6495df20",
+    "action": "render_draft",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790480181.2190423,
+    "audio_cache": {
+      "generated_scene_ids": [],
+      "reused_scene_ids": [
+        1,
+        2
+      ]
+    },
+    "seconds": 34.882,
+    "progress": [
+      "      \"sourceCorrelation\": 0.9999724166808561,",
+      "      \"paddingRms\": 0.0,",
+      "      \"codecOffsetSeconds\": 0.0003333333333333333,",
+      "      \"sourcePeak\": 0.74957275390625",
+      "    }",
+      "  ],",
+      "  \"fullDecode\": \"passed\"",
+      "}"
+    ]
+  },
+  {
+    "id": "d6ea95c99fa9",
+    "project": "113f6495df20",
+    "action": "preview",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790480217.815199,
+    "audio_cache": {
+      "generated_scene_ids": [],
+      "reused_scene_ids": [
+        1
+      ]
+    },
+    "seconds": 5.845,
+    "progress": [
+      "Getting composition",
+      "Composition          VisualForgeVideo",
+      "Format               png",
+      "Output               D:\\Personal Project\\VisualForge AI\\data\\editor\\113f6495df20\\preview.pending.png",
+      "Rendered 0/1",
+      "Rendered 0/1",
+      "Rendered 1/1",
+      "+                    D:\\Personal Project\\VisualForge AI\\data\\editor\\113f6495df20\\preview.pending.png"
+    ]
+  },
+  {
+    "project": "113f6495df20",
+    "title": "Inside a computer",
+    "duration": {
+      "estimated_seconds": 28.56,
+      "measured_seconds": 24.83,
+      "target_seconds": null,
+      "outside_target": false,
+      "words": 62
+    },
+    "layouts": [
+      "components",
+      "process"
+    ],
+    "draft_url": "/media/113f6495df20/draft?v=b0eb088ff4a1d43ad38cae7f4f584163eae0c07322e5fc669ed401c51faf3be0",
+    "video_url": null,
+    "quality": {
+      "status": "checks_passed",
+      "issues": [],
+      "fact_check": "not_performed",
+      "notice": "Heuristics cannot establish factual accuracy. Review before publishing."
+    }
+  },
+  {
+    "id": "509514c19c36",
+    "project": "0836fd4d87c4",
+    "action": "render_draft",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790480223.9709735,
+    "audio_cache": {
+      "generated_scene_ids": [],
+      "reused_scene_ids": [
+        1,
+        2
+      ]
+    },
+    "seconds": 39.187,
+    "progress": [
+      "      \"sourceCorrelation\": 0.999972611796,",
+      "      \"paddingRms\": 0.0,",
+      "      \"codecOffsetSeconds\": 0.0,",
+      "      \"sourcePeak\": 0.63226318359375",
+      "    }",
+      "  ],",
+      "  \"fullDecode\": \"passed\"",
+      "}"
+    ]
+  },
+  {
+    "id": "b2ec61f19d46",
+    "project": "0836fd4d87c4",
+    "action": "preview",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790480264.6617796,
+    "audio_cache": {
+      "generated_scene_ids": [],
+      "reused_scene_ids": [
+        1
+      ]
+    },
+    "seconds": 7.116,
+    "progress": [
+      "Getting composition",
+      "Composition          VisualForgeVideo",
+      "Format               png",
+      "Output               D:\\Personal Project\\VisualForge AI\\data\\editor\\0836fd4d87c4\\preview.pending.png",
+      "Rendered 0/1",
+      "Rendered 0/1",
+      "Rendered 1/1",
+      "+                    D:\\Personal Project\\VisualForge AI\\data\\editor\\0836fd4d87c4\\preview.pending.png"
+    ]
+  },
+  {
+    "project": "0836fd4d87c4",
+    "title": "A garden through time",
+    "duration": {
+      "estimated_seconds": 30.33,
+      "measured_seconds": 26.9,
+      "target_seconds": null,
+      "outside_target": false,
+      "words": 66
+    },
+    "layouts": [
+      "timeline",
+      "takeaway"
+    ],
+    "draft_url": "/media/0836fd4d87c4/draft?v=b5be880632c57d230f17b1a4d912557b235e92396475b82343677592dfad431b",
+    "video_url": null,
+    "quality": {
+      "status": "checks_passed",
+      "issues": [],
+      "fact_check": "not_performed",
+      "notice": "Heuristics cannot establish factual accuracy. Review before publishing."
+    }
+  }
+]

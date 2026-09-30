@@ -1,0 +1,60 @@
+[
+  {
+    "project": "47138aaf14db",
+    "title": "Water cycle in motion",
+    "reports": {
+      "draft": {
+        "seconds": 25.9,
+        "size": [
+          1280,
+          720
+        ],
+        "frames": 777,
+        "min_correlation": 0.9999654114391139,
+        "max_offset_seconds": 0.0003333333333333333
+      },
+      "video": {
+        "seconds": 25.9,
+        "size": [
+          1920,
+          1080
+        ],
+        "frames": 777,
+        "min_correlation": 0.9999654114391139,
+        "max_offset_seconds": 0.0003333333333333333
+      }
+    }
+  },
+  {
+    "project": "113f6495df20",
+    "title": "Inside a computer",
+    "reports": {
+      "draft": {
+        "seconds": 24.833333,
+        "size": [
+          1280,
+          720
+        ],
+        "frames": 745,
+        "min_correlation": 0.999969419631114,
+        "max_offset_seconds": 0.0003333333333333333
+      }
+    }
+  },
+  {
+    "project": "0836fd4d87c4",
+    "title": "A garden through time",
+    "reports": {
+      "draft": {
+        "seconds": 26.9,
+        "size": [
+          1280,
+          720
+        ],
+        "frames": 807,
+        "min_correlation": 0.9999670878460284,
+        "max_offset_seconds": 0.0
+      }
+    }
+  }
+]

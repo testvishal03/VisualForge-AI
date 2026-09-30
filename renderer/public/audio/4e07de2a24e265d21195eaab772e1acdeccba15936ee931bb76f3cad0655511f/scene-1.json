@@ -1,0 +1,17 @@
+{
+  "key": "4e07de2a24e265d21195eaab772e1acdeccba15936ee931bb76f3cad0655511f",
+  "sha256": "722b4d7de21fdafbabe9bd7c0bafae76ac5e57a4c386cd53b7fdcda929d8413d",
+  "duration": 10.271958333333334,
+  "beats": [
+    {
+      "text": "Printed books work without batteries and can be shared in person.",
+      "start": 0.0,
+      "end": 3.582
+    },
+    {
+      "text": "In contrast, digital books can provide adjustable text and remote access on compatible devices.",
+      "start": 3.702,
+      "end": 10.271958333333334
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "key": "1235313c05a3949fc3885adcee5e25c00db935b2df1a8c00fde50438126e58dc",
+  "sha256": "b8b6cdf6b0fcac622ce892745171d7a62609dcddb6a445153a4e5d9312382685",
+  "duration": 9.009333333333334,
+  "beats": [
+    {
+      "text": "Code can also be split into many pieces because symbols, punctuation, operators, and variable names may all contribute to the token count.",
+      "start": 0.0,
+      "end": 9.009333333333334
+    }
+  ]
+}

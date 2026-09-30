@@ -1,0 +1,52 @@
+{
+  "key": "bb6badd88ddd433f1d6507d11072449c7e03b4e137a129d6d1c863c23cb1ebc2",
+  "sha256": "d32c6fff2ef333d6917a165b9bbbd408cd510ab34ee3346fc735a89d30f38d84",
+  "duration": 19.51525,
+  "beats": [
+    {
+      "text": "Context.",
+      "start": 0.0,
+      "end": 1.044625
+    },
+    {
+      "text": "LLM.",
+      "start": 1.164625,
+      "end": 2.157958333333333
+    },
+    {
+      "text": "Answer.",
+      "start": 2.2779583333333333,
+      "end": 3.141958333333333
+    },
+    {
+      "text": "This is one of the most common uses of embeddings in modern AI systems.",
+      "start": 3.2619583333333333,
+      "end": 7.687291666666667
+    },
+    {
+      "text": "But embeddings are not limited to text.",
+      "start": 7.807291666666667,
+      "end": 10.249958333333334
+    },
+    {
+      "text": "Images can also be converted into embeddings.",
+      "start": 10.369958333333333,
+      "end": 13.333291666666666
+    },
+    {
+      "text": "Audio can be represented as embeddings.",
+      "start": 13.453291666666667,
+      "end": 15.948583333333334
+    },
+    {
+      "text": "Products can have embeddings.",
+      "start": 16.068583333333333,
+      "end": 17.700583333333334
+    },
+    {
+      "text": "Users can have embeddings.",
+      "start": 17.82058333333333,
+      "end": 19.51525
+    }
+  ]
+}

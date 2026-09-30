@@ -1,0 +1,27 @@
+{
+  "key": "f3411d7db7e3d41f075b5484d632f9211a6d126151b0582351247e16309ffcbf",
+  "sha256": "f812d2016cb68db4c866956dd14aa0864d0b620cce87b53a220231b95f22c328",
+  "duration": 18.722625,
+  "beats": [
+    {
+      "text": "Consider the input text, \"The sky is\".",
+      "start": 0.0,
+      "end": 2.5592916666666667
+    },
+    {
+      "text": "Watch the tokenizer split this text into its measured token pieces.",
+      "start": 2.679291666666667,
+      "end": 6.997958333333333
+    },
+    {
+      "text": "Now the token IDs appear below those pieces.",
+      "start": 7.117958333333333,
+      "end": 9.964625
+    },
+    {
+      "text": "These identifiers come from the installed local model, so another model may divide the same text differently and assign different identifiers.",
+      "start": 10.084625,
+      "end": 18.722625
+    }
+  ]
+}

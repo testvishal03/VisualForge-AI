@@ -1,0 +1,70 @@
+{
+  "profile": "draft",
+  "width": 1280,
+  "height": 720,
+  "fps": 30,
+  "frames": 1383,
+  "videoDuration": 46.1,
+  "containerDuration": 46.123,
+  "videoCodec": "h264",
+  "audioCodec": "mp3",
+  "audioSampleRate": "48000",
+  "scenes": [
+    {
+      "id": 1,
+      "wav": "audio/daea1d07e892dec6c69f8d60038c051cde42b812d581e3325b2499513ada59f6/scene-1.wav",
+      "duration": 14.862666666666666,
+      "startFrame": 0,
+      "frames": 461,
+      "sourceCorrelation": 0.9999708185929179,
+      "paddingRms": 3.0992296728982183e-07,
+      "codecOffsetSeconds": 0.0,
+      "sourcePeak": 0.559814453125
+    },
+    {
+      "id": 2,
+      "wav": "audio/fe90be7ce95c1ef02f36c049fec47b336ce7037f5e31e72e7e095f3ce78d57a8/scene-1.wav",
+      "duration": 10.005958333333334,
+      "startFrame": 461,
+      "frames": 316,
+      "sourceCorrelation": 0.9999711001823368,
+      "paddingRms": 3.013282707797771e-07,
+      "codecOffsetSeconds": 0.0,
+      "sourcePeak": 0.601593017578125
+    },
+    {
+      "id": 3,
+      "wav": "audio/6f80119c8c1464e889e5498efb8b3e7ffd2a39ed0ea035fe6a0bb2003b45265c/scene-1.wav",
+      "duration": 6.917333333333334,
+      "startFrame": 777,
+      "frames": 223,
+      "sourceCorrelation": 0.9999770585995037,
+      "paddingRms": 4.319294077959057e-07,
+      "codecOffsetSeconds": 0.0,
+      "sourcePeak": 0.545013427734375
+    },
+    {
+      "id": 4,
+      "wav": "audio/148ab31e151148659117bfcd59c8d5354509bc8cca80cc1dfa9d0d4eba512de0/scene-1.wav",
+      "duration": 6.3352916666666665,
+      "startFrame": 1000,
+      "frames": 206,
+      "sourceCorrelation": 0.9999727522217422,
+      "paddingRms": 2.999279615778505e-07,
+      "codecOffsetSeconds": 0.0,
+      "sourcePeak": 0.61279296875
+    },
+    {
+      "id": 5,
+      "wav": "audio/cd6312db394bb96e563a864e33913ec07a1337a319c52fb035476d24bd3d5e0a/scene-1.wav",
+      "duration": 5.396625,
+      "startFrame": 1206,
+      "frames": 177,
+      "sourceCorrelation": 0.9999736151085373,
+      "paddingRms": 0.0,
+      "codecOffsetSeconds": 0.0,
+      "sourcePeak": 0.50921630859375
+    }
+  ],
+  "fullDecode": "passed"
+}

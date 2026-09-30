@@ -1,0 +1,12 @@
+{
+  "key": "67561a76f29abf27917da052958bf47d66d2ee4e025438f53fd77d0476f3349d",
+  "sha256": "769f45a155f6ef37487bc67458e5ff576484738a27cebad8d85e28691ff5cda7",
+  "duration": 7.004,
+  "beats": [
+    {
+      "text": "For example, imagine you type: “AI is useful.” The tokenizer might break this text into several tokens.",
+      "start": 0.0,
+      "end": 7.004
+    }
+  ]
+}

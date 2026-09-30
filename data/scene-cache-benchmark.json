@@ -1,0 +1,151 @@
+{
+  "folder": "D:\\Personal Project\\VisualForge AI\\data\\scene-cache-benchmark\\4c940e4c4b3f",
+  "runs": [
+    {
+      "cache": {
+        "rendered": [
+          "1",
+          "4",
+          "11",
+          "25"
+        ],
+        "reused": [],
+        "seconds": 164.73,
+        "segments": 4,
+        "profile": "draft"
+      },
+      "validation": {
+        "profile": "draft",
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "frames": 2363,
+        "videoDuration": 78.766667,
+        "containerDuration": 78.766667,
+        "videoCodec": "h264",
+        "audioCodec": "mp3",
+        "audioSampleRate": "48000",
+        "scenes": [
+          {
+            "id": 1,
+            "wav": "audio/6d1df491f653f59f0a75681cd0e95d7c5b744d68de29f4e19cdb43d71c366ffc/scene-1.wav",
+            "duration": 18.63725,
+            "startFrame": 0,
+            "frames": 575,
+            "sourceCorrelation": 0.9999729386817714,
+            "paddingRms": 0.0,
+            "codecOffsetSeconds": 0.0,
+            "sourcePeak": 0.59393310546875
+          },
+          {
+            "id": 4,
+            "wav": "audio/f3411d7db7e3d41f075b5484d632f9211a6d126151b0582351247e16309ffcbf/scene-1.wav",
+            "duration": 18.722625,
+            "startFrame": 575,
+            "frames": 577,
+            "sourceCorrelation": 0.9999699198801828,
+            "paddingRms": 0.0,
+            "codecOffsetSeconds": 0.0,
+            "sourcePeak": 0.690673828125
+          },
+          {
+            "id": 11,
+            "wav": "audio/776e664979ea0f73ea861be1b11df9a2348cabf65c95fca4d9ffd9231eceba23/scene-1.wav",
+            "duration": 18.413916666666665,
+            "startFrame": 1152,
+            "frames": 568,
+            "sourceCorrelation": 0.9999745021933858,
+            "paddingRms": 4.3016649442506605e-07,
+            "codecOffsetSeconds": 0.0,
+            "sourcePeak": 0.607025146484375
+          },
+          {
+            "id": 25,
+            "wav": "audio/718ac20537838c9c522301300ccd9b701c7df3cac69575917e844d79c9b1bf1c/scene-1.wav",
+            "duration": 20.919958333333334,
+            "startFrame": 1720,
+            "frames": 643,
+            "sourceCorrelation": 0.9999700072968509,
+            "paddingRms": 0.0,
+            "codecOffsetSeconds": 0.0,
+            "sourcePeak": 0.63446044921875
+          }
+        ],
+        "fullDecode": "passed"
+      }
+    },
+    {
+      "cache": {
+        "rendered": [],
+        "reused": [
+          "1",
+          "4",
+          "11",
+          "25"
+        ],
+        "seconds": 2.12,
+        "segments": 4,
+        "profile": "draft"
+      },
+      "validation": {
+        "profile": "draft",
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "frames": 2363,
+        "videoDuration": 78.766667,
+        "containerDuration": 78.766667,
+        "videoCodec": "h264",
+        "audioCodec": "mp3",
+        "audioSampleRate": "48000",
+        "scenes": [
+          {
+            "id": 1,
+            "wav": "audio/6d1df491f653f59f0a75681cd0e95d7c5b744d68de29f4e19cdb43d71c366ffc/scene-1.wav",
+            "duration": 18.63725,
+            "startFrame": 0,
+            "frames": 575,
+            "sourceCorrelation": 0.9999729386817714,
+            "paddingRms": 0.0,
+            "codecOffsetSeconds": 0.0,
+            "sourcePeak": 0.59393310546875
+          },
+          {
+            "id": 4,
+            "wav": "audio/f3411d7db7e3d41f075b5484d632f9211a6d126151b0582351247e16309ffcbf/scene-1.wav",
+            "duration": 18.722625,
+            "startFrame": 575,
+            "frames": 577,
+            "sourceCorrelation": 0.9999699198801828,
+            "paddingRms": 0.0,
+            "codecOffsetSeconds": 0.0,
+            "sourcePeak": 0.690673828125
+          },
+          {
+            "id": 11,
+            "wav": "audio/776e664979ea0f73ea861be1b11df9a2348cabf65c95fca4d9ffd9231eceba23/scene-1.wav",
+            "duration": 18.413916666666665,
+            "startFrame": 1152,
+            "frames": 568,
+            "sourceCorrelation": 0.9999745021933858,
+            "paddingRms": 4.3016649442506605e-07,
+            "codecOffsetSeconds": 0.0,
+            "sourcePeak": 0.607025146484375
+          },
+          {
+            "id": 25,
+            "wav": "audio/718ac20537838c9c522301300ccd9b701c7df3cac69575917e844d79c9b1bf1c/scene-1.wav",
+            "duration": 20.919958333333334,
+            "startFrame": 1720,
+            "frames": 643,
+            "sourceCorrelation": 0.9999700072968509,
+            "paddingRms": 0.0,
+            "codecOffsetSeconds": 0.0,
+            "sourcePeak": 0.63446044921875
+          }
+        ],
+        "fullDecode": "passed"
+      }
+    }
+  ]
+}

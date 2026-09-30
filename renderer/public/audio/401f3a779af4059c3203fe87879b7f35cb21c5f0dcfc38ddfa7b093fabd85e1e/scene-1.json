@@ -1,0 +1,17 @@
+{
+  "key": "401f3a779af4059c3203fe87879b7f35cb21c5f0dcfc38ddfa7b093fabd85e1e",
+  "sha256": "b182b40ccada81984166b32a338d8ee2f77a30abde45188e5b4f33576fecfebd",
+  "duration": 7.700666666666667,
+  "beats": [
+    {
+      "text": "How can concepts like “king” and “queen” be represented mathematically?",
+      "start": 0.0,
+      "end": 4.084
+    },
+    {
+      "text": "And how can AI compare the meaning of different pieces of text?",
+      "start": 4.204,
+      "end": 7.700666666666667
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "key": "c9c548c2cfc6a9752ec460146745e5f806856643fdd54ace34f52f10c0b16eb5",
+  "sha256": "b0e33b824c2bcdfeb87994d0e9aaa0bdccc653699d44d921c485e63bcd080dda",
+  "duration": 5.662,
+  "beats": [
+    {
+      "text": "Now let’s zoom into two important ideas that affect almost every interaction with an LLM:",
+      "start": 0.0,
+      "end": 5.662
+    }
+  ]
+}

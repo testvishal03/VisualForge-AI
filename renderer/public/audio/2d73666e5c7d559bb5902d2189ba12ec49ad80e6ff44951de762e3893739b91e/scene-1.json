@@ -1,0 +1,22 @@
+{
+  "key": "2d73666e5c7d559bb5902d2189ba12ec49ad80e6ff44951de762e3893739b91e",
+  "sha256": "3aebaafafc751dff062d2e10e0f25e9febddc1614a6b5510b153d3eff3c85d64",
+  "duration": 13.304,
+  "beats": [
+    {
+      "text": "As moist air rises and cools, water vapor can condense into tiny droplets.",
+      "start": 0.0,
+      "end": 5.086666666666667
+    },
+    {
+      "text": "Many droplets together form a cloud.",
+      "start": 5.206666666666667,
+      "end": 7.457333333333334
+    },
+    {
+      "text": "When droplets grow heavy enough, water returns to the ground as rain, continuing the water cycle.",
+      "start": 7.577333333333334,
+      "end": 13.304
+    }
+  ]
+}

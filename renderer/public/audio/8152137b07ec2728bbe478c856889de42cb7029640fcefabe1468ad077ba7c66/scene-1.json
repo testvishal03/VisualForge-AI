@@ -1,0 +1,12 @@
+{
+  "key": "8152137b07ec2728bbe478c856889de42cb7029640fcefabe1468ad077ba7c66",
+  "sha256": "717e1d9eaa666e0eed926c0e9239e8570caa5de5e6edb8f7dd56395c0edb5a97",
+  "duration": 8.020625,
+  "beats": [
+    {
+      "text": "An SQL inner join matches orders to customers using their shared identifier, producing a combined result for each match.",
+      "start": 0.0,
+      "end": 8.020625
+    }
+  ]
+}

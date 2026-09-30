@@ -1,0 +1,22 @@
+{
+  "key": "52a9ba7b10d245eaeb6c9c9b98edc25201d37f8be5aeabcbf8f0a6d13d4fc5fe",
+  "sha256": "15912e8bdf8bf14491e9315a4d231dcae86d8fc9fad73d8611dd3e96623b412e",
+  "duration": 14.977958333333333,
+  "beats": [
+    {
+      "text": "Vector search compares a query vector with stored vectors.",
+      "start": 0.0,
+      "end": 3.284625
+    },
+    {
+      "text": "Cosine similarity measures how closely their directions align.",
+      "start": 3.404625,
+      "end": 7.488625
+    },
+    {
+      "text": "This small example uses illustrative coordinates, so its scores are calculated examples rather than model measurements.",
+      "start": 7.608625,
+      "end": 14.977958333333333
+    }
+  ]
+}

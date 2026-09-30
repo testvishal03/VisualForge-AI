@@ -1,0 +1,62 @@
+{
+  "profile": {
+    "model": "Qwen/Qwen3-4B-Instruct-2507",
+    "revision": "a06e946bb6b655725eafa393f4a9745d460374c9",
+    "backend": "gguf",
+    "runtime": "b11206",
+    "quantization": "Q4_K_M",
+    "ready": true,
+    "label": "Qwen3 4B \u00b7 Q4_K_M \u00b7 CPU"
+  },
+  "project": "88fcff790f6a",
+  "workspace": "80ce67463bf8",
+  "seconds": 247.141,
+  "job": {
+    "id": "474470889803",
+    "project": "88fcff790f6a",
+    "action": "generate",
+    "status": "complete",
+    "phase": "Complete",
+    "started": 1790488080.8521557,
+    "audio_cache": {
+      "generated_scene_ids": [
+        1,
+        2,
+        3
+      ],
+      "reused_scene_ids": []
+    },
+    "seconds": 244.109,
+    "progress": [
+      "      \"sourceCorrelation\": 0.999970229006744,",
+      "      \"paddingRms\": 0.0,",
+      "      \"codecOffsetSeconds\": 0.0,",
+      "      \"sourcePeak\": 0.50921630859375",
+      "    }",
+      "  ],",
+      "  \"fullDecode\": \"passed\"",
+      "}"
+    ]
+  },
+  "draft_url": "/media/88fcff790f6a/draft?v=6a546f30b8d4256a3444c7c653f7f5d60e46c33c3ee1b12b67ffacd700d2babb",
+  "duration": {
+    "estimated_seconds": 25.5,
+    "measured_seconds": 20.2,
+    "target_seconds": 30.0,
+    "outside_target": true,
+    "words": 54
+  },
+  "quality": {
+    "status": "needs_review",
+    "issues": [
+      {
+        "scene": 0,
+        "code": "duration_target",
+        "severity": "warning",
+        "message": "Runtime is approximately 20s for a 30s target. Review narration length before final export."
+      }
+    ],
+    "fact_check": "not_performed",
+    "notice": "Heuristics cannot establish factual accuracy. Review before publishing."
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "key": "ab5410a04bbdfdae7851ac805580363eeb7a46d29272a2663f1024ea6c4b923f",
+  "sha256": "af15ffd6bd71cfbc5e3622b3887dee4aedd022d8cf95e43a648ae2f536d32a20",
+  "duration": 9.887958333333334,
+  "beats": [
+    {
+      "text": "Students can read a timeline to compare the stages of their garden project.",
+      "start": 0.0,
+      "end": 4.329958333333333
+    },
+    {
+      "text": "Keeping events in order helps them see which work was completed before each later improvement.",
+      "start": 4.449958333333333,
+      "end": 9.887958333333334
+    }
+  ]
+}

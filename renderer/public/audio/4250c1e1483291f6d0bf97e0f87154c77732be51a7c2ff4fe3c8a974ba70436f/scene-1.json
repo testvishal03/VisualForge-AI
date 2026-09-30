@@ -1,0 +1,22 @@
+{
+  "key": "4250c1e1483291f6d0bf97e0f87154c77732be51a7c2ff4fe3c8a974ba70436f",
+  "sha256": "1bcbf4c741dbcc47859f71e24dc08bc7141a65d2ebab14605f54ebee73fa9b57",
+  "duration": 12.281333333333333,
+  "beats": [
+    {
+      "text": "Now there is an important thing to understand.",
+      "start": 0.0,
+      "end": 2.570666666666667
+    },
+    {
+      "text": "An embedding does not contain a human-readable definition of a word.",
+      "start": 2.6906666666666665,
+      "end": 6.817333333333333
+    },
+    {
+      "text": "You cannot look at one number inside the vector and say: “This number represents the word’s color.”",
+      "start": 6.937333333333333,
+      "end": 12.281333333333333
+    }
+  ]
+}

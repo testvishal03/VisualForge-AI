@@ -1,0 +1,32 @@
+{
+  "key": "667bf67aba5a0a049a1a0ae27f0c5b0bd46cf3f2090a0befc042a9280e375147",
+  "sha256": "9d6c6cd4abca05b531e055782a1c2ab1f9a6d9c94e94e7d3cd91475f20872487",
+  "duration": 16.703958333333333,
+  "beats": [
+    {
+      "text": "In the next video, we’ll visualize what a vector database is, how vector search works, and why vector databases are so important for RAG and modern AI applications.",
+      "start": 0.0,
+      "end": 11.230666666666666
+    },
+    {
+      "text": "This is VisualForge AI.",
+      "start": 11.350666666666667,
+      "end": 13.291291666666666
+    },
+    {
+      "text": "See it.",
+      "start": 13.411291666666667,
+      "end": 14.329291666666666
+    },
+    {
+      "text": "Understand it.",
+      "start": 14.449291666666667,
+      "end": 15.633291666666667
+    },
+    {
+      "text": "Build it.",
+      "start": 15.753291666666666,
+      "end": 16.703958333333333
+    }
+  ]
+}

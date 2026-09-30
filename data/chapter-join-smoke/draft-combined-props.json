@@ -1,0 +1,177 @@
+{
+  "videoData": {
+    "title": "Full video",
+    "scenes": [
+      {
+        "id": 1,
+        "headline": "Water cycle in motion",
+        "body": "Sunlight warms surface water, causing evaporation into the air.",
+        "narration": "Sunlight warms surface water, causing evaporation into the air. Cooling water vapor condenses and clouds form above the land. Precipitation falls as rain when droplets grow heavy. Water collects in rivers and flows back toward the ocean.",
+        "audio": "audio/daea1d07e892dec6c69f8d60038c051cde42b812d581e3325b2499513ada59f6/scene-1.wav",
+        "duration": 14.862666666666666,
+        "beats": [
+          {
+            "text": "Sunlight warms surface water, causing evaporation into the air.",
+            "start": 0.0,
+            "end": 4.0
+          },
+          {
+            "text": "Cooling water vapor condenses and clouds form above the land.",
+            "start": 4.12,
+            "end": 7.8853333333333335
+          },
+          {
+            "text": "Precipitation falls as rain when droplets grow heavy.",
+            "start": 8.005333333333333,
+            "end": 11.364
+          },
+          {
+            "text": "Water collects in rivers and flows back toward the ocean.",
+            "start": 11.484,
+            "end": 14.862666666666666
+          }
+        ],
+        "visual": {
+          "kind": "water_cycle",
+          "items": [
+            "Evaporation",
+            "Condensation",
+            "Precipitation",
+            "Collection"
+          ],
+          "cues": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "icon": "rain",
+          "directed": true,
+          "variant": 0,
+          "icons": [
+            "water",
+            "cloud",
+            "rain",
+            "idea"
+          ],
+          "transition": "fade",
+          "revealAt": [
+            0.0,
+            4.12,
+            8.005333333333333,
+            11.484
+          ]
+        }
+      },
+      {
+        "id": 2,
+        "headline": "The water cycle moves water between the surface",
+        "body": "The water cycle moves water between the surface and the atmosphere.",
+        "narration": "The water cycle moves water between the surface and the atmosphere. Local temperature and weather affect how quickly water evaporates and where precipitation falls.",
+        "audio": "audio/fe90be7ce95c1ef02f36c049fec47b336ce7037f5e31e72e7e095f3ce78d57a8/scene-1.wav",
+        "duration": 10.005958333333334,
+        "beats": [
+          {
+            "text": "The water cycle moves water between the surface and the atmosphere.",
+            "start": 0.0,
+            "end": 3.924625
+          },
+          {
+            "text": "Local temperature and weather affect how quickly water evaporates and where precipitation falls.",
+            "start": 4.044625,
+            "end": 10.005958333333334
+          }
+        ],
+        "visual": {
+          "kind": "takeaway",
+          "items": [],
+          "cues": [],
+          "icon": "rain",
+          "directed": true,
+          "variant": 1,
+          "icons": [],
+          "transition": "slide",
+          "revealAt": []
+        }
+      },
+      {
+        "id": 3,
+        "headline": "A Library Is a Place for Knowledge",
+        "body": "A library helps you find books, movies, and information easily.",
+        "narration": "A library collects books, movies, and resources and organizes them so you can find information easily.",
+        "audio": "audio/6f80119c8c1464e889e5498efb8b3e7ffd2a39ed0ea035fe6a0bb2003b45265c/scene-1.wav",
+        "duration": 6.917333333333334,
+        "beats": [
+          {
+            "text": "A library collects books, movies, and resources and organizes them so you can find information easily.",
+            "start": 0.0,
+            "end": 6.917333333333334
+          }
+        ],
+        "visual": {
+          "kind": "title",
+          "items": [],
+          "cues": [],
+          "icon": "book",
+          "directed": true,
+          "variant": 0,
+          "icons": [],
+          "transition": "fade",
+          "revealAt": []
+        }
+      },
+      {
+        "id": 4,
+        "headline": "Libraries Use Systems to Find Items",
+        "body": "Books are sorted by subject and author for easy finding.",
+        "narration": "Books are sorted by subject and author using a catalog system so users can find them quickly and easily.",
+        "audio": "audio/148ab31e151148659117bfcd59c8d5354509bc8cca80cc1dfa9d0d4eba512de0/scene-1.wav",
+        "duration": 6.3352916666666665,
+        "beats": [
+          {
+            "text": "Books are sorted by subject and author using a catalog system so users can find them quickly and easily.",
+            "start": 0.0,
+            "end": 6.3352916666666665
+          }
+        ],
+        "visual": {
+          "kind": "explanation",
+          "items": [],
+          "cues": [],
+          "icon": "book",
+          "directed": true,
+          "variant": 1,
+          "icons": [],
+          "transition": "slide",
+          "revealAt": []
+        }
+      },
+      {
+        "id": 5,
+        "headline": "Maria Finds a Book on Weather",
+        "body": "Maria checks weather book by title and checks it out with her card.",
+        "narration": "Maria looks up the weather book by title in the catalog and checks it out with her library card.",
+        "audio": "audio/cd6312db394bb96e563a864e33913ec07a1337a319c52fb035476d24bd3d5e0a/scene-1.wav",
+        "duration": 5.396625,
+        "beats": [
+          {
+            "text": "Maria looks up the weather book by title in the catalog and checks it out with her library card.",
+            "start": 0.0,
+            "end": 5.396625
+          }
+        ],
+        "visual": {
+          "kind": "takeaway",
+          "items": [],
+          "cues": [],
+          "icon": "book",
+          "directed": true,
+          "variant": 0,
+          "icons": [],
+          "transition": "fade",
+          "revealAt": []
+        }
+      }
+    ]
+  }
+}

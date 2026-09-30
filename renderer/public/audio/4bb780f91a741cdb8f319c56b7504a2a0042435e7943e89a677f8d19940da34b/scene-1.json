@@ -1,0 +1,32 @@
+{
+  "key": "4bb780f91a741cdb8f319c56b7504a2a0042435e7943e89a677f8d19940da34b",
+  "sha256": "4fce55bf4340029d4455d6de1d74bede5c315ab021219640996d9d08238af62b",
+  "duration": 16.086,
+  "beats": [
+    {
+      "text": "So let’s recap.",
+      "start": 0.0,
+      "end": 1.2906666666666666
+    },
+    {
+      "text": "An embedding is a numerical representation of information.",
+      "start": 1.4106666666666667,
+      "end": 5.089333333333333
+    },
+    {
+      "text": "That information could be text, images, audio, code, or something else.",
+      "start": 5.209333333333333,
+      "end": 9.448666666666666
+    },
+    {
+      "text": "An embedding is represented as a vector.",
+      "start": 9.568666666666667,
+      "end": 12.138
+    },
+    {
+      "text": "Similar meanings tend to produce vectors that are closer together.",
+      "start": 12.258,
+      "end": 16.086
+    }
+  ]
+}

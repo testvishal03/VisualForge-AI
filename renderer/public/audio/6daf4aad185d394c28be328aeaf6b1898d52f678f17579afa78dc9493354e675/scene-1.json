@@ -1,0 +1,27 @@
+{
+  "key": "6daf4aad185d394c28be328aeaf6b1898d52f678f17579afa78dc9493354e675",
+  "sha256": "703e86ec58b8b0d5c58055e4fa71737f0233d1a565d625f7528f9e3ec35a47de",
+  "duration": 20.887333333333334,
+  "beats": [
+    {
+      "text": "Token IDs are identifiers in a vocabulary, not definitions of the text.",
+      "start": 0.0,
+      "end": 5.172
+    },
+    {
+      "text": "The model maps tokens to numerical representations called embeddings.",
+      "start": 5.292,
+      "end": 9.727333333333334
+    },
+    {
+      "text": "Those representations participate in the model computation.",
+      "start": 9.847333333333333,
+      "end": 13.888666666666667
+    },
+    {
+      "text": "A larger identifier does not mean a word is more important, more positive, or more similar to another word.",
+      "start": 14.008666666666667,
+      "end": 20.887333333333334
+    }
+  ]
+}

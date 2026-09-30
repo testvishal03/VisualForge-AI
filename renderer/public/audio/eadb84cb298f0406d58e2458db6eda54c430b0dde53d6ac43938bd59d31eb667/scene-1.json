@@ -1,0 +1,12 @@
+{
+  "key": "eadb84cb298f0406d58e2458db6eda54c430b0dde53d6ac43938bd59d31eb667",
+  "sha256": "8691282cadbf7fef58c5144de5daa0842de79c8e9ea3d2c460ad321e160f314b",
+  "duration": 5.609958333333333,
+  "beats": [
+    {
+      "text": "Before the model can process your text, that text is broken into smaller pieces called tokens.",
+      "start": 0.0,
+      "end": 5.609958333333333
+    }
+  ]
+}

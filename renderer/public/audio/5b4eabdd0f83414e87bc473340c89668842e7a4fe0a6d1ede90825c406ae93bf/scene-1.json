@@ -1,0 +1,12 @@
+{
+  "key": "5b4eabdd0f83414e87bc473340c89668842e7a4fe0a6d1ede90825c406ae93bf",
+  "sha256": "af2b5645c5a2007e91d9cd52cdd46fdb7930b61cafc73d1bb51ae2ed7551d525",
+  "duration": 5.982666666666667,
+  "beats": [
+    {
+      "text": "This Python loop adds each amount to a running total, then prints the sum after the final iteration.",
+      "start": 0.0,
+      "end": 5.982666666666667
+    }
+  ]
+}

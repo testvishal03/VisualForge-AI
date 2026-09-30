@@ -1,0 +1,32 @@
+{
+  "key": "e4433a844b1bb2fcdf4837bf005a8c4e4484f0c33b8fd77fd68e710c0a405162",
+  "sha256": "95c219dd37671a68c48bbe1ae5cb0f20609e5f7210d453638f60b2f5a0bfa6b8",
+  "duration": 20.016583333333333,
+  "beats": [
+    {
+      "text": "First, water moves from roots to leaves.",
+      "start": 0.0,
+      "end": 2.505333333333333
+    },
+    {
+      "text": "Next, plant leaves release water vapor through tiny pores called stomata.",
+      "start": 2.6253333333333333,
+      "end": 6.869958333333333
+    },
+    {
+      "text": "This process, called transpiration, helps cool the plant and returns water to the atmosphere.",
+      "start": 6.989958333333333,
+      "end": 12.577291666666667
+    },
+    {
+      "text": "In contrast, evaporation from soil is passive.",
+      "start": 12.697291666666667,
+      "end": 15.87525
+    },
+    {
+      "text": "Plants actively pump water into the air, helping clouds form again.",
+      "start": 15.99525,
+      "end": 20.016583333333333
+    }
+  ]
+}

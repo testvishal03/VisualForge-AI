@@ -1,0 +1,17 @@
+{
+  "key": "b638e68f062a2485d4c24cb08eef5ad82be5c0ea56fff7b26c872d9ff901b8af",
+  "sha256": "55bc0927642e48bb70b9f6c3adecad78563dd8e0407e5024cf1364347a8988a4",
+  "duration": 6.326583333333334,
+  "beats": [
+    {
+      "text": "One model may split a word into two tokens.",
+      "start": 0.0,
+      "end": 2.665958333333333
+    },
+    {
+      "text": "Another model may treat that same word as a single token.",
+      "start": 2.7859583333333333,
+      "end": 6.326583333333334
+    }
+  ]
+}

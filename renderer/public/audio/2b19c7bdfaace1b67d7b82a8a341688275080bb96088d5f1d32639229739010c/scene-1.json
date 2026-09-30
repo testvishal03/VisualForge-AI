@@ -1,0 +1,17 @@
+{
+  "key": "2b19c7bdfaace1b67d7b82a8a341688275080bb96088d5f1d32639229739010c",
+  "sha256": "0781c6abb4e82c96db588706e02d59b2317846dd33f3cc99b44346ce2e073dd2",
+  "duration": 5.983958333333334,
+  "beats": [
+    {
+      "text": "What happens when the context becomes too large?",
+      "start": 0.0,
+      "end": 2.772625
+    },
+    {
+      "text": "There is no single behavior for every application.",
+      "start": 2.892625,
+      "end": 5.983958333333334
+    }
+  ]
+}

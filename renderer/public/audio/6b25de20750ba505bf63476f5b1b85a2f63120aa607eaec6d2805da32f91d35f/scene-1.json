@@ -1,0 +1,17 @@
+{
+  "key": "6b25de20750ba505bf63476f5b1b85a2f63120aa607eaec6d2805da32f91d35f",
+  "sha256": "12deb9741134322b3fdf39d88be201677069682b80021a2165077de271888005",
+  "duration": 10.764,
+  "beats": [
+    {
+      "text": "An embedding represents text using a numerical vector.",
+      "start": 0.0,
+      "end": 3.530666666666667
+    },
+    {
+      "text": "An embedding model learns the values from training data, so the coordinates shown here are only an illustrative example.",
+      "start": 3.6506666666666665,
+      "end": 10.764
+    }
+  ]
+}

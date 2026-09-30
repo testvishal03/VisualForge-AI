@@ -1,0 +1,17 @@
+{
+  "key": "9ff7341adb94346705fe30f6d4a8cbc7a7f7581b9bd470938cace06afc8ea6a4",
+  "sha256": "4e136c7322d32979d1f51cb7d225fdd110be513744187569823efff022b563f0",
+  "duration": 6.668,
+  "beats": [
+    {
+      "text": "These are different things.",
+      "start": 0.0,
+      "end": 1.4826666666666666
+    },
+    {
+      "text": "This distinction becomes very useful when we talk about real AI applications.",
+      "start": 1.6026666666666667,
+      "end": 6.668
+    }
+  ]
+}

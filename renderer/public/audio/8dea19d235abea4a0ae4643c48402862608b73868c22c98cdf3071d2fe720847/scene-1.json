@@ -1,0 +1,17 @@
+{
+  "key": "8dea19d235abea4a0ae4643c48402862608b73868c22c98cdf3071d2fe720847",
+  "sha256": "0e977b6c024421b0a0fc81ce6a13defbcebdf2fd83ea22a8f92b45afe6f1c416",
+  "duration": 8.012,
+  "beats": [
+    {
+      "text": "The context window is different.",
+      "start": 0.0,
+      "end": 1.9733333333333334
+    },
+    {
+      "text": "The context window contains temporary information that is available during the current interaction.",
+      "start": 2.0933333333333333,
+      "end": 8.012
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "title": "What is Generative AI?",
+  "scenes": [
+    {
+      "id": 1,
+      "headline": "What if computers could create?",
+      "body": "Not just calculate. Not just search. Actually create.",
+      "narration": "What if computers could create? Not just calculate and not just search, but actually create.",
+      "audio": "audio/9489d771301e0b99/scene-1.wav",
+      "duration": 5.353958333333333
+    },
+    {
+      "id": 2,
+      "headline": "That's Generative AI",
+      "body": "It can create text, images, audio, video and code.",
+      "narration": "This is the idea behind generative AI. It can create text, images, audio, video, and even software code.",
+      "audio": "audio/9489d771301e0b99/scene-2.wav",
+      "duration": 7.443291666666667
+    },
+    {
+      "id": 3,
+      "headline": "How does it work?",
+      "body": "Generative AI learns patterns from large amounts of existing data.",
+      "narration": "Generative AI learns patterns from large amounts of existing data, then uses those patterns to generate new content.",
+      "audio": "audio/9489d771301e0b99/scene-3.wav",
+      "duration": 7.584
+    }
+  ],
+  "tts": {
+    "engine": "kokoro-onnx",
+    "version": "0.6.1",
+    "voice": "af_sarah",
+    "seed": 0
+  }
+}

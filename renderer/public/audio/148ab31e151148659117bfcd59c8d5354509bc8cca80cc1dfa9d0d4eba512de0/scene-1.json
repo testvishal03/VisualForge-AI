@@ -1,0 +1,12 @@
+{
+  "key": "148ab31e151148659117bfcd59c8d5354509bc8cca80cc1dfa9d0d4eba512de0",
+  "sha256": "66b4cc036ce8052fae22126914d1b8416410e73b780a510fd6d8e87d6abcc031",
+  "duration": 6.3352916666666665,
+  "beats": [
+    {
+      "text": "Books are sorted by subject and author using a catalog system so users can find them quickly and easily.",
+      "start": 0.0,
+      "end": 6.3352916666666665
+    }
+  ]
+}

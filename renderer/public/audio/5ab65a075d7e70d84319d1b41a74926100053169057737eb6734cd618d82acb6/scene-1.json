@@ -1,0 +1,22 @@
+{
+  "key": "5ab65a075d7e70d84319d1b41a74926100053169057737eb6734cd618d82acb6",
+  "sha256": "aa0a7888493f271fe6e2a1ce9725184e1791ec50be291f6f5bec982e0d7c91bd",
+  "duration": 9.997291666666667,
+  "beats": [
+    {
+      "text": "So the total context is shared between input and output.",
+      "start": 0.0,
+      "end": 3.540625
+    },
+    {
+      "text": "This is important.",
+      "start": 3.660625,
+      "end": 5.057958333333334
+    },
+    {
+      "text": "If the input is very small, the model may have plenty of room for a long response.",
+      "start": 5.177958333333334,
+      "end": 9.997291666666667
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "key": "204b214d11a9d1fe93d06be15a0e9c4ec580698b7d5a6832afa5ef5e5a3a06b8",
+  "sha256": "dfe2911e26957b22cdf2d89edca45124ddf384f18d064724548b97736a71e26f",
+  "duration": 19.345333333333333,
+  "beats": [
+    {
+      "text": "Now let’s see how embeddings are created.",
+      "start": 0.0,
+      "end": 2.3133333333333335
+    },
+    {
+      "text": "Suppose we start with a sentence: “Python is a programming language.” First, the text is processed by an embedding model.",
+      "start": 2.433333333333333,
+      "end": 9.845333333333333
+    },
+    {
+      "text": "The model analyzes the relationships and meaning inside that text.",
+      "start": 9.965333333333334,
+      "end": 14.134666666666666
+    },
+    {
+      "text": "Then it produces a numerical vector.",
+      "start": 14.254666666666667,
+      "end": 16.697333333333333
+    },
+    {
+      "text": "So the basic flow looks like this: Text.",
+      "start": 16.817333333333334,
+      "end": 19.345333333333333
+    }
+  ]
+}

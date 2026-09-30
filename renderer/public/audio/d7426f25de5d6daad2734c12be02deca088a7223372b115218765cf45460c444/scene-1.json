@@ -1,0 +1,17 @@
+{
+  "key": "d7426f25de5d6daad2734c12be02deca088a7223372b115218765cf45460c444",
+  "sha256": "d503ddb169f97300b1efca11bd5ed8a7e1af550c608c12c61d34428503283c94",
+  "duration": 5.780666666666667,
+  "beats": [
+    {
+      "text": "It retrieves a few relevant pieces of information.",
+      "start": 0.0,
+      "end": 2.942
+    },
+    {
+      "text": "Those pieces are added to the model’s context.",
+      "start": 3.062,
+      "end": 5.780666666666667
+    }
+  ]
+}

@@ -1,0 +1,118 @@
+{
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+  "device": "cpu",
+  "dtype": "float32",
+  "seed": 42,
+  "temperature": 0.0,
+  "do_sample": false,
+  "max_new_tokens": 1800,
+  "outline_token_limit": 1000,
+  "body_token_limit": 180,
+  "narration_token_limit": 300,
+  "threads": 2,
+  "target_minutes": 2.0,
+  "strategy": "validated outline, then individually validated captions and narration; one model instance",
+  "elapsed_seconds": 397.557,
+  "model_load_seconds": 47.036,
+  "generation_seconds": 349.31,
+  "generated_tokens": 819,
+  "attempts": [
+    {
+      "stage": "outline",
+      "attempt": 1,
+      "seconds": 148.026,
+      "tokens": 389,
+      "status": "valid"
+    },
+    {
+      "stage": "scene-1-body",
+      "attempt": 1,
+      "seconds": 8.349,
+      "tokens": 17,
+      "status": "valid"
+    },
+    {
+      "stage": "scene-1-narration",
+      "attempt": 1,
+      "seconds": 21.578,
+      "tokens": 51,
+      "status": "valid"
+    },
+    {
+      "stage": "scene-2-body",
+      "attempt": 1,
+      "seconds": 10.029,
+      "tokens": 22,
+      "status": "valid"
+    },
+    {
+      "stage": "scene-2-narration",
+      "attempt": 1,
+      "seconds": 23.404,
+      "tokens": 54,
+      "status": "valid"
+    },
+    {
+      "stage": "scene-3-body",
+      "attempt": 1,
+      "seconds": 9.504,
+      "tokens": 21,
+      "status": "valid"
+    },
+    {
+      "stage": "scene-3-narration",
+      "attempt": 1,
+      "seconds": 21.863,
+      "tokens": 49,
+      "status": "valid"
+    },
+    {
+      "stage": "scene-4-body",
+      "attempt": 1,
+      "seconds": 8.477,
+      "tokens": 18,
+      "status": "valid"
+    },
+    {
+      "stage": "scene-4-narration",
+      "attempt": 1,
+      "seconds": 33.517,
+      "tokens": 52,
+      "status": "valid"
+    },
+    {
+      "stage": "scene-5-body",
+      "attempt": 1,
+      "seconds": 10.559,
+      "tokens": 26,
+      "status": "valid"
+    },
+    {
+      "stage": "scene-5-narration",
+      "attempt": 1,
+      "seconds": 19.81,
+      "tokens": 46,
+      "status": "valid"
+    },
+    {
+      "stage": "scene-6-body",
+      "attempt": 1,
+      "seconds": 11.447,
+      "tokens": 25,
+      "status": "valid"
+    },
+    {
+      "stage": "scene-6-narration",
+      "attempt": 1,
+      "seconds": 22.747,
+      "tokens": 49,
+      "status": "valid"
+    }
+  ],
+  "title": "What is Generative AI?",
+  "topic": "What is Generative AI?",
+  "scenes": 6,
+  "narration_words": 213,
+  "script_sha256": "924a849fff1ce8944d4de6fb03ea4bc807e379644123f2d983e0c76fda636aa6"
+}

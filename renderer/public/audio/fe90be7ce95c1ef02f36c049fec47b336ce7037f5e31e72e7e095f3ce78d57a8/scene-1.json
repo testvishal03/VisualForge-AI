@@ -1,0 +1,17 @@
+{
+  "key": "fe90be7ce95c1ef02f36c049fec47b336ce7037f5e31e72e7e095f3ce78d57a8",
+  "sha256": "3caba4e4484cda56f6ba8c88e8bc6206620d0e24102abb3156f60099ec946ea5",
+  "duration": 10.005958333333334,
+  "beats": [
+    {
+      "text": "The water cycle moves water between the surface and the atmosphere.",
+      "start": 0.0,
+      "end": 3.924625
+    },
+    {
+      "text": "Local temperature and weather affect how quickly water evaporates and where precipitation falls.",
+      "start": 4.044625,
+      "end": 10.005958333333334
+    }
+  ]
+}

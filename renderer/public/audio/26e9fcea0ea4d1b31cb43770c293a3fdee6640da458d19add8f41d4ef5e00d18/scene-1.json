@@ -1,0 +1,72 @@
+{
+  "key": "26e9fcea0ea4d1b31cb43770c293a3fdee6640da458d19add8f41d4ef5e00d18",
+  "sha256": "0d4b62855365e01246fed014ca439b08ce72fd7a6afb248b10f4d1dd69b2bcad",
+  "duration": 24.503708333333332,
+  "beats": [
+    {
+      "text": "Movies can have embeddings.",
+      "start": 0.0,
+      "end": 1.6632916666666666
+    },
+    {
+      "text": "Even source code can be represented as embeddings.",
+      "start": 1.7832916666666667,
+      "end": 5.077958333333333
+    },
+    {
+      "text": "This makes embeddings useful for many applications.",
+      "start": 5.197958333333333,
+      "end": 8.247916666666667
+    },
+    {
+      "text": "Semantic search.",
+      "start": 8.367916666666666,
+      "end": 9.647208333333333
+    },
+    {
+      "text": "Recommendation systems.",
+      "start": 9.767208333333333,
+      "end": 11.451833333333333
+    },
+    {
+      "text": "Document retrieval.",
+      "start": 11.571833333333334,
+      "end": 12.9905
+    },
+    {
+      "text": "Duplicate detection.",
+      "start": 13.1105,
+      "end": 14.581791666666666
+    },
+    {
+      "text": "Clustering.",
+      "start": 14.701791666666667,
+      "end": 15.683791666666666
+    },
+    {
+      "text": "Classification.",
+      "start": 15.803791666666667,
+      "end": 17.094458333333332
+    },
+    {
+      "text": "Image search.",
+      "start": 17.214458333333333,
+      "end": 18.344416666666667
+    },
+    {
+      "text": "Code search.",
+      "start": 18.464416666666665,
+      "end": 19.50904166666667
+    },
+    {
+      "text": "And many other tasks.",
+      "start": 19.629041666666666,
+      "end": 21.046375
+    },
+    {
+      "text": "For example, imagine a movie recommendation system.",
+      "start": 21.166375,
+      "end": 24.503708333333332
+    }
+  ]
+}

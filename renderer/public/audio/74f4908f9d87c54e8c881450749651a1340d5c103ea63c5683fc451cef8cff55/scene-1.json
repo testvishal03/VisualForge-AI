@@ -1,0 +1,22 @@
+{
+  "key": "74f4908f9d87c54e8c881450749651a1340d5c103ea63c5683fc451cef8cff55",
+  "sha256": "262694c51436fafad6ee27f4a78307ecf1cd6e7dfb12f16a2b864e1d72ba338f",
+  "duration": 12.237291666666666,
+  "beats": [
+    {
+      "text": "Another important point is that tokenization is model-specific.",
+      "start": 0.0,
+      "end": 4.158
+    },
+    {
+      "text": "Different models can use different tokenizers.",
+      "start": 4.278,
+      "end": 7.019333333333333
+    },
+    {
+      "text": "That means the same sentence may be split differently depending on the model you are using.",
+      "start": 7.139333333333333,
+      "end": 12.237291666666666
+    }
+  ]
+}

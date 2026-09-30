@@ -1,0 +1,27 @@
+{
+  "key": "fbb99aa70bf95c4dc9b90cba87906665d5beb73d0e64f4dd64e7c7e233b85378",
+  "sha256": "8e011b2176543e0003996ab03cfa7e7ace6fd9e472855cc0f4cf817e776e1f3a",
+  "duration": 13.273916666666667,
+  "beats": [
+    {
+      "text": "When rain hits pavement, it doesn't soak in.",
+      "start": 0.0,
+      "end": 2.580625
+    },
+    {
+      "text": "Instead, it flows over the surface—this is surface runoff.",
+      "start": 2.700625,
+      "end": 6.2312916666666665
+    },
+    {
+      "text": "It quickly enters streams and rivers.",
+      "start": 6.351291666666667,
+      "end": 8.462583333333333
+    },
+    {
+      "text": "Whereas water on soil soaks in, this flow moves fast and can cause flooding.",
+      "start": 8.582583333333334,
+      "end": 13.273916666666667
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "key": "eec3fcac889e7a6b530244f07122517d5d0d32ab30831709b8f6f2db3108683b",
+  "sha256": "c7336e16080369cdcdfe46536fa9a1bf0ca546b9ef9851b20b314cc012836701",
+  "duration": 20.211916666666667,
+  "beats": [
+    {
+      "text": "Let’s look at a simple two-dimensional example.",
+      "start": 0.0,
+      "end": 2.9219583333333334
+    },
+    {
+      "text": "Imagine a graph.",
+      "start": 3.0419583333333335,
+      "end": 4.332625
+    },
+    {
+      "text": "On this graph, we place the words: Cat.",
+      "start": 4.452625,
+      "end": 7.027958333333333
+    },
+    {
+      "text": "Dog.",
+      "start": 7.147958333333333,
+      "end": 7.980625
+    },
+    {
+      "text": "Lion.",
+      "start": 8.100625,
+      "end": 8.954625
+    },
+    {
+      "text": "Car.",
+      "start": 9.074625,
+      "end": 9.928625
+    },
+    {
+      "text": "Truck.",
+      "start": 10.048625,
+      "end": 10.869958333333333
+    },
+    {
+      "text": "Banana.",
+      "start": 10.989958333333334,
+      "end": 11.875291666666667
+    },
+    {
+      "text": "The animal-related words may cluster together.",
+      "start": 11.995291666666667,
+      "end": 14.821958333333333
+    },
+    {
+      "text": "Vehicle-related words may form another cluster.",
+      "start": 14.941958333333334,
+      "end": 17.809958333333334
+    },
+    {
+      "text": "And food-related words may form another.",
+      "start": 17.92995833333333,
+      "end": 20.211916666666667
+    }
+  ]
+}

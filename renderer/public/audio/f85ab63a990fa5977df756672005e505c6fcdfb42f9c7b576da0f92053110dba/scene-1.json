@@ -1,0 +1,27 @@
+{
+  "key": "f85ab63a990fa5977df756672005e505c6fcdfb42f9c7b576da0f92053110dba",
+  "sha256": "d26831d9cec7955ff65c582a998ac6e4a427bf5dbd271ad277d33cb275f341e4",
+  "duration": 15.010625,
+  "beats": [
+    {
+      "text": "First, water moves from roots to leaves.",
+      "start": 0.0,
+      "end": 2.505333333333333
+    },
+    {
+      "text": "Next, plants release it as vapor through tiny pores.",
+      "start": 2.6253333333333333,
+      "end": 5.866
+    },
+    {
+      "text": "Finally, this water joins the air and helps form clouds.",
+      "start": 5.986,
+      "end": 9.398625
+    },
+    {
+      "text": "Whereas evaporation is from soil, transpiration is from plants—life fuels the sky.",
+      "start": 9.518625,
+      "end": 15.010625
+    }
+  ]
+}

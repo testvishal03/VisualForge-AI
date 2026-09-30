@@ -1,0 +1,27 @@
+{
+  "key": "37e1e228fd91a009073c0a96cbb25e070dc7c5281ab6ac5a0b6c2f75a6725560",
+  "sha256": "e79a3d7cf528f4516f86c64246b8d3bbcb673e320429d22ec9037de817f6dbf8",
+  "duration": 19.498,
+  "beats": [
+    {
+      "text": "Tokens can represent whole words, word pieces, or punctuation.",
+      "start": 0.0,
+      "end": 4.094
+    },
+    {
+      "text": "Spaces may also be included in a token piece.",
+      "start": 4.214,
+      "end": 7.241333333333333
+    },
+    {
+      "text": "The boundaries depend on the tokenizer and its vocabulary, so counting words is not the same as counting tokens.",
+      "start": 7.3613333333333335,
+      "end": 14.430666666666667
+    },
+    {
+      "text": "There is no single universal conversion that works for every sentence and language.",
+      "start": 14.550666666666666,
+      "end": 19.498
+    }
+  ]
+}

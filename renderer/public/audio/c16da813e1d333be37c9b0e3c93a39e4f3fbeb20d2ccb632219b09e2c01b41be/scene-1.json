@@ -1,0 +1,27 @@
+{
+  "key": "c16da813e1d333be37c9b0e3c93a39e4f3fbeb20d2ccb632219b09e2c01b41be",
+  "sha256": "8f3303566dfcec632623c19a44f991e48f75f257674f22e8fc3dab13c4865876",
+  "duration": 16.661875,
+  "beats": [
+    {
+      "text": "First, tiny droplets in clouds collide and stick together.",
+      "start": 0.0,
+      "end": 3.540625
+    },
+    {
+      "text": "Next, they merge repeatedly, growing in size.",
+      "start": 3.660625,
+      "end": 6.609958333333333
+    },
+    {
+      "text": "Finally, when droplets reach millimeter size, they fall as rain.",
+      "start": 6.729958333333333,
+      "end": 10.76125
+    },
+    {
+      "text": "Whereas drizzle comes from small droplets, heavy rain results from large, fast-growing drops.",
+      "start": 10.88125,
+      "end": 16.661875
+    }
+  ]
+}

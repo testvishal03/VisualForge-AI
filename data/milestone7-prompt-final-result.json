@@ -1,0 +1,20 @@
+{
+  "id": "b78fd6399765",
+  "project": "e78449f10720",
+  "action": "generate",
+  "status": "failed",
+  "phase": "Failed",
+  "started": 1790480455.5592978,
+  "error": "Stage exited with code 1. See D:\\Personal Project\\VisualForge AI\\data\\editor\\e78449f10720\\logs\\draft.log",
+  "seconds": 189.678,
+  "progress": [
+    "scene-3-body: attempt 1/3...",
+    "scene-3-narration: attempt 1/3...",
+    "Validation failed: No complete JSON object found; return one object, not a list or prose.",
+    "scene-3-narration: attempt 2/3...",
+    "Validation failed: narration: Value error, narration must contain 15\ufffd60 words; aim for 20\ufffd45",
+    "scene-3-narration: attempt 3/3...",
+    "Validation failed: narration: Value error, narration must contain 15\ufffd60 words; aim for 20\ufffd45",
+    "Script generation failed: No valid scene-3-narration after 3 attempts. Existing output was preserved. Last error: narration: Value error, narration must contain 15\ufffd60 words; aim for 20\ufffd45"
+  ]
+}

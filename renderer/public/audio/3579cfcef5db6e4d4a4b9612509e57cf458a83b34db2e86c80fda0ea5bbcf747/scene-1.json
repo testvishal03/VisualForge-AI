@@ -1,0 +1,17 @@
+{
+  "key": "3579cfcef5db6e4d4a4b9612509e57cf458a83b34db2e86c80fda0ea5bbcf747",
+  "sha256": "cbdb2b424090aa15bb785d9daaa4039b1a375f762e1b146fdee9024f50648638",
+  "duration": 9.376,
+  "beats": [
+    {
+      "text": "Imagine the context window as a container with a limited amount of space.",
+      "start": 0.0,
+      "end": 4.382666666666666
+    },
+    {
+      "text": "Every piece of text placed inside that container consumes some of that capacity.",
+      "start": 4.502666666666666,
+      "end": 9.376
+    }
+  ]
+}

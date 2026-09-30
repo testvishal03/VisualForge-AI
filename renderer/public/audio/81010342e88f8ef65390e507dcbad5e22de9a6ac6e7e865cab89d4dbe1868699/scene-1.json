@@ -1,0 +1,17 @@
+{
+  "key": "81010342e88f8ef65390e507dcbad5e22de9a6ac6e7e865cab89d4dbe1868699",
+  "sha256": "0472146807d7393c5baf93efcad4ef8e7f1132616bc8b5e7ab3ae749be1f5efa",
+  "duration": 7.575333333333333,
+  "beats": [
+    {
+      "text": "It depends on the tokenizer used by that model.",
+      "start": 0.0,
+      "end": 3.03
+    },
+    {
+      "text": "This matters because tokens are not only how the model processes text.",
+      "start": 3.15,
+      "end": 7.575333333333333
+    }
+  ]
+}

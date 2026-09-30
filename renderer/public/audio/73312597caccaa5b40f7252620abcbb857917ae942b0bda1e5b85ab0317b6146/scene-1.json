@@ -1,0 +1,22 @@
+{
+  "key": "73312597caccaa5b40f7252620abcbb857917ae942b0bda1e5b85ab0317b6146",
+  "sha256": "343fe5535423ec8abd407d71ebda6937ab650bb46bc2694d9f8c5390187b7c55",
+  "duration": 12.460625,
+  "beats": [
+    {
+      "text": "Of course, real embeddings do not usually exist in only two dimensions.",
+      "start": 0.0,
+      "end": 4.745333333333333
+    },
+    {
+      "text": "They can exist in hundreds or thousands of dimensions.",
+      "start": 4.865333333333333,
+      "end": 8.043291666666667
+    },
+    {
+      "text": "We reduce them to two or three dimensions only so we can visualize them.",
+      "start": 8.163291666666666,
+      "end": 12.460625
+    }
+  ]
+}

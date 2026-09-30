@@ -1,0 +1,27 @@
+{
+  "key": "05d90a09629596888fb8625575068a989ff1054b641410d1dbebb4be1a75693d",
+  "sha256": "96cbc040bc60268171b8bab98bf76482f4627694cace2afaadc5808024fc60a6",
+  "duration": 14.529916666666667,
+  "beats": [
+    {
+      "text": "First, tiny droplets grow in clouds.",
+      "start": 0.0,
+      "end": 2.5379583333333335
+    },
+    {
+      "text": "Next, when they reach about 0.5 millimeters in diameter, gravity pulls them down.",
+      "start": 2.657958333333333,
+      "end": 8.245291666666667
+    },
+    {
+      "text": "Finally, they fall as rain.",
+      "start": 8.365291666666666,
+      "end": 10.28325
+    },
+    {
+      "text": "Whereas smaller droplets stay suspended, larger ones fall quickly.",
+      "start": 10.40325,
+      "end": 14.529916666666667
+    }
+  ]
+}

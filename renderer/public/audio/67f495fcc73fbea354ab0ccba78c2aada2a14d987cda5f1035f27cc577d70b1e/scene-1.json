@@ -1,0 +1,17 @@
+{
+  "key": "67f495fcc73fbea354ab0ccba78c2aada2a14d987cda5f1035f27cc577d70b1e",
+  "sha256": "06a4a8b94fc643a2bb361e679a06cbd4dcf9a472918cf6726b082abfb9a33ea2",
+  "duration": 6.465333333333334,
+  "beats": [
+    {
+      "text": "They also affect how much information the model can handle at one time.",
+      "start": 0.0,
+      "end": 4.32
+    },
+    {
+      "text": "And that brings us to the second concept:",
+      "start": 4.44,
+      "end": 6.465333333333334
+    }
+  ]
+}

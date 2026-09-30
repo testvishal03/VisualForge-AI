@@ -1,0 +1,17 @@
+{
+  "key": "52282f3d0d0607f8cb7413d41af2fc48cffce5075618d8580759a19c9e5574b2",
+  "sha256": "404fafc5d60571a784449c012e5f54581205beb048c25ef2bf874b4720dd11df",
+  "duration": 6.624625,
+  "beats": [
+    {
+      "text": "The context window contains temporary information available right now.",
+      "start": 0.0,
+      "end": 4.415291666666667
+    },
+    {
+      "text": "So the complete simplified flow is:",
+      "start": 4.535291666666667,
+      "end": 6.624625
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "key": "84462ec5c966df9e94b57ac22c4b4ff81d229d2cbe360661b9fab6c2db01e8c7",
+  "sha256": "89fe613fb45c6109c7fb9cc1acaee5fc11824f055a793eecae33f6b861ae63e7",
+  "duration": 19.887291666666666,
+  "beats": [
+    {
+      "text": "Instructions tell the model how to respond.",
+      "start": 0.0,
+      "end": 2.580625
+    },
+    {
+      "text": "Conversation history supplies earlier exchanges, and the current question adds the immediate task.",
+      "start": 2.700625,
+      "end": 8.704625
+    },
+    {
+      "text": "The application packages these parts into model input.",
+      "start": 8.824625,
+      "end": 12.419291666666666
+    },
+    {
+      "text": "Extra formatting and special tokens can contribute to the total, so the visible chat text may not be the entire input.",
+      "start": 12.539291666666667,
+      "end": 19.887291666666666
+    }
+  ]
+}

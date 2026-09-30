@@ -1,0 +1,27 @@
+{
+  "key": "daea1d07e892dec6c69f8d60038c051cde42b812d581e3325b2499513ada59f6",
+  "sha256": "bb014bfe8836d293e38d283679e6490251b55e119746f94f9fe8531df77811b4",
+  "duration": 14.862666666666666,
+  "beats": [
+    {
+      "text": "Sunlight warms surface water, causing evaporation into the air.",
+      "start": 0.0,
+      "end": 4.0
+    },
+    {
+      "text": "Cooling water vapor condenses and clouds form above the land.",
+      "start": 4.12,
+      "end": 7.8853333333333335
+    },
+    {
+      "text": "Precipitation falls as rain when droplets grow heavy.",
+      "start": 8.005333333333333,
+      "end": 11.364
+    },
+    {
+      "text": "Water collects in rivers and flows back toward the ocean.",
+      "start": 11.484,
+      "end": 14.862666666666666
+    }
+  ]
+}

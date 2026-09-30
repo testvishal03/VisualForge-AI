@@ -1,0 +1,27 @@
+{
+  "key": "68c8fe14110f1caa154f78acc1f50a3fd70a3d184cc4f998a4489ecc50daf90a",
+  "sha256": "644508244db1b97a0d0d166dae88d1378366bd4bc9ce6cee4259c1fb930a58e9",
+  "duration": 20.449333333333332,
+  "beats": [
+    {
+      "text": "First, sunlight warms water, turning it into vapor through evaporation.",
+      "start": 0.0,
+      "end": 4.34
+    },
+    {
+      "text": "Next, this vapor rises and cools, changing back into tiny droplets through condensation.",
+      "start": 4.46,
+      "end": 10.388666666666667
+    },
+    {
+      "text": "Whereas evaporation moves water up, condensation forms clouds below.",
+      "start": 10.508666666666667,
+      "end": 15.040666666666667
+    },
+    {
+      "text": "In contrast, evaporation is liquid to gas; condensation is gas to liquid.",
+      "start": 15.160666666666666,
+      "end": 20.449333333333332
+    }
+  ]
+}

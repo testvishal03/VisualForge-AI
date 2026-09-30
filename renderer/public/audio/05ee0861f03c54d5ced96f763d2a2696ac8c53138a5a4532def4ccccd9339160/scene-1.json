@@ -1,0 +1,17 @@
+{
+  "key": "05ee0861f03c54d5ced96f763d2a2696ac8c53138a5a4532def4ccccd9339160",
+  "sha256": "d639cc9df63dde1b7b05a7bf5d6b4dba3a95bca88e922de4430367bb10e32c99",
+  "duration": 5.014625,
+  "beats": [
+    {
+      "text": "This is why word count and token count are not the same thing.",
+      "start": 0.0,
+      "end": 3.711291666666667
+    },
+    {
+      "text": "Now you might ask:",
+      "start": 3.8312916666666665,
+      "end": 5.014625
+    }
+  ]
+}

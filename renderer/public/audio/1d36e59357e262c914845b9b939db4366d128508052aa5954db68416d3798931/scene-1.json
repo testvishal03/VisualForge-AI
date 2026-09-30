@@ -1,0 +1,27 @@
+{
+  "key": "1d36e59357e262c914845b9b939db4366d128508052aa5954db68416d3798931",
+  "sha256": "f85186432710ac44bff02b8b4ef0218003bb449b35f74756c2b0eb58f6129e0a",
+  "duration": 19.375208333333333,
+  "beats": [
+    {
+      "text": "Start with input text, such as a question typed into a chat box.",
+      "start": 0.0,
+      "end": 4.084
+    },
+    {
+      "text": "A tokenizer converts that input text into tokens.",
+      "start": 4.204,
+      "end": 7.7872916666666665
+    },
+    {
+      "text": "The resulting sequence is the representation the model receives before further numerical processing.",
+      "start": 7.907291666666667,
+      "end": 14.199916666666667
+    },
+    {
+      "text": "Text that looks simple to us can therefore occupy several positions in that sequence.",
+      "start": 14.319916666666666,
+      "end": 19.375208333333333
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "key": "07e0c462c148c0ae6751bed1c10ad5c20a3437d4a11bedd5324e1b1c7f569405",
+  "sha256": "45ec728289eab811de8b9938538b5bd5a7e28a466ec0c9bdf7ed693eb49c6254",
+  "duration": 17.10258333333333,
+  "beats": [
+    {
+      "text": "First, warm water vapor rises and cools as it goes higher.",
+      "start": 0.0,
+      "end": 3.764
+    },
+    {
+      "text": "Next, when it reaches the dew point, it changes back into tiny liquid droplets.",
+      "start": 3.884,
+      "end": 8.875291666666667
+    },
+    {
+      "text": "Finally, these droplets gather to form the first cloud particles.",
+      "start": 8.995291666666667,
+      "end": 12.844625
+    },
+    {
+      "text": "Whereas warm air holds more vapor, cooler air can only hold a little.",
+      "start": 12.964625,
+      "end": 17.10258333333333
+    }
+  ]
+}

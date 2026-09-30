@@ -1,0 +1,17 @@
+{
+  "key": "103ce8f958d146515faf5ac1bfb91dad52a1d24b45dee5ef642259b07ab97a00",
+  "sha256": "5c71aef98658a97966bd4f68c65afc0ea8609765c5b952c1d5acc4d2ebdfb94a",
+  "duration": 7.531291666666666,
+  "beats": [
+    {
+      "text": "The tokenizer splits this short input into five tokens.",
+      "start": 0.0,
+      "end": 3.625958333333333
+    },
+    {
+      "text": "Each piece has a numerical identifier used by this model.",
+      "start": 3.7459583333333333,
+      "end": 7.531291666666666
+    }
+  ]
+}

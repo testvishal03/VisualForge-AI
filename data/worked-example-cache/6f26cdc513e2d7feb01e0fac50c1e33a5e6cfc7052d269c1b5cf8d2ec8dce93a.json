@@ -1,0 +1,60 @@
+{
+  "key": "6f26cdc513e2d7feb01e0fac50c1e33a5e6cfc7052d269c1b5cf8d2ec8dce93a",
+  "input": "AI is useful.",
+  "tokens": [
+    {
+      "id": 15469,
+      "piece": "AI"
+    },
+    {
+      "id": 374,
+      "piece": " is"
+    },
+    {
+      "id": 5390,
+      "piece": " useful"
+    },
+    {
+      "id": 13,
+      "piece": "."
+    }
+  ],
+  "continuation": " But it's not a panacea. It's not a",
+  "prefixes": [
+    " But",
+    " But it",
+    " But it's",
+    " But it's not",
+    " But it's not a",
+    " But it's not a pan",
+    " But it's not a panacea",
+    " But it's not a panacea.",
+    " But it's not a panacea. It",
+    " But it's not a panacea. It's",
+    " But it's not a panacea. It's not",
+    " But it's not a panacea. It's not a"
+  ],
+  "generated_ids": [
+    1988,
+    432,
+    594,
+    537,
+    264,
+    7215,
+    82582,
+    13,
+    1084,
+    594,
+    537,
+    264
+  ],
+  "model": {
+    "model": "Qwen3-4B-Instruct-2507-Q4_K_M.gguf",
+    "sha256": "3605803b982cb64aead44f6c1b2ae36e3acdb41d8e46c8a94c6533bc4c67e597",
+    "runtime": "b11206",
+    "size": 2497281120,
+    "modified": 1790488074393292100
+  },
+  "mode": "raw_completion",
+  "seed": 42
+}

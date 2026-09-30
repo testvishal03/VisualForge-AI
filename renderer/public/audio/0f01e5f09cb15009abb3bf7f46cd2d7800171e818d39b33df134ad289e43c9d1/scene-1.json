@@ -1,0 +1,27 @@
+{
+  "key": "0f01e5f09cb15009abb3bf7f46cd2d7800171e818d39b33df134ad289e43c9d1",
+  "sha256": "5e5ba8d31428f9a5976ff362b43605c245c63551a472b153d66fd5b16cb0dfb7",
+  "duration": 16.269291666666668,
+  "beats": [
+    {
+      "text": "First, visit the library's circulation desk.",
+      "start": 0.0,
+      "end": 2.7939583333333333
+    },
+    {
+      "text": "Next, fill out the request form with your name and the book you want to borrow.",
+      "start": 2.9139583333333334,
+      "end": 7.232625
+    },
+    {
+      "text": "You can keep the book for as long as you like, but you must return it on time.",
+      "start": 7.352625,
+      "end": 11.543291666666667
+    },
+    {
+      "text": "This way, you can enjoy reading and the library can continue to serve others.",
+      "start": 11.663291666666666,
+      "end": 16.269291666666668
+    }
+  ]
+}

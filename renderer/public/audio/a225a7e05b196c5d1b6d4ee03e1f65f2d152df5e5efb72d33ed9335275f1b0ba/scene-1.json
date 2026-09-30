@@ -1,0 +1,12 @@
+{
+  "key": "a225a7e05b196c5d1b6d4ee03e1f65f2d152df5e5efb72d33ed9335275f1b0ba",
+  "sha256": "63adca5a59f285bcd47cdcc9945b6d741f2919b1147fe79c7a3772c8e7eb1047",
+  "duration": 7.433333333333334,
+  "beats": [
+    {
+      "text": "Tokenization gives the model a structured way to convert text into pieces that can then be mapped to numerical IDs.",
+      "start": 0.0,
+      "end": 7.433333333333334
+    }
+  ]
+}

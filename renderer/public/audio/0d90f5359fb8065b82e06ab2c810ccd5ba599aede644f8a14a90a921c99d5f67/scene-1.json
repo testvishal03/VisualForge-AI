@@ -1,0 +1,17 @@
+{
+  "key": "0d90f5359fb8065b82e06ab2c810ccd5ba599aede644f8a14a90a921c99d5f67",
+  "sha256": "59370897029feda5d61fdb02d8ba882a78bc796a65a29b5813b5ea1c505fd3d0",
+  "duration": 7.201333333333333,
+  "beats": [
+    {
+      "text": "That would use a huge amount of context.",
+      "start": 0.0,
+      "end": 2.2506666666666666
+    },
+    {
+      "text": "Instead, you can retrieve only the information that appears relevant to the question.",
+      "start": 2.3706666666666667,
+      "end": 7.201333333333333
+    }
+  ]
+}

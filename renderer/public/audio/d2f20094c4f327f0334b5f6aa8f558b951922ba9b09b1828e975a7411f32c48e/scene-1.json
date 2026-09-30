@@ -1,0 +1,22 @@
+{
+  "key": "d2f20094c4f327f0334b5f6aa8f558b951922ba9b09b1828e975a7411f32c48e",
+  "sha256": "4684d337a785205b24e7c63ee7015d03f36c366a05e6f7c66a10c7710e83a5a4",
+  "duration": 5.477291666666667,
+  "beats": [
+    {
+      "text": "What should be removed.",
+      "start": 0.0,
+      "end": 1.302
+    },
+    {
+      "text": "What should be summarized.",
+      "start": 1.422,
+      "end": 2.850625
+    },
+    {
+      "text": "And what should be retrieved only when needed.",
+      "start": 2.970625,
+      "end": 5.477291666666667
+    }
+  ]
+}

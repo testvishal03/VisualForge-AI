@@ -1,0 +1,22 @@
+{
+  "key": "30ac18ce96934e3bb3065fc477216c5693c38213693a6d8a0a32ca631a5a0745",
+  "sha256": "973fd15f6889e35918cc487a43d71c9615d44522aa8ff21468c8774b8636762d",
+  "duration": 13.302666666666667,
+  "beats": [
+    {
+      "text": "First, rainwater soaks into soil through tiny spaces.",
+      "start": 0.0,
+      "end": 3.4326666666666665
+    },
+    {
+      "text": "Next, this water moves slowly downward, reducing surface flow.",
+      "start": 3.5526666666666666,
+      "end": 7.413333333333333
+    },
+    {
+      "text": "Whereas surface water rushes into rivers, soil water feeds roots and recharges groundwater.",
+      "start": 7.533333333333333,
+      "end": 13.302666666666667
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "key": "6ba3997e928f580e0cf83fd3ec1ba39561a0a1f194119c5738ad5acd5816552d",
+  "sha256": "f0d9769e36c7126907a5f0e5789c5ec97cfc17d3b5afb475e287dc910de35707",
+  "duration": 11.273333333333333,
+  "beats": [
+    {
+      "text": "When Sarah types 'bake a cake with chocolate', the model splits it into tokens, focuses attention on 'chocolate' as key context, and predicts 'flavor' based on patterns from its training data.",
+      "start": 0.0,
+      "end": 11.273333333333333
+    }
+  ]
+}
