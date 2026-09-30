@@ -79,7 +79,11 @@ def description(title, topic, scenes, style, parts=None):
     points = [s for s in scenes if s.get('headline')][:8]
     voice = VOICES.get(style.get('voice', DEFAULT_VOICE), (style.get('voice', 'Kokoro'),))[0]
     lines = [title, '', first_sentence(scenes[0]['narration']) if scenes else topic, '', 'In this video:']
-    lines += [f"• {s['headline']}" + (f" - {s['body']}" if s.get('body') and s['body'].casefold() != s['headline'].casefold() else '') for s in points]
+    if parts:
+        # Chapter videos summarise by chapter; listing every scene would bury the structure.
+        lines += [f'• {name}' for name, _ in parts[:12]]
+    else:
+        lines += [f"• {s['headline']}" + (f" - {s['body']}" if s.get('body') and s['body'].casefold() != s['headline'].casefold() else '') for s in points]
     if marks:
         lines += ['', 'Chapters:', *[f'{stamp(start)} {name}' for start, name in marks]]
     if scenes and scenes[-1].get('body'):

@@ -1,6 +1,7 @@
 import {AbsoluteFill, useCurrentFrame, useVideoConfig} from 'remotion';
 import type {Scene, VideoData} from '../types';
 import {Caption} from './Caption';
+import {FlowChips} from './FlowChips';
 import {cueProgress, objectState} from '../choreography';
 import {cameraAt,shotPosition} from '../shot-direction';
 import {ActionStage} from './ActionStage';
@@ -81,7 +82,11 @@ export function IllustratedStory({scene,style,previous,next,first,guide}:{scene:
         const progress=cueProgress(t,step.start,step.end);
         const distance=Math.max(1,Math.hypot(bx-ax,by-ay)),ux=(bx-ax)/distance,uy=(by-ay)/distance;
         const sx=ax+ux*79,sy=ay+uy*79,ex=bx-ux*85,ey=by-uy*85;
-        return <path key={`path-${i}`} d={`M${sx} ${sy} Q${(sx+ex)/2} ${Math.min(sy,ey)-55} ${ex} ${ey}`} fill="none" stroke={coral} strokeWidth="5" pathLength="1" strokeDasharray="1" strokeDashoffset={1-progress} markerEnd="url(#story-arrow)"/>;
+        const control:[number,number]=[(sx+ex)/2,Math.min(sy,ey)-55];
+        return <g key={`path-${i}`}>
+          <path d={`M${sx} ${sy} Q${control[0]} ${control[1]} ${ex} ${ey}`} fill="none" stroke={coral} strokeWidth="5" pathLength="1" strokeDasharray="1" strokeDashoffset={1-progress} markerEnd="url(#story-arrow)"/>
+          <FlowChips from={[sx,sy]} control={control} to={[ex,ey]} start={step.start} time={t} label={c.objects[b].label} accent={coral}/>
+        </g>;
       })}
       </g>
       {c.objects.map((object,i)=>{

@@ -136,7 +136,9 @@ class WordCueTests(unittest.TestCase):
         self.assertEqual([(o['label'], o['at']) for o in result['objects']],
                          [('input text', 0.85), ('tokenizer', 4.97), ('tokens', 7.97)])
         connect = next(s for s in result['steps'] if s['action'] == 'connect')
-        self.assertEqual((connect['start'], connect['end']), (5.47, 9.2))
+        # "converts that input text into tokens": the arrow runs input text -> tokens, drawn once tokens is spoken.
+        self.assertEqual([result['objects'][i]['label'] for i in connect['targets']], ['input text', 'tokens'])
+        self.assertEqual((connect['start'], connect['end']), (7.97, 9.2))
         # Without measured words every cue stays on its sentence boundary.
         legacy = timed(compile_scene(scene), worded_beats(False))
         self.assertEqual([o['at'] for o in legacy['objects']], [0, 4.62, 4.62])

@@ -17,7 +17,7 @@ export function validateChoreography(scene:Scene){
   for(const s of c.steps){
     const b=scene.beats?.[s.sentence];
     if(!Number.isInteger(s.sentence)||s.sentence<previous||!b||!withinBeat(s.start,b)||s.end!==b.end||!['reveal','focus','connect','remove'].includes(s.action)||!Array.isArray(s.targets)||!s.targets.length||s.targets.some(i=>!Number.isInteger(i)||!c.objects[i]||c.objects[i].sentence>s.sentence))throw new Error('Choreography must match measured sentence cues');
-    if(s.action==='connect'&&(s.targets.length!==2||!(/\b(convert\w*|become\w*|map\w*|connect\w*|pass\w*|flow\w*|lead\w*|produce\w*|turn\w*|link\w*)\b/i).test(b.text)))throw new Error('Unsupported connection');
+    if(s.action==='connect'&&(s.targets.length!==2||!(/\b(convert\w*|become\w*|map\w*|connect\w*|pass\w*|flow\w*|lead\w*|produce\w*|turn\w*|link\w*|receiv\w*|send\w*|feed\w*|generat\w*|creat\w*|split\w*|transform\w*)\b/i).test(b.text)))throw new Error('Unsupported connection');
     if(s.action==='remove'&&!(/\b(remove\w*|drop\w*|outside|omit\w*|exclud\w*)\b/i).test(b.text))throw new Error('Unsupported removal');
     previous=s.sentence;
   }

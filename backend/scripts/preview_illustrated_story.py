@@ -19,16 +19,21 @@ def main():
     parser.add_argument('--resume',help='Resume an isolated preview project after a renderer fix')
     args=parser.parse_args()
     source_id=(ROOT/'data/tokens-director-project.txt').read_text(encoding='utf-8').strip()
-    original=json.loads((ROOT/'data/editor'/source_id/'project.json').read_text(encoding='utf-8'))
-    selected=[copy.deepcopy(original['document']['scenes'][i-1]) for i in (2,3,7,8)]
-    document={'title':'Tokens and Context Windows - Illustrated Story Preview',
-              'topic':original['topic'],'scenes':selected}
+    source=ROOT/'data/editor'/source_id/'project.json'
     store=EditorStore(ROOT/'data/illustrated-story-preview/projects')
+    original=json.loads(source.read_text(encoding='utf-8')) if source.is_file() else None
+    if original is None and not args.resume:
+        raise SystemExit(f'Source project {source_id} is gone. Re-render an existing preview with --resume PROJECT_ID; '
+                         'it keeps its own copy of the scenes.')
+    selected=[copy.deepcopy(original['document']['scenes'][i-1]) for i in (2,3,7,8)] if original else None
     if args.resume:
         project=store.load(args.resume)
-        if [s['uid'] for s in project['document']['scenes']] != [s['uid'] for s in selected]:
+        # The preview keeps its own scenes, so it still renders after the source project is deleted.
+        if selected and [s['uid'] for s in project['document']['scenes']] != [s['uid'] for s in selected]:
             raise ValueError('Resume project no longer matches the selected source scenes')
     else:
+        document={'title':'Tokens and Context Windows - Illustrated Story Preview',
+                  'topic':original['topic'],'scenes':selected}
         project=store.create(original['topic'],document,source={'mode':'script','profile':'draft'})
         project=store.approve_storyboard(project['id'],project['revision'])
     jobs=EditorJobs(ROOT,store)
@@ -37,7 +42,7 @@ def main():
     jobs._perform(project,'render_draft',None,'',folder)
     result=store.load(project['id'])
     validation=json.loads((folder/'draft-validation.json').read_text(encoding='utf-8'))
-    report={'source_project':source_id,'source_revision':original['revision'],
+    report={'source_project':source_id,'source_revision':original['revision'] if original else None,
             'scene_numbers':[2,3,7,8],'preview':str(folder/'draft.mp4'),
             'validation':validation,'cache':jobs.state.get('scene_cache')}
     write_json_atomic(ROOT/'data/illustrated-story-preview/result.json',report)

@@ -7,6 +7,7 @@ import {activeWord,captionPhrases,sceneTransition,palette} from '../src/presenta
 import {BRIDGE_HEADLINE_DELAY,BRIDGE_SECONDS,bridgedFrom,carriedLabels,ENTER_SECONDS,enterProgress,EXIT_SECONDS,exitProgress,sceneSeconds,teaserWindow} from '../src/transitions.ts';
 import {idleOffset,mentionPulse,mentionTimes,sceneDrift} from '../src/emphasis.ts';
 import {fitLabel,objectScale,textWidth} from '../src/labels.ts';
+import {along,chipKind} from '../src/flow.ts';
 import {animationTiming,activeConcept,sharedConcept} from '../src/animation.ts';
 import {isContextWindow,contextCues} from '../src/context-window.ts';
 import {validateTeaching,teachingStage,type TeachingPlan} from '../src/teaching-plan.ts';
@@ -335,6 +336,28 @@ test('labels fit their shapes without truncation',()=>{
   assert.equal(fitLabel('current question',175,24,16).lines.join(' '),'current question');
   assert.ok(objectScale(2)>objectScale(3)&&objectScale(3)>objectScale(6));
   assert.throws(()=>validateVideoData({title:'T',style:{theme:'ocean' as const,brand:'B',topicMap:'yes' as unknown as boolean},scenes:[scene(1,2)]}),/bookend/);
+});
+
+test('without authored shots the camera closes in on a single focused object and widens for several',()=>{
+  const plan={layout:'sequence' as const,note:'Illustrative diagram; not measured model output',
+    objects:[{label:'prompt',sentence:0,at:0},{label:'history',sentence:1,at:3}],
+    steps:[{sentence:0,action:'reveal' as const,targets:[0],start:0,end:3},{sentence:1,action:'reveal' as const,targets:[1],start:3,end:6},
+      {sentence:2,action:'focus' as const,targets:[0],start:6,end:9},{sentence:3,action:'focus' as const,targets:[0,1],start:9,end:12}]};
+  const s={...scene(1,12),choreography:plan};
+  assert.equal(cameraAt(s,1).scale,1);
+  assert.ok(Math.abs(cameraAt(s,7).scale-1.05)<1e-9,'single-object focus is a close-up');
+  assert.ok(cameraAt(s,6.4).scale>1&&cameraAt(s,6.4).scale<1.05,'the move is eased');
+  assert.equal(cameraAt(s,10).scale,1,'several objects widen again');
+  assert.equal(cameraAt({...scene(1,5)},2).scale,1);
+});
+
+test('items travel the connection curve and look like what they become',()=>{
+  assert.deepEqual(along([0,0],[50,-50],[100,0],0),[0,0]);
+  assert.deepEqual(along([0,0],[50,-50],[100,0],1),[100,0]);
+  assert.deepEqual(along([0,0],[50,-50],[100,0],.5),[50,-25]);
+  assert.equal(chipKind('tokens'),'chip');assert.equal(chipKind('Token IDs'),'chip');
+  assert.equal(chipKind('retrieved documents'),'page');
+  assert.equal(chipKind('video ideas'),'dot','no accidental match on "id" inside words');
 });
 
 test('caption phrases preserve every word within measured sentence boundaries',()=>{

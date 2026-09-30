@@ -1,4 +1,5 @@
 import type {Scene} from '../types';
+import {FlowChips} from './FlowChips';
 import {cueProgress,objectState} from '../choreography';
 import {actionPosition,activeAction} from '../visual-actions';
 import {easeInOut} from '../transitions';
@@ -52,7 +53,8 @@ export function ActionStage({scene,previous,time,shotIndex,exit=0,keep=new Set<s
     {choreography.steps.filter(step=>step.action==='connect'&&step.start<=time).map((step,i)=>{
       const [a,b]=step.targets,[ax,ay]=position(a),[bx,by]=position(b),p=cueProgress(time,step.start,step.end);
       const arc=Math.min(ay,by)-90;
-      return <g key={`connection-${i}`}><path d={`M${ax} ${ay-75} Q${(ax+bx)/2} ${arc-55} ${bx} ${by-75}`} fill="none" stroke={coral} strokeWidth="5" opacity={.65*p} pathLength="1" strokeDasharray="1" strokeDashoffset={1-p}/></g>;
+      return <g key={`connection-${i}`}><path d={`M${ax} ${ay-75} Q${(ax+bx)/2} ${arc-55} ${bx} ${by-75}`} fill="none" stroke={coral} strokeWidth="5" opacity={.65*p} pathLength="1" strokeDasharray="1" strokeDashoffset={1-p}/>
+        <FlowChips from={[ax,ay-75]} control={[(ax+bx)/2,arc-55]} to={[bx,by-75]} start={step.start} time={time} label={choreography.objects[b].label} accent={coral}/></g>;
     })}
     </g>
     {moving&&<g opacity={(action.progress<1?1:0)*(1-exit)}><circle cx={from[0]+(to[0]-from[0])*action.progress} cy={motionY} r="16" fill={coral}/><circle cx={from[0]+(to[0]-from[0])*action.progress} cy={motionY} r="27" fill="none" stroke={coral} strokeWidth="2" opacity=".4"/></g>}
