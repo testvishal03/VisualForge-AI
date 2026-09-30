@@ -1,8 +1,9 @@
 """Source-grounded diagram actions for the illustrated video stage."""
 import re
 
-from backend.services.choreography import compile_scene
+from backend.services.choreography import compile_scene, timed as timed_choreography
 from backend.services.director import sentences
+from backend.utils.word_timing import cue_time, pattern_time
 
 FORMS={'flow','split','mapping','compare','window','network'}
 VERBS={'reveal','split','transform','evict','fill','compare','flow'}
@@ -20,14 +21,18 @@ def form_for(scene, choreography):
     return {'workspace':'window','comparison':'compare','connections':'network'}.get(choreography['layout'],'flow')
 
 
+VERB_PATTERNS={
+    'evict':r'\b(remove\w*|drop\w*|outside|omit\w*|exclud\w*)\b',
+    'split':r'\b(split\w*|pieces|segments?|boundaries)\b',
+    'transform':r'\b(map\w*|convert\w*|become\w*|transform\w*|representations?)\b',
+    'fill':r'\b(grow\w*|accumulat\w*|fill\w*|occupy|add\w*)\b',
+    'compare':r'\b(different|compar\w*|whereas|unlike|rather than)\b|not the same',
+    'flow':r'\b(pass\w*|flow\w*|lead\w*|connect\w*|produce\w*|enter\w*)\b',
+}
+
+
 def verb_for(text):
-    if re.search(r'\b(remove\w*|drop\w*|outside|omit\w*|exclud\w*)\b',text,re.I):return 'evict'
-    if re.search(r'\b(split\w*|pieces|segments?|boundaries)\b',text,re.I):return 'split'
-    if re.search(r'\b(map\w*|convert\w*|become\w*|transform\w*|representations?)\b',text,re.I):return 'transform'
-    if re.search(r'\b(grow\w*|accumulat\w*|fill\w*|occupy|add\w*)\b',text,re.I):return 'fill'
-    if re.search(r'\b(different|compar\w*|whereas|unlike|rather than)\b|not the same',text,re.I):return 'compare'
-    if re.search(r'\b(pass\w*|flow\w*|lead\w*|connect\w*|produce\w*|enter\w*)\b',text,re.I):return 'flow'
-    return 'reveal'
+    return next((verb for verb,pattern in VERB_PATTERNS.items() if re.search(pattern,text,re.I)),'reveal')
 
 
 def plan(scene):
@@ -51,4 +56,12 @@ def timed(scene,beats):
     result=plan(scene)
     if not result:return None
     if len(result['beats'])!=len(beats):raise ValueError('Visual actions require every measured narration sentence')
-    return {**result,'beats':[{**row,'start':beats[i]['start'],'end':beats[i]['end']} for i,row in enumerate(result['beats'])]}
+    objects=timed_choreography(compile_scene(scene),beats)['objects']
+    rows=[]
+    for i,row in enumerate(result['beats']):
+        beat=beats[i]
+        # The action plays on its spoken verb, once every object it uses has appeared.
+        spoken=pattern_time(beat,VERB_PATTERNS[row['verb']]) if row['verb'] in VERB_PATTERNS else None
+        ready=[objects[t]['at'] for t in row['targets'] if objects[t]['sentence']==i]
+        rows.append({**row,'start':beat['start'],'end':beat['end'],'at':max([cue_time(beat,spoken),*ready])})
+    return {**result,'beats':rows}

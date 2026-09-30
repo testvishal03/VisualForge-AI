@@ -61,8 +61,8 @@ def plan_document(document):
     for i,row in enumerate(rows):
         if row.get('choreography'):
             if len(row['choreography']['objects'])>4:warnings.append({'scene':i+1,'message':'Several objects share this scene. Check label readability in the preview.'})
-            continue
-        if row['kind']=='fallback':warnings.append({'scene':i+1,'message':'No specialized demonstration matches this passage. Review the existing diagram or card in the preview.'})
+        elif row['kind']=='fallback':warnings.append({'scene':i+1,'message':'No specialized demonstration matches this passage. Review the existing diagram or card in the preview.'})
+        # Repetition is worth flagging whether or not the scenes are illustrated.
         if i>=2 and row['kind']==rows[i-1]['kind']==rows[i-2]['kind']:
             warnings.append({'scene':i+1,'message':'This visual mechanism repeats across three scenes. Detail views vary the focus; consider combining repeated explanations.'})
     return {'scenes':rows,'warnings':warnings,'specialized':sum(r['kind'] in TITLES for r in rows),'total':len(rows)}

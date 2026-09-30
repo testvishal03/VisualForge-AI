@@ -63,7 +63,19 @@ export type Scene = {
   /** Relative to renderer/public. */
   audio: string;
   visual?: Visual;
-  beats?: { text: string; start: number; end: number }[];
+  beats?: Beat[];
+};
+
+/** Scene-relative seconds for one spoken whitespace word. */
+export type WordTiming = { text: string; start: number; end: number };
+
+export type Beat = {
+  text: string;
+  start: number;
+  end: number;
+  /** "model" comes from Kokoro phoneme durations; "estimated" is letter-weighted. */
+  wordTiming?: 'model' | 'estimated';
+  words?: WordTiming[];
 };
 
 export type VideoData = {
@@ -74,6 +86,14 @@ export type VideoData = {
     brand: string;
     showIntro?: boolean;
     showOutro?: boolean;
+    /** Topic rail and "Up next" bridge between scenes; on unless false. */
+    topicMap?: boolean;
+    /** Narration voice; part of the style so a voice change invalidates renders. */
+    voice?: string;
+    /** Next lesson in a series playlist, shown on the outro. */
+    nextTopic?: string;
+    /** Lesson topics for the intro and outro when they differ from this video's scenes (chapters). */
+    agenda?: string[];
   };
   scenes: Scene[];
 };

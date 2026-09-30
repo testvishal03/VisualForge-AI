@@ -8,3 +8,26 @@ __pycache__/
 backend/.cache/
 data/runs/
 data/editor/
+
+# Generated narration cache. The studio and generate_audio.py recreate it from the scripts.
+renderer/public/audio/
+
+# Local run outputs. Scripts, fixtures, validation JSON and documentation screenshots stay tracked.
+data/**/*.log
+data/**/*.mp4
+data/**/*.wav
+data/**/scene-cache/
+data/**/logs/
+data/illustrated-story-preview/projects/
+data/scene-cache-benchmark/
+data/chapter-join-smoke/
+data/voice-samples/
+*.pending.*
+
+# Secrets and machine-specific files
+.env
+.env.*
+*.local.json
+Thumbs.db
+Desktop.ini
+.DS_Store

@@ -1,5 +1,6 @@
 """Reviewed chapter plans with isolated, resumable chapter projects."""
 import copy
+import json
 from backend.services.script_generator import write_json_atomic
 from backend.services.run_state import fingerprint
 from backend.services.editor_store import EditorStore, document_from_video
@@ -120,18 +121,40 @@ def save(store, project, body):
     return candidate
 
 
+def publish_chapters(jobs, project, nested, data, folder, profile):
+    """Thumbnail and description for the joined chapter video, using each chapter's exact render props."""
+    from backend.services.publishing import publish_safely, scene_seconds
+    name = 'draft-props.json' if profile == 'draft' else 'render-props.json'
+    scenes, parts = [], []
+    for chapter in data['chapters']:
+        props = nested.store.folder(chapter['id'])/name
+        if not props.is_file():
+            return None
+        rows = json.loads(props.read_text(encoding='utf-8'))['videoData']['scenes']
+        scenes += rows
+        parts.append((chapter['title'], sum(scene_seconds(s) for s in rows)))
+    style = {**jobs.workspaces.style(project['id']), 'agenda': [c['title'] for c in data['chapters']][:100]}
+    video = {'title': project.get('topic') or data['chapters'][0]['title'], 'style': style, 'scenes': scenes}
+    jobs.state.update(phase='thumbnail')
+    return publish_safely(jobs, project, folder, video, lambda command, name: jobs.remotion(folder, command, name), profile, parts)
+
+
 def nested_jobs(jobs, project):
     from backend.services.editor_jobs import EditorJobs
     nested = EditorJobs(jobs.root, chapters_store(jobs.store, project))
     nested.cancel = jobs.cancel
     nested.state = jobs.state
+    nested.publishing = False
     # Chapter style and lifecycle belong to the parent workspace.
     nested.workspaces = copy.copy(jobs.workspaces)
     def chapter_style(child_id):
         style=jobs.workspaces.style(project['id'])
         ids=[c['id'] for c in project['long_video']['chapters']]
+        # Bookends describe the whole lesson, so they list chapters rather than one chapter's scenes.
+        titles=[c['title'] for c in project['long_video']['chapters'] if isinstance(c.get('title'),str) and c['title'].strip()][:100]
         return {**style,'showIntro':bool(ids and child_id==ids[0] and style.get('showIntro')),
-                'showOutro':bool(ids and child_id==ids[-1] and style.get('showOutro'))}
+                'showOutro':bool(ids and child_id==ids[-1] and style.get('showOutro')),
+                **({'agenda':[t.strip()[:160] for t in titles]} if len(titles)>1 else {})}
     nested.workspaces.style = chapter_style
     nested.workspaces.for_project = lambda _: jobs.workspaces.for_project(project['id'])
     return nested
@@ -293,7 +316,13 @@ def perform(jobs, project, action, uid, instructions='Make this explanation conc
             pending.replace(final)
             from backend.services.run_state import file_hash
             project.pop('accepted_export',None)
+            project.pop('publish',None)
             project['draft_render' if profile == 'draft' else 'render'] = {'key': output_key(jobs, project, profile), 'profile': profile, 'file': final.name, 'sha256': file_hash(final), 'styled': True}
+            project['revision'] += 1
+            write_json_atomic(folder / 'project.json', project)
+            publish_chapters(jobs, project, nested, data, folder, profile)
+            project = jobs.store.load(project['id'])
+            return
     else:
         raise ValueError('Unknown long-video task.')
     project['revision'] += 1

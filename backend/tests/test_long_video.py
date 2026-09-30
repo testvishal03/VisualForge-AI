@@ -34,6 +34,36 @@ class LongVideoTests(unittest.TestCase):
             video = script_to_video(child['topic'], WATER)
             self.children.save(child['id'], child['revision'], document_from_video(video, build_direction(video)))
 
+    def test_joined_chapter_video_gets_thumbnail_and_chapter_timed_description(self):
+        from backend.services.long_video import nested_jobs, publish_chapters
+        from backend.services.publishing import scene_seconds
+        jobs=EditorJobs(Path(__file__).resolve().parents[2],self.store)
+        nested=nested_jobs(jobs,self.p)
+        self.assertFalse(nested.publishing,'individual chapters are not published on their own')
+        durations=[[14.2,12.5],[11.0,13.3],[15.1,10.4],[12.0,16.6]]
+        for row,seconds in zip(self.p['long_video']['chapters'],durations):
+            scenes=[{'id':i+1,'headline':f"{row['title']} part {i+1}",'body':'A short summary.','narration':'Water moves. It changes state.',
+                     'audio':'audio/x/scene-1.wav','duration':d} for i,d in enumerate(seconds)]
+            (nested.store.folder(row['id'])/'draft-props.json').write_text(json.dumps({'videoData':{'title':row['title'],'scenes':scenes}}))
+        commands=[]
+        def remotion(folder,command,name):
+            commands.append(command);Path(command[2]).write_bytes(b'\x89PNG fixture')
+        with patch.object(jobs,'remotion',side_effect=remotion):
+            record=publish_chapters(jobs,self.p,nested,self.p['long_video'],self.store.folder(self.p['id']),'draft')
+        self.assertEqual(commands[0][:2],['still','VisualForgeThumbnail'])
+        self.assertEqual(record['chapters'],4)
+        text=(self.store.folder(self.p['id'])/'publish/description.txt').read_text(encoding='utf-8')
+        intro=3 if jobs.workspaces.style(self.p['id'])['showIntro'] else 0
+        second=intro+sum(scene_seconds({'duration':d}) for d in durations[0])
+        self.assertIn('0:00 Water chapter 1',text)
+        self.assertIn(f"{int(second)//60}:{int(second)%60:02d} Water chapter 2",text)
+        self.assertIn('• Water chapter 3\n',text)
+        self.assertNotIn('part 1',text,'chapter videos list chapters, not every scene')
+        props=json.loads((self.store.folder(self.p['id'])/'publish/thumbnail-props.json').read_text())['videoData']
+        self.assertEqual(props['style']['agenda'],[c['title'] for c in self.p['long_video']['chapters']])
+        self.assertEqual(len(props['scenes']),8)
+        self.assertEqual(self.store.load(self.p['id'])['publish']['profile'],'draft')
+
     def test_chapter_style_preview_does_not_require_or_grant_approval(self):
         self.populate()
         jobs=EditorJobs(Path(__file__).resolve().parents[2],self.store)

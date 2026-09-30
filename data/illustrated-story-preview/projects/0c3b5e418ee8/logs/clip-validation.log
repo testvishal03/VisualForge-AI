@@ -1,4 +1,0 @@
-[vost#0:0 @ 00000158a39a16c0] Automatic encoder selection failed Default encoder for format null (codec wrapped_avframe) is probably disabled. Please choose an encoder manually.
-[vost#0:0 @ 00000158a39a16c0] Error selecting an encoder
-Error opening output file -.
-Error opening output files: Encoder not found

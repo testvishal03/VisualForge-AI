@@ -64,7 +64,8 @@ function renderCreator(){
   $('creator-placeholder-title').textContent=running?'Your video is taking shape':failed?'Let’s get your video finished':cancelled?'Generation cancelled':'Ready for the next step';
   $('creator-placeholder-note').textContent=running?'The finished video will appear here automatically.':cancelled?'Completed stages are saved. Retry to continue.':project.source?.approval_required?'Review the script above, then approve it to generate your video.':'Generate the video, or open the editor to adjust your content.';
   $('creator-error').hidden=!failed;$('creator-error-detail').textContent=failed?job.error||'Generation failed. Retry or open the editor to review your content.':'';
-  $('creator-download').hidden=!url;if(url)$('creator-download').href=url;
+  $('creator-download').hidden=!url;if(url){$('creator-download').href=url;$('creator-download').download=fileStem(state.doc?.title||project.topic)+'.mp4';}
+  renderPublishKit(project,currentUrl&&!running);
   $('creator-retry').hidden=running||!!currentUrl||!!(project.source?.approval_required&&!(failed&&job?.action==='auto_generate')&&(!project.long_video&&project.document||project.chapter_details?.length&&project.chapter_details.every(c=>c.script)));
   $('creator-retry').textContent=project.source?.approval_required&&failed&&job?.action==='auto_generate'?'Retry script preparation':previous?'Generate updated video':failed||cancelled?'Retry generation':'Generate video';
   $('creator-edit').hidden=!document.body.classList.contains('simple-mode');
@@ -193,3 +194,23 @@ $('creator-result').insertBefore($('creator-player-shell'),$('script-review'));
 window.addEventListener("beforeunload",event=>{if(state.reviewDirty){event.preventDefault();event.returnValue="";}});
 
 $("creator-edit").textContent="Advanced scene editor";document.querySelector(".creator-more").append($("creator-edit"),$("trash-space"));
+
+/** A safe, readable file name from the lesson title. */
+function fileStem(title){return (title||'visualforge').normalize('NFKD').replace(/[^ws-]/g,'').trim().replace(/s+/g,'-').slice(0,80)||'visualforge';}
+function renderPublishKit(project,show){
+  const kit=project.publish;
+  $('publish-kit').hidden=!(show&&kit);
+  if(!show||!kit)return;
+  const stem=fileStem(state.doc?.title||project.topic);
+  if($('publish-thumb').getAttribute('src')!==kit.thumbnail_url)$('publish-thumb').src=kit.thumbnail_url;
+  $('publish-thumb-download').href=kit.thumbnail_url;$('publish-thumb-download').download=stem+'-thumbnail.png';
+  $('publish-description-download').href=kit.description_url;$('publish-description-download').download=stem+'-description.txt';
+  if($('publish-description').value!==kit.description)$('publish-description').value=kit.description;
+  $('publish-note').textContent=kit.chapters?`Includes ${kit.chapters} chapter markers timed from the finished video.`:(kit.chapters_note||'');
+}
+$('publish-copy').onclick=async()=>{
+  const text=$('publish-description').value;
+  try{await navigator.clipboard.writeText(text);$('publish-copied').textContent='Copied';}
+  catch{$('publish-description').select();$('publish-copied').textContent='Selected. Press Ctrl+C to copy';}
+  setTimeout(()=>{$('publish-copied').textContent='';},2500);
+};

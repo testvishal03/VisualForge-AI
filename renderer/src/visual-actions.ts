@@ -1,13 +1,14 @@
 import type {Scene} from './types.ts';
+import {withinBeat} from './choreography.ts';
 
-export type VisualActions={form:'flow'|'split'|'mapping'|'compare'|'window'|'network';beats:{sentence:number;text:string;verb:'reveal'|'split'|'transform'|'evict'|'fill'|'compare'|'flow';targets:number[];start:number;end:number}[]};
+export type VisualActions={form:'flow'|'split'|'mapping'|'compare'|'window'|'network';beats:{sentence:number;text:string;verb:'reveal'|'split'|'transform'|'evict'|'fill'|'compare'|'flow';targets:number[];start:number;end:number;at?:number}[]};
 
 export function validateVisualActions(scene:Scene){
   const a=scene.actions;if(!a)return;
   const beats=scene.beats,objects=scene.choreography?.objects;
   if(!beats||!objects||!['flow','split','mapping','compare','window','network'].includes(a.form)||a.beats.length!==beats.length)throw new Error('Visual actions need complete narration and objects');
   for(const [i,row] of a.beats.entries()){
-    if(row.sentence!==i||row.text!==beats[i].text||row.start!==beats[i].start||row.end!==beats[i].end||
+    if(row.sentence!==i||row.text!==beats[i].text||row.start!==beats[i].start||row.end!==beats[i].end||(row.at!==undefined&&!withinBeat(row.at,beats[i]))||
       !['reveal','split','transform','evict','fill','compare','flow'].includes(row.verb)||!Array.isArray(row.targets)||
       row.targets.some(index=>!Number.isInteger(index)||!objects[index]||objects[index].sentence>i)||
       row.verb==='evict'&&!/\b(remove\w*|drop\w*|outside|omit\w*|exclud\w*)\b/i.test(row.text))throw new Error('Visual action must match its spoken sentence');
@@ -34,6 +35,8 @@ export function activeAction(scene:Scene,time:number){
   const rows=scene.actions?.beats;if(!rows?.length)return null;
   let index=0;for(let i=1;i<rows.length;i++)if(time>=rows[i].start)index=i;
   const row=rows[index];
-  const progress=Math.max(0,Math.min(1,(time-row.start)/Math.max(.55,Math.min(1.2,(row.end-row.start)*.4))));
-  return {...row,progress};
+  // The motion plays from its spoken verb; the sentence still selects the row.
+  const at=row.at??row.start;
+  const progress=Math.max(0,Math.min(1,(time-at)/Math.max(.55,Math.min(1.2,(row.end-at)*.4))));
+  return {...row,progress,started:time>=at};
 }

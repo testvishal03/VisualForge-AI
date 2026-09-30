@@ -7,6 +7,7 @@ import {validateWorkedScene} from './worked-example.ts';
 import {validateCodeExample} from './code-example.ts';
 import {validateTeaching} from './teaching-plan.ts';
 import {validateVisualPlan} from './semantic-motion.ts';
+import {validateBeatWords} from './presentation.ts';
 
 export const FPS = 30;
 export const SCENE_END_PADDING_SECONDS = 0.5;
@@ -29,7 +30,10 @@ export function validateVideoData(value: unknown): asserts value is VideoData {
   if (!Array.isArray(data.scenes) || data.scenes.length === 0) {
     throw new Error("videoData.scenes must contain at least one scene.");
   }
-  for(const flag of [data.style?.showIntro,data.style?.showOutro])if(flag!==undefined&&typeof flag!=='boolean')throw new Error('Invalid bookend flag.');
+  const text=(value:unknown,limit:number)=>typeof value==='string'&&value.trim().length>0&&value.length<=limit&&!/[\x00-\x1f]/.test(value);
+  if(data.style?.nextTopic!==undefined&&!text(data.style.nextTopic,160))throw new Error('Invalid next topic.');
+  if(data.style?.agenda!==undefined&&(!Array.isArray(data.style.agenda)||data.style.agenda.length>100||data.style.agenda.some(t=>!text(t,160))))throw new Error('Invalid lesson agenda.');
+  for(const flag of [data.style?.showIntro,data.style?.showOutro,data.style?.topicMap])if(flag!==undefined&&typeof flag!=='boolean')throw new Error('Invalid bookend flag.');
   const ids = new Set<number>();
   data.scenes.forEach((scene, index) => {
     const label = `Scene ${index + 1}`;
@@ -43,6 +47,8 @@ export function validateVideoData(value: unknown): asserts value is VideoData {
     validateShots(scene);
     validateVisualActions(scene);
     validateCodeExample(scene);
+    if (Array.isArray(scene.beats))
+      for (const beat of scene.beats) validateBeatWords(beat, label);
     if (!Number.isFinite(scene.duration) || scene.duration <= 0) {
       throw new Error(
         `${label} duration must be a positive number of seconds.`,
@@ -263,7 +269,9 @@ export function validateVideoData(value: unknown): asserts value is VideoData {
               t < 0 ||
               t >= scene.duration ||
               (i > 0 && t < reveals[i - 1]) ||
-              !beats.some((b) => Math.abs(b.start - t) < 1 / 24000),
+              // Sentence starts always qualify; word cues only where words were measured.
+              !beats.some((b) => Math.abs(b.start - t) < 1 / 24000 ||
+                (!!b.words?.length && t > b.start && t < b.end)),
           )
         ) {
           throw new Error(`${label} has invalid visual reveal timing.`);
@@ -271,6 +279,11 @@ export function validateVideoData(value: unknown): asserts value is VideoData {
       }
     }
   });
+}
+
+/** A scene's own frames: its narration plus the silent end padding. */
+export function sceneFrames(scene: Scene, fps: number) {
+  return Math.ceil((scene.duration + SCENE_END_PADDING_SECONDS) * fps);
 }
 
 export function buildTimeline(videoData: VideoData, fps: number) {
@@ -281,9 +294,7 @@ export function buildTimeline(videoData: VideoData, fps: number) {
   const outroFrames=videoData.style?.showOutro?Math.ceil(5*fps):0;
   let durationInFrames = introFrames;
   const scenes = videoData.scenes.map((scene: Scene) => {
-    const frames = Math.ceil(
-      (scene.duration + SCENE_END_PADDING_SECONDS) * fps,
-    );
+    const frames = sceneFrames(scene, fps);
     if (!Number.isSafeInteger(frames) || frames < 1) {
       throw new Error(
         `Scene ${scene.id} duration must fit a safe integer frame count.`,
