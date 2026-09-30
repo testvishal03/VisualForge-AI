@@ -4,6 +4,7 @@ import json
 import re
 import uuid
 from backend.services.script_generator import write_json_atomic
+from backend.tts.kokoro_tts import DEFAULT_VOICE, RECOMMENDED_VOICE, VOICES
 
 THEMES = {'ocean', 'forest', 'sunset'}
 GENERATIVE_AI_TOPICS = ['What is Generative AI?', 'How Large Language Models Work',
@@ -32,15 +33,16 @@ class Workspaces:
         catalog = json.loads(self.path.read_text(encoding='utf-8')) if self.path.exists() else []
         assigned = {p for w in catalog for p in w['episodes']}
         # Adopt old projects without touching their documents, revisions or outputs.
+        # They keep the original voice so their recorded narration stays valid.
         for p in self.store.list():
             if p['id'] not in assigned:
-                catalog.append(self.new(p['title'], 'single', [p['id']]))
+                catalog.append(self.new(p['title'], 'single', [p['id']]) | {'voice': DEFAULT_VOICE})
         return catalog
 
     @staticmethod
     def new(name, kind, episodes=None):
         return dict(id=uuid.uuid4().hex[:12], name=name, kind=kind, episodes=episodes or [],
-                    theme='ocean', audience='beginners', brand='VISUALFORGE / LEARN', voice='af_sarah', deleted=False,
+                    theme='ocean', audience='beginners', brand='VISUALFORGE / LEARN', voice=RECOMMENDED_VOICE, deleted=False,
                     show_intro=True, show_outro=True,
                     topics=list(GENERATIVE_AI_TOPICS) if name.casefold().strip() == 'generative ai visualized' and kind == 'series' else [], current_topic='')
 
@@ -89,7 +91,7 @@ class Workspaces:
             if not isinstance(value,str) or not value.strip() or len(value)>limit or any(ord(c)<32 for c in value):
                 raise ValueError(f'{key} must be a single line of 1–{limit} characters')
             w[key] = value.strip()
-        if w['kind'] not in {'single','series'} or w['theme'] not in THEMES or w['voice'] != 'af_sarah':
+        if w['kind'] not in {'single','series'} or w['theme'] not in THEMES or w.get('voice', DEFAULT_VOICE) not in VOICES:
             raise ValueError('Unsupported workspace settings')
         if w['kind']=='single' and len(w['episodes'])>1:
             raise ValueError('A single-video workspace can contain only one video')
@@ -101,12 +103,19 @@ class Workspaces:
         with self.store.lock:
             catalog=self.read()
             w=self.new(body.get('name',''), body.get('kind','single'))
-            for key in ('theme','audience','brand','show_intro','show_outro','topics','current_topic'):
+            for key in ('theme','audience','brand','voice','show_intro','show_outro','topics','current_topic'):
                 if key in body: w[key]=body[key]
             self.validate(w)
             catalog.append(w)
             write_json_atomic(self.path,catalog)
             return w
+
+    def home(self, workspace_id, project_id, name):
+        """Put a new project in its workspace; without one, give it a fresh single-video workspace
+        so it gets current defaults (natural voice, intro and outro) rather than legacy adoption."""
+        if not workspace_id:
+            workspace_id = self.create({'name': (name or 'New video').strip()[:120] or 'New video', 'kind': 'single'})['id']
+        self.attach(workspace_id, project_id)
 
     def attach(self, workspace_id, project_id):
         with self.store.lock:
@@ -128,8 +137,8 @@ class Workspaces:
             elif action=='trash': w['deleted']=True
             elif w['deleted']: raise ValueError('Restore this workspace first')
             elif action=='save':
-                old_style = {key:w.get(key) for key in ('theme','brand','show_intro','show_outro')}
-                for key in ('name','kind','theme','audience','brand','show_intro','show_outro','topics','current_topic'):
+                old_style = {key:w.get(key) for key in ('theme','brand','voice','show_intro','show_outro')}
+                for key in ('name','kind','theme','audience','brand','voice','show_intro','show_outro','topics','current_topic'):
                     if key in body: w[key]=body[key]
                 self.validate(w)
                 if old_style != {key:w.get(key) for key in old_style}:
@@ -145,7 +154,8 @@ class Workspaces:
                 w['episodes']=order
             elif action=='duplicate':
                 duplicate=self.new(w['name'][:110]+' (copy)',w['kind'])
-                for key in ('theme','audience','brand','voice','show_intro','show_outro'): duplicate[key]=w.get(key,False)
+                for key in ('theme','audience','brand','show_intro','show_outro'): duplicate[key]=w.get(key,False)
+                duplicate['voice']=w.get('voice',DEFAULT_VOICE)
                 for project_id in w['episodes']:
                     p=self.store.load(project_id)
                     copied=self.store.create(p['topic'],copy.deepcopy(p['document']),source=copy.deepcopy(p.get('source')))
@@ -167,8 +177,19 @@ class Workspaces:
             return w
 
     def style(self, project_id):
+        """Render style. The voice is included so a voice change invalidates every export key."""
         w = self.for_project(project_id)
         if w:
-            return {key: w[key] for key in ('theme', 'brand') if key in w} | \
-                   {'showIntro':w.get('show_intro',False),'showOutro':w.get('show_outro',False)}
-        return {'theme': 'ocean', 'brand': 'VISUALFORGE / LEARN', 'showIntro': False, 'showOutro': False}
+            style = {key: w[key] for key in ('theme', 'brand') if key in w} | \
+                    {'showIntro':w.get('show_intro',False),'showOutro':w.get('show_outro',False),'voice':w.get('voice',DEFAULT_VOICE)}
+            # A series outro can point viewers to the next lesson in the playlist sequence.
+            if w['kind'] == 'series' and project_id in w['episodes']:
+                through = w['episodes'][:w['episodes'].index(project_id)+1]
+                upcoming = next_topic(w, [self.store.load(pid)['topic'] for pid in through])
+                if upcoming:
+                    style['nextTopic'] = upcoming
+            return style
+        return {'theme': 'ocean', 'brand': 'VISUALFORGE / LEARN', 'showIntro': False, 'showOutro': False, 'voice': DEFAULT_VOICE}
+
+    def voice(self, project_id):
+        return self.style(project_id).get('voice', DEFAULT_VOICE)

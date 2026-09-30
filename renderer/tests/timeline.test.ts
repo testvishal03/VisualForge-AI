@@ -3,7 +3,10 @@ import {readFileSync, existsSync} from 'node:fs';
 import {test} from 'node:test';
 import {buildTimeline, FPS, SCENE_END_PADDING_SECONDS, validateVideoData} from '../src/timeline.ts';
 import {environmentFor} from '../src/motion.ts';
-import {captionPhrases,sceneTransition,palette} from '../src/presentation.ts';
+import {activeWord,captionPhrases,sceneTransition,palette} from '../src/presentation.ts';
+import {BRIDGE_HEADLINE_DELAY,BRIDGE_SECONDS,bridgedFrom,carriedLabels,ENTER_SECONDS,enterProgress,EXIT_SECONDS,exitProgress,sceneSeconds,teaserWindow} from '../src/transitions.ts';
+import {idleOffset,mentionPulse,mentionTimes,sceneDrift} from '../src/emphasis.ts';
+import {fitLabel,objectScale,textWidth} from '../src/labels.ts';
 import {animationTiming,activeConcept,sharedConcept} from '../src/animation.ts';
 import {isContextWindow,contextCues} from '../src/context-window.ts';
 import {validateTeaching,teachingStage,type TeachingPlan} from '../src/teaching-plan.ts';
@@ -245,6 +248,94 @@ test('statistic and code scenes reject invented numbers and empty code',()=>{
   validateVideoData({title:'Code',scenes:[{...base,visual:{kind:'code',items:[],codeLines:['print("Hello")']}}]});
 });
 
+
+test('measured word timing drives caption phrases and the spoken word',()=>{
+  const text='Text becomes tokens.';
+  const words=[{text:'Text',start:.2,end:.5},{text:'becomes',start:.6,end:1.1},{text:'tokens.',start:1.3,end:1.9}];
+  const s={...scene(1,2),narration:text,beats:[{text,start:0,end:2,wordTiming:'model' as const,words}]};
+  validateVideoData({title:'Words',scenes:[s]});
+  const [phrase]=captionPhrases(s);
+  assert.deepEqual([phrase.start,phrase.end],[0,2]);
+  assert.equal(activeWord(phrase.words,.1),-1);
+  assert.equal(activeWord(phrase.words,1.2),1);
+  assert.equal(activeWord(phrase.words,1.3),2);
+  for(const bad of [words.slice(1),[{...words[0],text:'Txt'},...words.slice(1)],[words[0],{...words[1],start:.1},words[2]],[words[0],words[1],{...words[2],end:2.5}]])
+    assert.throws(()=>validateVideoData({title:'Words',scenes:[{...s,beats:[{...s.beats[0],words:bad}]}]}),/word timing/);
+  const long=Array.from({length:20},(_,i)=>`w${i}`);
+  const timed=long.map((w,i)=>({text:w,start:i*.5,end:i*.5+.4}));
+  const phrases=captionPhrases({...scene(1,10),narration:long.join(' '),beats:[{text:long.join(' '),start:0,end:10,words:timed}]});
+  assert.equal(phrases.length,2);
+  assert.equal(phrases[1].start,timed[10].start);
+  assert.equal(phrases[0].end,phrases[1].start);
+});
+
+test('visual cues may sit inside a sentence only when its words were measured',()=>{
+  const text='Input becomes tokens.';
+  const words=[{text:'Input',start:.1,end:.5},{text:'becomes',start:.6,end:1},{text:'tokens.',start:1.2,end:1.8}];
+  const base={...scene(1,2),narration:text,visual:{kind:'relationship' as const,items:['Input','tokens'],directed:true,revealAt:[0,1.05]}};
+  validateVideoData({title:'Cue',scenes:[{...base,beats:[{text,start:0,end:2,words}]}]});
+  assert.throws(()=>validateVideoData({title:'Cue',scenes:[{...base,beats:[{text,start:0,end:2}]}]}),/reveal timing/);
+  const choreography={layout:'sequence' as const,note:'Illustrative diagram; not measured model output',
+    objects:[{label:'Input',sentence:0,at:0},{label:'tokens',sentence:0,at:1.05}],
+    steps:[{sentence:0,action:'reveal' as const,targets:[0,1],start:0,end:2},{sentence:0,action:'connect' as const,targets:[0,1],start:1.05,end:2}]};
+  const s={...scene(1,2),narration:text,beats:[{text,start:0,end:2,words}],choreography};
+  validateVideoData({title:'Cue',scenes:[s]});
+  assert.equal(objectState(choreography,1,1).visible,false);
+  assert.equal(objectState(choreography,1,1.05).visible,true);
+  assert.equal(objectState(choreography,0,.5).visible,true);
+  assert.throws(()=>validateVideoData({title:'Cue',scenes:[{...s,beats:[{text,start:0,end:2}]}]}),/grounded|cues/);
+  assert.throws(()=>validateVideoData({title:'Cue',scenes:[{...s,choreography:{...choreography,objects:[choreography.objects[0],{label:'tokens',sentence:0,at:3}]}}]}),/grounded/);
+});
+
+test('action motion waits for its spoken verb',()=>{
+  const s={...scene(1,4),actions:{form:'flow' as const,beats:[{sentence:0,text:'Input becomes tokens.',verb:'transform' as const,targets:[1,0],start:0,end:4,at:1.5}]}};
+  assert.equal(activeAction(s,1.4)!.started,false);
+  assert.equal(activeAction(s,1.4)!.progress,0);
+  assert.equal(activeAction(s,1.5)!.started,true);
+  assert.ok(activeAction(s,2)!.progress>0);
+});
+
+test('scene changes exit inside the padding, then enter; shared objects carry across',()=>{
+  const a={...scene(1,10)},total=sceneSeconds(a,30);
+  assert.equal(exitProgress(total-EXIT_SECONDS-.01,total),0);
+  assert.equal(exitProgress(total,total),1);
+  assert.ok(total-EXIT_SECONDS>=a.duration,'content never leaves while narration is still speaking');
+  assert.equal(enterProgress(0,.12,false),0);assert.equal(enterProgress(0,.12,true),1);
+  assert.equal(enterProgress(.12+ENTER_SECONDS,.12,false),1);
+  const plan=(labels:string[])=>({layout:'sequence' as const,note:'',steps:[],objects:labels.map(label=>({label,sentence:0}))});
+  assert.deepEqual([...carriedLabels({...a,choreography:plan(['input text','tokens'])},{...a,choreography:plan(['Tokens','word pieces'])})],['tokens']);
+  assert.equal(teaserWindow(a,undefined,30),null);
+  assert.equal(teaserWindow({...a,duration:6},a,30),null);
+  const w=teaserWindow(a,a,30)!;assert.ok(w.start>=a.duration*.6&&w.start<a.duration&&w.end===total);
+  assert.equal(bridgedFrom(a,a,30,true),true);
+  assert.equal(bridgedFrom(a,a,30,false),false,'no bridge when the topic map is off');
+  assert.equal(bridgedFrom({...a,duration:6},a,30,true),false,'no bridge when the previous scene had no teaser');
+  assert.ok(BRIDGE_HEADLINE_DELAY<BRIDGE_SECONDS);
+});
+
+test('named-again objects pulse on their measured words; nothing is guessed without words',()=>{
+  const text='Tokens matter. Here the tokens split.';
+  const s={...scene(1,6),narration:text,beats:[
+    {text:'Tokens matter.',start:0,end:2,words:[{text:'Tokens',start:.1,end:.6},{text:'matter.',start:.7,end:1.5}]},
+    {text:'Here the tokens split.',start:2.2,end:6,words:[{text:'Here',start:2.3,end:2.6},{text:'the',start:2.7,end:2.9},{text:'tokens',start:3,end:3.5},{text:'split.',start:3.6,end:4.2}]}]};
+  const times=mentionTimes(s,'token');assert.deepEqual(times,[.1,3]);
+  assert.equal(mentionPulse(times,.3,0),0,'the introduction is not a re-mention');
+  assert.ok(mentionPulse(times,3.2,0)>.5);
+  assert.equal(mentionPulse(times,4.5,0),0);
+  assert.deepEqual(mentionTimes({...s,beats:s.beats.map(({words,...b})=>b)},'tokens'),[]);
+  assert.ok(Math.abs(idleOffset(1,0,false))<=3&&Math.abs(idleOffset(1,0,true))<=5);
+  assert.equal(sceneDrift(0,10),1);assert.ok(Math.abs(sceneDrift(10,10)-1.03)<1e-9);
+});
+
+test('labels fit their shapes without truncation',()=>{
+  const short=fitLabel('tokens',190,24);assert.deepEqual(short,{lines:['tokens'],fontSize:24});
+  const long=fitLabel('conversation history',160,24,16);
+  assert.equal(long.lines.join(' '),'conversation history');
+  assert.ok(long.lines.every(line=>textWidth(line,long.fontSize)<=160));
+  assert.equal(fitLabel('current question',175,24,16).lines.join(' '),'current question');
+  assert.ok(objectScale(2)>objectScale(3)&&objectScale(3)>objectScale(6));
+  assert.throws(()=>validateVideoData({title:'T',style:{theme:'ocean' as const,brand:'B',topicMap:'yes' as unknown as boolean},scenes:[scene(1,2)]}),/bookend/);
+});
 
 test('caption phrases preserve every word within measured sentence boundaries',()=>{
   const text=Array.from({length:35},(_,i)=>`word${i}`).join(' ');

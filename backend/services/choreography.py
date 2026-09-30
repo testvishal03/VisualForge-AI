@@ -1,9 +1,12 @@
 """Compile bounded, source-grounded visual actions; never execute generated code."""
 import re
 from backend.services.director import sentences
+from backend.utils.word_timing import cue_time, pattern_time, phrase_time
 
 LAYOUTS = {'sequence', 'workspace', 'comparison', 'connections', 'intro', 'outro', 'budget'}
 TREATMENTS = {'build', 'focus', 'compare'}
+CONNECT = r'\b(convert\w*|become\w*|map\w*|connect\w*|pass\w*|flow\w*|lead\w*|produce\w*|turn\w*|link\w*)\b'
+REMOVE = r'\b(remove\w*|drop\w*|outside|omit\w*|exclud\w*)\b'
 
 
 def validate(spec, narration):
@@ -33,9 +36,9 @@ def validate(spec, narration):
             raise ValueError('Invalid action targets')
         if any(objects[i]['sentence'] > step['sentence'] for i in step['targets']):
             raise ValueError('An action cannot precede its spoken object')
-        if step['action'] == 'remove' and not re.search(r'\b(remove\w*|drop\w*|outside|omit\w*|exclud\w*)\b',parts[step['sentence']],re.I):
+        if step['action'] == 'remove' and not re.search(REMOVE,parts[step['sentence']],re.I):
             raise ValueError('Removal requires explicit narration support')
-        if step['action'] == 'connect' and (len(step['targets']) != 2 or not re.search(r'\b(convert\w*|become\w*|map\w*|connect\w*|pass\w*|flow\w*|lead\w*|produce\w*|turn\w*|link\w*)\b',parts[step['sentence']],re.I)):
+        if step['action'] == 'connect' and (len(step['targets']) != 2 or not re.search(CONNECT,parts[step['sentence']],re.I)):
             raise ValueError('Connections require a narrated relationship')
     if [s['sentence'] for s in steps] != sorted(s['sentence'] for s in steps):
         raise ValueError('Actions must follow narration order')
@@ -85,9 +88,9 @@ def compile_scene(scene, visual=None):
         present=[i for i,o in enumerate(objects) if o['sentence']<=cue and o['label'].casefold() in part.casefold()]
         if new:steps.append({'sentence':cue,'action':'reveal','targets':new})
         if present:steps.append({'sentence':cue,'action':'focus','targets':present})
-        if len(present)>=2 and re.search(r'\b(convert\w*|become\w*|map\w*|connect\w*|pass\w*|flow\w*|lead\w*|produce\w*|turn\w*|link\w*)\b',part,re.I):
+        if len(present)>=2 and re.search(CONNECT,part,re.I):
             steps.append({'sentence':cue,'action':'connect','targets':present[:2]})
-        if re.search(r'\b(remove\w*|drop\w*|outside|omit\w*|exclud\w*)\b',part,re.I):
+        if re.search(REMOVE,part,re.I):
             targets=[i for i in present if objects[i]['label'].casefold()=='older messages']
             if targets:steps.append({'sentence':cue,'action':'remove','targets':targets})
     if len(steps)>20:return None
@@ -95,4 +98,23 @@ def compile_scene(scene, visual=None):
 
 
 def timed(spec, beats):
-    return {**spec, 'steps':[{**s,'start':beats[s['sentence']]['start'],'end':beats[s['sentence']]['end']} for s in spec['steps']]}
+    """Attach measured times: objects appear on their spoken label, actions on their spoken cue.
+
+    Without word timing every cue falls back to its sentence start, as before.
+    """
+    objects = [{**o, 'at': cue_time(beats[o['sentence']], phrase_time(beats[o['sentence']], o['label']))} for o in spec['objects']]
+    steps = []
+    for s in spec['steps']:
+        beat = beats[s['sentence']]
+        # Objects introduced in this sentence must be on screen before an action uses them.
+        introduced = [objects[i]['at'] for i in s['targets'] if objects[i]['sentence'] == s['sentence']]
+        if s['action'] == 'reveal':
+            start = min(introduced)
+        elif s['action'] == 'focus':
+            mentions = [phrase_time(beat, objects[i]['label']) for i in s['targets']]
+            start = cue_time(beat, min((m for m in mentions if m is not None), default=None))
+        else:
+            start = cue_time(beat, pattern_time(beat, CONNECT if s['action'] == 'connect' else REMOVE))
+            start = max([start, *introduced])
+        steps.append({**s, 'start': start, 'end': beat['end']})
+    return {**spec, 'objects': objects, 'steps': steps}

@@ -166,6 +166,8 @@ class EditorStore:
             current = self.load(project_id)
             if kind in {'render','draft_render'}:
                 current.pop('accepted_export',None)
+                # A new export needs its own thumbnail and description.
+                current.pop('publish',None)
             if kind == 'motion':
                 current.setdefault('motion_previews', {})[uid] = record
             elif kind == 'preview':

@@ -8,9 +8,10 @@ from backend.services.director import sentences
 
 from backend.services.run_state import file_hash, fingerprint
 from backend.services.script_generator import write_json_atomic
-from backend.tts.kokoro_tts import DEFAULT_VOICE, SEED, generate_speech
+from backend.tts.kokoro_tts import DEFAULT_VOICE, SEED, generate_speech, generate_timed_speech
 from backend.utils.audio_duration import audio_duration
 from backend.utils.scene_data import load_source
+from backend.utils.word_timing import ALIGNMENT_VERSION, estimate_words, offset_words, validate_words
 
 
 def speech_key(narration, voice=DEFAULT_VOICE, directed=False):
@@ -28,6 +29,9 @@ def cached_speech(public_dir: Path, narration: str, voice=DEFAULT_VOICE, directe
         if record['key'] == key and record['sha256'] == file_hash(wav) and record['duration'] == audio_duration(wav):
             if directed:
                 validate_beats(record['beats'], narration, record['duration'])
+                # An improved aligner may now measure sentences an older one had to estimate.
+                if record.get('alignment') != ALIGNMENT_VERSION and any(b.get('wordTiming') == 'estimated' for b in record['beats']):
+                    return None
             return wav, record['duration']
     except (OSError, ValueError, KeyError, TypeError):
         pass
@@ -41,6 +45,8 @@ def validate_beats(beats, narration, duration):
     for beat in beats:
         if not 0 <= previous <= beat['start'] < beat['end'] <= duration:
             raise ValueError('Invalid sentence timing range')
+        # Records made before word timing lack words and are regenerated once.
+        validate_words(beat.get('words'), beat['text'], beat['start'], beat['end'])
         previous = beat['end']
     if not beats or beats[0]['start'] != 0 or abs(beats[-1]['end']-duration) > 1/24000:
         raise ValueError('Incomplete sentence timing')
@@ -51,7 +57,7 @@ def sentence_speech(narration, pending, voice, synthesizer):
     beats, samples, params, cursor = [], [], None, 0
     for index, text in enumerate(parts):
         part = pending.parent/f'part-{index}.wav'
-        synthesizer(text, part, voice)
+        timed = synthesizer(text, part, voice)
         with wave.open(str(part), 'rb') as reader:
             fmt = (reader.getnchannels(), reader.getsampwidth(), reader.getframerate())
             if fmt != (1, 2, 24000):
@@ -61,7 +67,14 @@ def sentence_speech(narration, pending, voice, synthesizer):
             if frames <= 0:
                 raise ValueError('Empty sentence audio')
             samples.append(reader.readframes(frames))
-        beats.append({'text': text, 'start': cursor/24000, 'end': (cursor+frames)/24000})
+        start, end = cursor/24000, (cursor+frames)/24000
+        if isinstance(timed, dict) and timed.get('words'):
+            local, measured = timed['words'], timed.get('measured', False)
+        else:
+            # Synthesizers without phoneme durations get letter-weighted estimates.
+            local, measured = estimate_words(text, 0.0, frames/24000), False
+        beats.append({'text': text, 'start': start, 'end': end, 'wordTiming': 'model' if measured else 'estimated',
+                      'words': offset_words(local, start, end)})
         cursor += frames
         if index < len(parts)-1:
             samples.append(b'\0\0'*2880)
@@ -72,8 +85,9 @@ def sentence_speech(narration, pending, voice, synthesizer):
     return beats
 
 
-def generate_incremental(source: Path, output: Path, public_dir: Path, voice=DEFAULT_VOICE, synthesizer=generate_speech, directed=False):
+def generate_incremental(source: Path, output: Path, public_dir: Path, voice=DEFAULT_VOICE, synthesizer=None, directed=False):
     data = load_source(source)
+    synthesizer = synthesizer or (generate_timed_speech if directed else generate_speech)
     enriched, generated, reused = [], [], []
     for scene in data['scenes']:
         cached = cached_speech(public_dir, scene['narration'], voice, directed)
@@ -92,7 +106,8 @@ def generate_incremental(source: Path, output: Path, public_dir: Path, voice=DEF
                     synthesizer(scene['narration'], pending, voice)
                 duration = audio_duration(pending)
                 pending.replace(wav)
-            write_json_atomic(wav.with_suffix('.json'), {'key': key, 'sha256': file_hash(wav), 'duration': duration, **({'beats': beats} if directed else {})})
+            write_json_atomic(wav.with_suffix('.json'), {'key': key, 'sha256': file_hash(wav), 'duration': duration,
+                                                         **({'beats': beats, 'alignment': ALIGNMENT_VERSION} if directed else {})})
             generated.append(scene['id'])
         timing = {'beats': json.loads(wav.with_suffix('.json').read_text(encoding='utf-8'))['beats']} if directed else {}
         enriched.append({**scene, 'audio': wav.relative_to(public_dir).as_posix(), 'duration': duration, **timing})

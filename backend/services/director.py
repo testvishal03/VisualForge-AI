@@ -339,6 +339,12 @@ def timed_visual(visual, narration, beats):
         # A manual layout edit has no authored alignment; distribute items over
         # measured sentence boundaries, never fabricate sub-sentence precision.
         cues = [min(i, len(beats)-1) for i in range(len(visual['items']))]
-    result['revealAt'] = [beats[i]['start'] for i in cues]
+    from backend.utils.word_timing import cue_time, phrase_time
+    # An item quoted from its sentence appears as it is spoken; summaries keep the sentence start.
+    reveals = []
+    for item, cue in zip(visual['items'], cues):
+        at = cue_time(beats[cue], phrase_time(beats[cue], item) if isinstance(item, str) else None)
+        reveals.append(max(at, reveals[-1]) if reveals else at)
+    result['revealAt'] = reveals
     result.setdefault('transition', 'fade')
     return result

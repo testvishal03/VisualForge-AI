@@ -26,6 +26,8 @@ class EditorJobs:
         self.cancel = threading.Event()
         self.state = {'status': 'idle'}
         self.version = renderer_version(root)
+        # Whole videos get a thumbnail and description; chapter renders inside a long video do not.
+        self.publishing = True
         self.workspaces = Workspaces(store)
 
     def output_key(self, project, uid=None, profile='final'):
@@ -131,13 +133,7 @@ class EditorJobs:
             return python_stage(self.root/'backend/scripts'/script, args, root=self.root, folder=folder, name=name, timeout=3600, cancel_event=self.cancel)
         def render(command, name):
             phase(name)
-            for attempt in range(2):
-                try:
-                    return execute([node_executable(), self.root/'renderer/node_modules/@remotion/cli/remotion-cli.js', *command],
-                                   cwd=self.root/'renderer', log=folder/'logs'/f'{name}.log', cancel_event=self.cancel)
-                except RuntimeError:
-                    if attempt:
-                        raise
+            return self.remotion(folder, command, name)
         if action == 'draft' or action == 'generate' and project['document'] is None:
             source = folder/'draft.json'
             workspace = self.workspaces.for_project(project['id'])
@@ -254,7 +250,7 @@ class EditorJobs:
             directed=bool(project.get('directed') or any(s['visual'].get('worked') for s in document['scenes']))
             durations={}
             for row in document['scenes']:
-                speech=cached_speech(self.root/'renderer/public',row['narration'],directed=directed)
+                speech=cached_speech(self.root/'renderer/public',row['narration'],self.voice(project['id']),directed=directed)
                 durations[row['uid']]=speech[1] if speech else len(row['narration'].split())/135*60
             selected_uids={s['uid'] for s in select_contiguous(document['scenes'],uid,durations)}
             selected=[s for s in video.scenes if document['scenes'][s.id-1]['uid'] in selected_uids]
@@ -269,7 +265,7 @@ class EditorJobs:
         selected_source = folder/'speech-source.json'
         write_json_atomic(selected_source, {'title': video.title, 'topic': video.topic, 'scenes': [s.model_dump() for s in selected]})
         metadata = folder/'speech.generated.json'
-        py('audio', 'generate_audio.py', ['--input', selected_source, '--output', metadata, '--incremental', *(['--directed'] if project.get('directed') or any(s['visual'].get('worked') for s in document['scenes']) else [])])
+        py('audio', 'generate_audio.py', ['--input', selected_source, '--output', metadata, '--incremental', *(['--directed'] if project.get('directed') or any(s['visual'].get('worked') for s in document['scenes']) else []), '--voice', self.voice(project['id'])])
         data = json.loads(metadata.read_text(encoding='utf-8'))
         self.state['audio_cache'] = data['cache']
         if action=='story_preview':
@@ -340,7 +336,29 @@ class EditorJobs:
         pending.replace(final)
         artifact={'key': key, 'file': final.name, 'sha256': file_hash(final), 'profile':profile, 'styled':True}
         if action=='story_preview':artifact.update(start_uid=uid,scene_uids=[document['scenes'][s['id']-1]['uid'] for s in data['scenes']],seconds=sum(math.ceil((s['duration']+.5)*30)/30 for s in data['scenes']))
-        self.store.update_artifact(project['id'], 'story_render' if action=='story_preview' else 'style_render' if action=='style_preview' else 'motion' if action=='motion' else 'preview' if action == 'preview' else 'draft_render' if profile=='draft' else 'render',artifact, uid)
+        kind='story_render' if action=='story_preview' else 'style_render' if action=='style_preview' else 'motion' if action=='motion' else 'preview' if action == 'preview' else 'draft_render' if profile=='draft' else 'render'
+        self.store.update_artifact(project['id'], kind, artifact, uid)
+        if kind in {'render','draft_render'} and self.publishing:
+            from backend.services.publishing import publish_safely
+            phase('thumbnail')
+            publish_safely(self, project, folder, data, render, profile)
+
+    def voice(self, project_id):
+        """Narration voice from the render style, so stand-in catalogues that only provide style() work."""
+        from backend.tts.kokoro_tts import DEFAULT_VOICE
+        return self.workspaces.style(project_id).get('voice', DEFAULT_VOICE)
+
+    def remotion(self, folder, command, name):
+        """Run one Remotion CLI command for a project, retrying once after a transient browser failure."""
+        from backend.services.render_assets import with_public_dir
+        command = with_public_dir(self.root, folder, command)
+        for attempt in range(2):
+            try:
+                return execute([node_executable(), self.root/'renderer/node_modules/@remotion/cli/remotion-cli.js', *command],
+                               cwd=self.root/'renderer', log=folder/'logs'/f'{name}.log', cancel_event=self.cancel)
+            except RuntimeError:
+                if attempt:
+                    raise
 
     def close(self):
         self.cancel.set()
@@ -372,6 +390,8 @@ class EditorJobs:
         if 'long_video' in project:
             from backend.services.long_video import present
             result=present(self, project, result)
+            from backend.services.publishing import present as publish_present
+            result=publish_present(self, project, result)
             from backend.services.episode_review import review, candidate
             result['episode_review']=review(result)
             pending=candidate(self,project)
@@ -393,9 +413,10 @@ class EditorJobs:
         result['motion_urls'] = {}
         result['audio'] = {}
         result['preview_urls'] = {}
+        voice = self.voice(project['id'])
         for scene in project['document']['scenes']:
             uid = scene['uid']
-            cached = cached_speech(self.root/'renderer/public', scene['narration'], directed=bool(project.get('directed') or any(s['visual'].get('worked') for s in project['document']['scenes'])))
+            cached = cached_speech(self.root/'renderer/public', scene['narration'], voice, directed=bool(project.get('directed') or any(s['visual'].get('worked') for s in project['document']['scenes'])))
             if cached:
                 result['audio'][uid] = {'url': f"/media/{project['id']}/audio/{uid}?v={file_hash(cached[0])[:12]}", 'duration': cached[1]}
             record = project['previews'].get(uid)
@@ -420,6 +441,8 @@ class EditorJobs:
                 if self.artifact_intact(project,old):
                     result['previous_export_url'] = f"/media/{project['id']}/{kind}?previous=1&v={old['key']}"
                     break
+        from backend.services.publishing import present as publish_present
+        result=publish_present(self, project, result)
         target=project.get('source',{}).get('minutes',0)*60 if project.get('source',{}).get('mode')=='prompt' else None
         result['duration']=duration_report(project['document'],result['audio'],target)
         style=self.workspaces.style(project['id'])

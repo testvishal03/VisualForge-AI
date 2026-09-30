@@ -8,6 +8,7 @@ import re
 import secrets
 import socket
 import sys
+import threading
 from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -18,6 +19,11 @@ from backend.services.editor_store import EditorStore, document_from_video, qual
 from backend.services.editor_jobs import EditorJobs
 from backend.services.incremental_audio import cached_speech
 from backend.services.director import script_to_video, build_direction
+
+
+VOICE_SAMPLE_TEXT = ('Hello! This is how your lessons will sound. Each idea is explained step by step, '
+                     'and the visuals appear as I speak.')
+voice_lock = threading.Lock()
 
 
 class LocalHTTPServer(ThreadingHTTPServer):
@@ -74,7 +80,8 @@ def make_server(port=8765, root=ROOT, directory=None):
                 if start > end or start >= size:
                     return self.json_response({'error': 'Range outside file'}, 416)
                 code = 206
-            self.common_headers(code, mimetypes.guess_type(path.name)[0] or 'application/octet-stream', end-start+1)
+            kind = mimetypes.guess_type(path.name)[0] or 'application/octet-stream'
+            self.common_headers(code, f'{kind}; charset=utf-8' if kind.startswith('text/') else kind, end-start+1)
             self.send_header('Accept-Ranges', 'bytes')
             if code == 206:
                 self.send_header('Content-Range', f'bytes {start}-{end}/{size}')
@@ -98,7 +105,23 @@ def make_server(port=8765, root=ROOT, directory=None):
                     return self.file_response(root/'review' / ('index.html' if path=='/' else path[1:]))
                 if path == '/api/config':
                     from backend.llm.gguf_llm import model_status
-                    return self.json_response({'token': token, 'model': model_status()})
+                    from backend.tts.kokoro_tts import RECOMMENDED_VOICE, VOICES
+                    return self.json_response({'token': token, 'model': model_status(), 'recommended_voice': RECOMMENDED_VOICE,
+                                               'voices': [{'id': key, 'name': name, 'description': note} for key, (name, note, _) in VOICES.items()]})
+                sample = re.fullmatch(r'/api/voice-sample/([a-z]{2}_[a-z]+)', path)
+                if sample:
+                    from backend.tts.kokoro_tts import VOICES, generate_speech
+                    if sample[1] not in VOICES:
+                        raise ValueError('Unknown voice')
+                    target = root/'data/voice-samples'/f'{sample[1]}.wav'
+                    # One short local clip per voice, synthesized on first request and reused.
+                    with voice_lock:
+                        if not target.is_file():
+                            target.parent.mkdir(parents=True, exist_ok=True)
+                            pending = target.with_suffix('.pending.wav')
+                            generate_speech(VOICE_SAMPLE_TEXT, pending, sample[1])
+                            pending.replace(target)
+                    return self.file_response(target)
                 chapter_media = re.fullmatch(r'/media/([a-f0-9]{12})/chapter/([a-f0-9]{12})/(draft|style)', path)
                 if chapter_media:
                     from backend.services.long_video import nested_jobs
@@ -160,6 +183,13 @@ def make_server(port=8765, root=ROOT, directory=None):
                     if not nested.artifact_ready(child,record,chapter_motion[4]):
                         raise FileNotFoundError('Scene preview is not current')
                     return self.file_response(nested.store.folder(child['id'])/record['file'])
+                publish_media=re.fullmatch(r'/media/([a-f0-9]{12})/(thumbnail|description)',path)
+                if publish_media:
+                    project=store.load(publish_media[1]);jobs.workspaces.require_active(project['id'])
+                    current=jobs.present(project).get('publish')
+                    if not current:raise FileNotFoundError('Thumbnail and description are not ready')
+                    record=project['publish'][publish_media[2]]
+                    return self.file_response(store.folder(project['id'])/record['file'])
                 proposal=re.fullmatch(r'/media/([a-f0-9]{12})/candidate',path)
                 if proposal:
                     from backend.services.episode_review import candidate
@@ -181,7 +211,7 @@ def make_server(port=8765, root=ROOT, directory=None):
                     ready = jobs.present(project)
                     if match[2] == 'audio':
                         scene = next(s for s in project['document']['scenes'] if s['uid']==match[3])
-                        cached = cached_speech(root/'renderer/public', scene['narration'], directed=project.get('directed', False))
+                        cached = cached_speech(root/'renderer/public', scene['narration'], jobs.voice(project['id']), directed=bool(project.get('directed') or any(s['visual'].get('worked') for s in project['document']['scenes'])))
                         if not cached:
                             raise FileNotFoundError('Audio needs regeneration')
                         return self.file_response(cached[0])
@@ -270,8 +300,7 @@ def make_server(port=8765, root=ROOT, directory=None):
                             if mode == 'long':
                                 from backend.services.long_video import initialize
                                 project = initialize(store, normalize_topic(text), body.get('minutes'))
-                                if workspace_id:
-                                    jobs.workspaces.attach(workspace_id, project['id'])
+                                jobs.workspaces.home(workspace_id, project['id'], project['topic'])
                                 jobs.start(project['id'], 'long_outline')
                                 return self.json_response(jobs.present(project), 201)
                             if mode not in {'prompt', 'script'}:
@@ -293,7 +322,7 @@ def make_server(port=8765, root=ROOT, directory=None):
                                     project['source']['automatic']=True
                                     from backend.services.script_generator import write_json_atomic
                                     write_json_atomic(store.folder(project['id'])/'project.json',project)
-                                if workspace_id: jobs.workspaces.attach(workspace_id,project['id'])
+                                jobs.workspaces.home(workspace_id, project['id'], project['topic'])
                                 jobs.start(project['id'], 'auto_generate' if automatic or 'long_video' in project else 'generate')
                                 return self.json_response(jobs.present(project),201)
                             else:
@@ -306,7 +335,7 @@ def make_server(port=8765, root=ROOT, directory=None):
                             if render_now and document:
                                 store.approve_storyboard(project['id'], project['revision'])
                                 project = store.load(project['id'])
-                            if workspace_id: jobs.workspaces.attach(workspace_id,project['id'])
+                            jobs.workspaces.home(workspace_id, project['id'], project['topic'])
                             jobs.start(project['id'], 'auto_generate' if automatic else 'generate')
                             return self.json_response(jobs.present(project), 201)
                         topic = normalize_topic(body.get('topic'))

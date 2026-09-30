@@ -8,6 +8,7 @@ function generationProgress(job,previous=0) {
   if(phase==='audio'){stage=3;pct=50;label='Recording the narration';}
   if(phase==='render'||phase==='preview'){stage=4;pct=67;label='Rendering your video';if(frames&&Number(frames[2])>0)pct=67+27*Math.min(1,Number(frames[1])/Number(frames[2]));}
   if(/validate/.test(phase)){stage=5;pct=97;label='Checking video and audio';}
+  if(phase==='thumbnail'){stage=5;pct=98;label='Creating thumbnail and description';}
   if(job.chapter_total&&Number.isInteger(job.chapter_index)&&['audio','render','validate'].includes(phase)){
     const local=phase==='audio'?0.1:phase==='validate'?.98:frames?0.2+.75*Number(frames[1])/Number(frames[2]):.2;
     pct=45+50*(job.chapter_index+Math.min(1,local))/job.chapter_total;

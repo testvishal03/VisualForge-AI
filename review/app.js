@@ -806,6 +806,8 @@ window.addEventListener("beforeunload", (e) => {
   try {
     const config = await api("/api/config");
     state.token = config.token;
+    state.voices = config.voices || [];
+    state.recommendedVoice = config.recommended_voice || "af_heart";
     $("model-status").textContent = config.model?.label || "Local workspace";
     const runs = await api("/api/runs");
     for (const run of runs) {
@@ -972,6 +974,18 @@ function spaceDialog(w) {
 
   $("space-topics").value=(w?.topics||[]).join("\n");
   updateTopicChoices(w?.current_topic||"");
+  // Existing workspaces keep their stored voice; new ones start with the recommended voice.
+  const voices = $("space-voice");
+  voices.replaceChildren(...(state.voices || []).map((v) => {
+    const option = element("option", `${v.name} - ${v.description}`);
+    option.value = v.id;
+    return option;
+  }));
+  voices.value = w?.voice || state.recommendedVoice || "af_heart";
+  // Show each workspace's real setting; new workspaces start with both bookends on.
+  $("space-intro").checked = w ? w.show_intro === true : true;
+  $("space-outro").checked = w ? w.show_outro === true : true;
+  $("space-voice-audio").pause();
   let swatch = $("theme-swatch");
   if (!swatch) {
     const label = document.querySelector('label[for="space-theme"]');
@@ -1019,7 +1033,20 @@ function spaceDialog(w) {
 $("new-space").onclick = () => spaceDialog();
 $("edit-space").onclick = () =>
   spaceDialog(state.spaces.find((w) => w.id === state.spaceId));
-$("close-space").onclick = () => $("space-dialog").close();
+$("close-space").onclick = () => { $("space-voice-audio").pause(); $("space-dialog").close(); };
+$("space-voice-play").onclick = async () => {
+  const audio = $("space-voice-audio"), button = $("space-voice-play");
+  if (!audio.paused) { audio.pause(); return; }
+  // The first listen synthesizes a short local sample; later listens reuse it.
+  button.textContent = "Preparing…"; button.disabled = true;
+  audio.src = `/api/voice-sample/${$("space-voice").value}`;
+  try { await audio.play(); button.textContent = "Stop"; }
+  catch (error) { button.textContent = "Listen"; message("Could not play the voice sample. " + error.message); }
+  finally { button.disabled = false; }
+};
+$("space-voice-audio").onpause = () => { $("space-voice-play").textContent = "Listen"; };
+$("space-voice-audio").onended = () => { $("space-voice-play").textContent = "Listen"; };
+$("space-voice").onchange = () => $("space-voice-audio").pause();
 $("space-form").onsubmit = (e) => {
   e.preventDefault();
   guarded(async () => {
@@ -1032,6 +1059,9 @@ $("space-form").onsubmit = (e) => {
       audience: $("space-audience").value,
       topics: $("space-topics").value.split(/\r?\n/).map(t=>t.trim()).filter(Boolean),
       current_topic: $("space-current-topic").value,
+      voice: $("space-voice").value,
+      show_intro: $("space-intro").checked,
+      show_outro: $("space-outro").checked,
     };
     const w = await api(
       state.editingSpace
