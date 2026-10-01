@@ -8,7 +8,7 @@ import {BRIDGE_HEADLINE_DELAY,BRIDGE_SECONDS,bridgedFrom,carriedLabels,lightCard
 import {idleOffset,mentionPulse,mentionTimes,sceneDrift} from '../src/emphasis.ts';
 import {fitLabel,objectScale,textWidth} from '../src/labels.ts';
 import {along,chipKind} from '../src/flow.ts';
-import {after,inside,noise} from '../src/explainer.ts';
+import {after,chipRows,inside,mapLayout,noise} from '../src/explainer.ts';
 import {animationTiming,activeConcept,sharedConcept} from '../src/animation.ts';
 import {isContextWindow,contextCues} from '../src/context-window.ts';
 import {validateTeaching,teachingStage,type TeachingPlan} from '../src/teaching-plan.ts';
@@ -383,6 +383,22 @@ test('mostly light videos keep their title and takeaway cards light',()=>{
   assert.equal(lightCard(plain('title'),true),true);
   assert.equal(lightCard(plain('explanation'),true),false,'only title and takeaway cards switch');
   assert.equal(lightVideo([plain('title'),plain('explanation'),plain('process'),board]),false);
+});
+
+test('pack two explainers accept only faithful data',()=>{
+  const base={...scene(1,8),narration:'Text is broken into tokens.'};
+  const tokens={kind:'tokens' as const,text:'Embeddings work',pieces:['Emb','eddings',' work'],ids:[1,2,3],model:'Qwen3',at:{split:1,ids:3},end:8};
+  validateVideoData({title:'E',scenes:[{...base,explainer:tokens}]});
+  for(const bad of [{...tokens,pieces:['Emb','edding',' work']},{...tokens,ids:[1,2]},{...tokens,ids:[1,-2,3]}])
+    assert.throws(()=>validateVideoData({title:'E',scenes:[{...base,explainer:bad}]}),/explainer/);
+  const map={kind:'embedding_map' as const,points:[{label:'Cat',group:0},{label:'Dog',group:0},{label:'King',group:1},{label:'Banana',group:2}],at:{},end:8};
+  validateVideoData({title:'E',scenes:[{...base,explainer:map}]});
+  assert.throws(()=>validateVideoData({title:'E',scenes:[{...base,explainer:{...map,points:map.points.slice(0,3)}}]}),/explainer/);
+  validateVideoData({title:'E',scenes:[{...base,explainer:{kind:'retrieval',stages:[{key:'question',title:'Question'},{key:'embedding',title:'Embedding'},{key:'chunks',title:'Closest chunks'},{key:'answer',title:'Answer'}],at:{},end:8}}]});
+  const placed=mapLayout([0,0,1,2]);
+  const d=(a:number[],b:number[])=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+  assert.ok(d(placed[0],placed[1])<d(placed[0],placed[2]),'grouped points sit closer than other groups');
+  assert.equal(chipRows([500,500,500],1200)[2].y>0,true,'chips wrap to a new row');
 });
 
 test('caption phrases preserve every word within measured sentence boundaries',()=>{

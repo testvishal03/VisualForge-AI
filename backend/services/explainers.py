@@ -46,6 +46,44 @@ def quoted(text):
     return [q.strip(' .?!,') for q in re.findall(QUOTE, text)]
 
 
+TOKENIZE = r'\btokeni[sz]\w*|\b(?:broken|split|divided|chopped|turned)\s+(?:\w+\s+){0,2}into\s+tokens\b|\btoken\s+IDs?\b'
+RETRIEVAL = r'\bretriev\w*|\bRAG\b'
+EMBED = r'\bembeddings?\b|\bvector space\b|\bclose together\b|\bclusters?\b'
+NEAR = r'\b(?:close|closer|near|nearby|together|similar|cluster\w*)\b'
+# Retrieval stages in pipeline order; a stage is drawn only when the narration names it.
+STAGES = [('question', 'Question', r"\b(?:question|query|asks?)\b"), ('embedding', 'Embedding', r'\b(?:embedding|vector)s?\b'),
+          ('search', 'Vector search', r'\b(?:vector database|vector search|similarity search|search\w*)\b'),
+          ('chunks', 'Closest chunks', r'\b(?:chunks?|passages?|documents?)\b'), ('llm', 'Language model', r'\b(?:language model|LLM)s?\b'),
+          ('answer', 'Answer', r'\b(?:answers?|responses?)\b')]
+
+
+def map_items(parts):
+    """Short concepts the narration lists or quotes (“Cat”, “King” and “Queen”, or "Cat."), in spoken order."""
+    items = []
+    for i, part in enumerate(parts):
+        found = [q for q in quoted(part) if 1 <= len(q.split()) <= 2 and q[:1].isalpha()]
+        if not found and re.fullmatch(r'[A-Z][\w-]{1,20}\.', part.strip()):
+            found = [part.strip(' .')]
+        for item in found:
+            if item.casefold() not in [x['label'].casefold() for x in items]:
+                items.append({'label': item, 'sentence': i})
+    return items[:8]
+
+
+def clusters(items, parts):
+    """Group items that a sentence says are close; everything else stays apart."""
+    group = {x['label']: n for n, x in enumerate(items)}
+    for part in parts:
+        named = [x['label'] for x in items if re.search(rf'\b{re.escape(x["label"])}\b', part, re.I)]
+        if len(named) >= 2 and re.search(NEAR, part, re.I) and not re.search(r'\b(?:far|apart|different)\b', part, re.I):
+            target = group[named[0]]
+            for label in named[1:]:
+                old = group[label]
+                group = {k: (target if v == old else v) for k, v in group.items()}
+    order = list(dict.fromkeys(group[x['label']] for x in items))
+    return [order.index(group[x['label']]) for x in items]
+
+
 def plan(scene):
     """The explainer this narration calls for, or None. Cues are sentence indices plus spoken patterns."""
     # The opening card keeps its title treatment. A closing scene may still be explained, since
@@ -92,6 +130,28 @@ def plan(scene):
         if sum(s['key'] != 'step' for s in steps) >= 2 and len({s['key'] for s in steps}) >= 2:
             return {'kind': 'steps', 'steps': steps,
                     'cues': {f's{n}': (i, r'^(?:first|second|third|next|then|finally|lastly|step)$') for n, (i, _) in enumerate(ordered)}}
+    if re.search(RETRIEVAL, text, re.I) and re.search(r'\b(?:chunks?|documents?|passages?)\b', text, re.I):
+        stages = [(key, title, first(parts, pattern), pattern) for key, title, pattern in STAGES]
+        stages = [s for s in stages if s[2] is not None]
+        if len(stages) >= 4:
+            return {'kind': 'retrieval', 'stages': [{'key': key, 'title': title} for key, title, _, _ in stages],
+                    'cues': {key: (index, pattern.replace(r'\b', '')) for key, _, index, pattern in stages}}
+    items = map_items(parts)
+    # A map needs narration about meaning-distance, not just a list (metadata fields are not a map).
+    if re.search(EMBED, text, re.I) and re.search(NEAR + r'|\b(?:far|apart|distance)\b', text, re.I) and len(items) >= 4:
+        groups = clusters(items, parts)
+        return {'kind': 'embedding_map', 'points': [{'label': x['label'], 'group': g} for x, g in zip(items, groups)],
+                'cues': {f'p{n}': (x['sentence'], rf'^{re.escape(re.sub(r"[^A-Za-z0-9-]", "", x["label"].split()[0]))}\w*$')
+                         for n, x in enumerate(items)}}
+    if re.search(TOKENIZE, text, re.I):
+        example = next((q for q in quoted(text) if 2 <= len(q.split()) <= 12), None)
+        if example is None:
+            example = next((p.strip() for p in parts if 3 <= len(p.split()) <= 14 and not re.search(TOKENIZE, p, re.I)), None)
+        if example:
+            cue = first(parts, TOKENIZE)
+            return {'kind': 'tokens', 'text': example.strip(' "'), 'pieces': [], 'ids': [],
+                    'cues': {'split': (cue, r'^(?:tokeni\w*|split\w*|broken|divided|tokens?)$'),
+                             'ids': (first(parts, r'\b(?:IDs?|identifiers?|numbers?)\b'), r'^(?:IDs?|identifiers?|numbers?)$')}}
     cards = [(key, title, first(parts, pattern), pattern) for key, title, pattern in CAVEATS]
     cards = [c for c in cards if c[2] is not None]
     if len(cards) >= 2:

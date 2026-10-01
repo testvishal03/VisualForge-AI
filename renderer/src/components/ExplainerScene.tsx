@@ -1,6 +1,6 @@
 import {AbsoluteFill, useCurrentFrame, useVideoConfig} from 'remotion';
 import type {Scene, VideoData} from '../types';
-import {after, inside, noise, type Explainer} from '../explainer';
+import {after, chipRows, inside, mapLayout, noise, type Explainer} from '../explainer';
 import {backgroundProgress, bridgedFrom, BRIDGE_HEADLINE_DELAY, easeInOut, easeOut, enterProgress, exitProgress, isIllustrated, sceneSeconds} from '../transitions';
 import {fitLabel} from '../labels';
 import {Caption} from './Caption';
@@ -31,6 +31,9 @@ export function ExplainerScene({scene,style,previous,first,guide}:{scene:Scene;s
       {e.kind==='contrast'&&<Contrast e={e} t={t}/>}
       {e.kind==='caveats'&&<Caveats e={e} t={t}/>}
       {e.kind==='steps'&&<Steps e={e} t={t}/>}
+      {e.kind==='tokens'&&<Tokens e={e} t={t}/>}
+      {e.kind==='embedding_map'&&<EmbeddingMap e={e} t={t}/>}
+      {e.kind==='retrieval'&&<Retrieval e={e} t={t}/>}
     </svg>
     <div style={{opacity:1-exit}}>
       <Caption scene={scene} t={t} highlight={teal} style={{position:'absolute',bottom:83,left:210,right:210,textAlign:'center',fontSize:29,lineHeight:1.35,fontWeight:550}} boxStyle={{background:'#fff',border:'1px solid #d7e3e0',boxShadow:'0 8px 22px #17304413',padding:'11px 22px',borderRadius:12}}/>
@@ -221,4 +224,76 @@ export function LightCard({scene,style,previous,first,guide}:{scene:Scene;style?
     </div>
     <div style={{position:'absolute',bottom:0,left:0,height:7,width:`${Math.min(100,t/scene.duration*100)}%`,background:teal,opacity:background}}/>
   </AbsoluteFill>;
+}
+
+/** The narration's sentence splits into the model's real tokens, then their real IDs appear. */
+function Tokens({e,t}:{e:Extract<Explainer,{kind:'tokens'}>;t:number}){
+  const split=e.at.split??0,ids=e.at.ids??split+1.6;
+  const shown=e.pieces.map(piece=>piece.startsWith(' ')?'␣'+piece.slice(1):piece);
+  const widths=shown.map(piece=>Math.max(54,piece.length*21+30));
+  const places=chipRows(widths,1400,12,108);
+  const apart=easeInOut(after(t,split,.9));
+  return <g>
+    <text x="100" y="70" fontSize="22" fontWeight="700" letterSpacing="3" fill={teal}>{`TOKENIZED BY ${e.model.toUpperCase()} · ${e.pieces.length} TOKENS`}</text>
+    {shown.map((piece,i)=>{
+      const p=after(t,split+i*.07,.4),[x,y]=[places[i].x,places[i].y];
+      return <g key={i} transform={`translate(${100+x*(.82+.18*apart)} ${110+y})`}>
+        <rect width={widths[i]} height="62" rx="12" fill={apart>0?chipTones[i%chipTones.length]:'#fff'} stroke={ink} strokeWidth={apart>0?3:0} opacity={.35+.65*Math.max(apart,1-apart)}/>
+        <text x={widths[i]/2} y="42" textAnchor="middle" fontSize="30" fontWeight="700" fill={ink}>{piece}</text>
+        <text x={widths[i]/2} y="92" textAnchor="middle" fontSize="20" fontWeight="700" fill={coral} opacity={after(t,ids+i*.06,.35)*p}>{e.ids[i]}</text>
+      </g>;
+    })}
+    <text x="100" y="465" fontSize="20" fill={muted}>␣ marks a leading space, which the tokenizer keeps as part of the token</text>
+  </g>;
+}
+
+/** Concepts appear as they are named; ones the narration calls close gather in one region. */
+function EmbeddingMap({e,t}:{e:Extract<Explainer,{kind:'embedding_map'}>;t:number}){
+  const at=e.points.map((_,i)=>e.at[`p${i}`]??i*.6);
+  const places=mapLayout(e.points.map(pt=>pt.group));
+  const groups=[...new Set(e.points.map(pt=>pt.group))].filter(g=>e.points.filter(pt=>pt.group===g).length>1);
+  return <g>
+    <text x="100" y="60" fontSize="22" fontWeight="700" letterSpacing="3" fill={teal}>MEANING AS DISTANCE · ILLUSTRATIVE MAP, NOT MEASURED</text>
+    <path d="M300 440H1300M300 440V80" stroke="#e1e9e7" strokeWidth="3"/>
+    {groups.map(g=>{
+      const members=e.points.map((pt,i)=>pt.group===g?i:-1).filter(i=>i>=0);
+      const second=Math.min(...members.map(i=>at[i]).sort((a,b)=>a-b).slice(1));
+      const cx=members.reduce((a,i)=>a+places[i][0],0)/members.length,cy=members.reduce((a,i)=>a+places[i][1],0)/members.length;
+      return <ellipse key={g} cx={cx} cy={cy} rx={150} ry={70} fill={`${teal}12`} stroke={teal} strokeWidth="3" strokeDasharray="10 8" opacity={after(t,second,.6)}/>;
+    })}
+    {e.points.map((pt,i)=>{
+      const p=after(t,at[i],.5),[x,y]=places[i];
+      return <g key={i} transform={`translate(${x} ${y}) scale(${.6+.4*pop(p)})`} opacity={Math.min(1,p*1.6)}>
+        <circle r="16" fill={pt.group%2?coral:teal}/>
+        <text x="26" y="10" fontSize="30" fontWeight="800" fill={ink}>{pt.label}</text>
+      </g>;
+    })}
+  </g>;
+}
+
+const STAGE_ICONS:Record<string,string>={question:'M-26-20h52v30H6l-14 12V10h-18z',embedding:'M-28-6h56M-28 6h56M-16-18v36M0-18v36M16-18v36',
+  search:'M-8-8m-16 0a16 16 0 1 0 32 0a16 16 0 1 0-32 0M4 4l20 20',chunks:'M-24-22h34l12 12v32h-46zM-14-4h22M-14 6h22',llm:'M-24-16L24 0-24 16M-24-16L24 16',answer:'M-26-20h52v30H6l-14 12V10h-18zM-12-5l6 6 12-12'};
+
+/** Question to answer: each stage lights up when the narration reaches it, and the query travels along. */
+function Retrieval({e,t}:{e:Extract<Explainer,{kind:'retrieval'}>;t:number}){
+  const n=e.stages.length,gap=1400/(n-1);
+  const at:number[]=[];e.stages.forEach((st,i)=>at.push(Math.max(e.at[st.key]??i*.8,at[i-1]??0)));
+  const active=at.reduce((a,c,i)=>t>=c?i:a,-1);
+  const travel=active>0?easeInOut(after(t,at[active],.8)):0;
+  return <g>
+    <text x="100" y="60" fontSize="22" fontWeight="700" letterSpacing="3" fill={teal}>HOW RETRIEVAL WORKS · ILLUSTRATIVE FLOW</text>
+    {e.stages.map((st,i)=>{
+      const x=100+i*gap,p=after(t,at[i],.5),on=i===active;
+      return <g key={st.key}>
+        {i>0&&<path d={`M${x-gap+70} 250H${x-70}`} stroke={p>0?teal:'#d7e3e0'} strokeWidth="5" strokeLinecap="round" strokeDasharray={p>0?'0':'8 10'}/>}
+        <g transform={`translate(${x} 250) scale(${.7+.3*pop(p)})`} opacity={.25+.75*Math.min(1,p*1.5)}>
+          <circle r="62" fill={on?'#fff0e7':'#e9f4f0'} stroke={on?coral:teal} strokeWidth={on?5:3}/>
+          <path d={STAGE_ICONS[st.key]} fill="none" stroke={ink} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+          <text y="104" textAnchor="middle" fontSize={fitLabel(st.title,gap-20,26,18).fontSize} fontWeight="800" fill={ink}>{st.title}</text>
+          {st.key==='chunks'&&p>0&&[0,1,2].map(k=><rect key={k} x={-60+k*42} y="-128" width="34" height="44" rx="5" fill={k===1?'#fff0e7':'#fff'} stroke={k===1?coral:muted} strokeWidth="3" opacity={after(t,at[i]+.3+k*.15,.3)}/>)}
+        </g>
+      </g>;
+    })}
+    {active>0&&travel<1&&<circle cx={100+(active-1)*gap+travel*gap} cy="250" r="14" fill={coral}/>}
+  </g>;
 }

@@ -10,7 +10,13 @@ export type Explainer =
   | {kind:'denoise';subject:string;named:boolean;at:{noise?:number;clean?:number};end:number}
   | {kind:'contrast';left:{title:string;verb:string};right:{title:string;verb:string};bins:string[];hoodie?:boolean;at:{left?:number;right?:number};end:number}
   | {kind:'caveats';cards:{key:'wrong'|'bias'|'editor'|'privacy';title:string}[];at:Record<string,number>;end:number}
-  | {kind:'steps';steps:{key:'feed'|'patterns'|'prompt'|'step';title:string;detail:string}[];at:Record<string,number>;end:number};
+  | {kind:'steps';steps:{key:'feed'|'patterns'|'prompt'|'step';title:string;detail:string}[];at:Record<string,number>;end:number}
+  | {kind:'tokens';text:string;pieces:string[];ids:number[];model:string;at:{split?:number;ids?:number};end:number}
+  | {kind:'embedding_map';points:{label:string;group:number}[];at:Record<string,number>;end:number}
+  | {kind:'retrieval';stages:{key:RetrievalStage;title:string}[];at:Record<string,number>;end:number};
+
+export type RetrievalStage='question'|'embedding'|'search'|'chunks'|'llm'|'answer';
+const STAGE_KEYS=['question','embedding','search','chunks','llm','answer'];
 
 export const SHAPES=['heart','star','sun','smile','moon','flower','tree','house','cat'];
 const text=(v:unknown,limit:number)=>typeof v==='string'&&v.trim().length>0&&v.length<=limit&&!/[\x00-\x1f]/.test(v);
@@ -33,6 +39,14 @@ export function validateExplainer(scene:Scene){
     if(!Array.isArray(e.cards)||e.cards.length<2||e.cards.length>4||e.cards.some(c=>!['wrong','bias','editor','privacy'].includes(c.key)||!text(c.title,30)))fail();
   }else if(e.kind==='steps'){
     if(!Array.isArray(e.steps)||e.steps.length<2||e.steps.length>4||e.steps.some(st=>!['feed','patterns','prompt','step'].includes(st.key)||!text(st.title,30)||!text(st.detail,80)))fail();
+  }else if(e.kind==='tokens'){
+    // Measured pieces must rebuild the narration's text exactly, one real ID per piece.
+    if(!text(e.text,200)||!text(e.model,60)||!Array.isArray(e.pieces)||!Array.isArray(e.ids)||e.pieces.length<1||e.pieces.length>40||e.pieces.length!==e.ids.length||
+      e.pieces.join('')!==e.text||e.ids.some(id=>!Number.isInteger(id)||id<0))fail();
+  }else if(e.kind==='embedding_map'){
+    if(!Array.isArray(e.points)||e.points.length<4||e.points.length>8||e.points.some(pt=>!text(pt.label,24)||!Number.isInteger(pt.group)||pt.group<0||pt.group>7))fail();
+  }else if(e.kind==='retrieval'){
+    if(!Array.isArray(e.stages)||e.stages.length<4||e.stages.length>6||e.stages.some(st=>!STAGE_KEYS.includes(st.key)||!text(st.title,30)))fail();
   }else fail();
 }
 
@@ -60,4 +74,18 @@ export function inside(shape:string,x:number,y:number){
     case 'cat':return Math.hypot(x,y-.1)<.6||(y<-.2&&y>-.85&&Math.abs(Math.abs(x)-.4)<(y+.85)*.35);
     default:return r<.6;
   }
+}
+
+/** Wrap token chips into rows that fit `width`; returns x/y for each chip. */
+export function chipRows(widths:number[],width:number,gap=10,row=96){
+  let x=0,y=0;
+  return widths.map(w=>{if(x>0&&x+w>width){x=0;y+=row;}const at={x,y};x+=w+gap;return at;});
+}
+
+/** Cluster centres for an illustrative map: groups spread across the plane, members around each centre. */
+export function mapLayout(groups:number[]){
+  const count=Math.max(...groups)+1,centres=Array.from({length:count},(_,g)=>{
+    const a=-Math.PI/2+g*2*Math.PI/count;return count===1?[700,275]:[700+Math.cos(a)*380,275+Math.sin(a)*125];});
+  const seen=new Map<number,number>();
+  return groups.map(g=>{const k=seen.get(g)??0;seen.set(g,k+1);const a=k*2.4;return [centres[g][0]+(k?Math.cos(a)*85:0),centres[g][1]+(k?Math.sin(a)*38:0)] as [number,number];});
 }

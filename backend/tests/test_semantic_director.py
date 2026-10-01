@@ -58,7 +58,9 @@ class SemanticDirectorTests(unittest.TestCase):
             plan = plan_video(video,engine=engine,cache=Path(tmp))
             again = plan_video(video,engine=engine,cache=Path(tmp))
             self.assertEqual(plan, again)
-            self.assertEqual(engine.generate_json.call_count, 2)
+            # Scene 2 ("The tokenizer splits input text into tokens") is drawn by the tokenization
+            # explainer, so only scene 1 reaches the model, and the second run is fully cached.
+            self.assertEqual(engine.generate_json.call_count, 1)
             self.assertEqual(before, video.model_dump())
             self.assertEqual(validate_document(document_from_video(video,plan)), video)
 

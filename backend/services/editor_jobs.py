@@ -264,7 +264,8 @@ class EditorJobs:
             ids={s['id'] for s in preview_scenes(candidates)}
             selected=[s for s in video.scenes if s.id in ids]
         worked_results=prepare_worked([document['scenes'][s.id-1] for s in selected]) if action!='audio' else {}
-        next_tokens=self.measure_next_tokens([document['scenes'][s.id-1] for s in selected],folder,py) if action!='audio' else {}
+        measured=self.measure_explainers([document['scenes'][s.id-1] for s in selected],folder,py) if action!='audio' else {'next':{},'tokens':{}}
+        next_tokens,tokenized=measured['next'],measured['tokens']
         selected_source = folder/'speech-source.json'
         write_json_atomic(selected_source, {'title': video.title, 'topic': video.topic, 'scenes': [s.model_dump() for s in selected]})
         metadata = folder/'speech.generated.json'
@@ -309,6 +310,10 @@ class EditorJobs:
                     from backend.services.next_token import shown
                     tokens,probs=shown(next_tokens[explainer['prompt']])
                     if tokens:explainer.update(candidates=tokens,probs=probs,measured=True,model=self.model_name())
+                if explainer and explainer['kind']=='tokens':
+                    # Only the model's own tokenization is drawn; without it the scene keeps its normal visual.
+                    found=tokenized.get(explainer['text'])
+                    explainer=dict(explainer,pieces=found['pieces'],ids=found['ids'],model=self.model_name()) if found else None
                 if explainer:scene['explainer']=timed_explainer(explainer,scene['beats'])
             scene['visual'] = timed_visual(document['scenes'][scene['id']-1]['visual'], scene['narration'], scene.get('beats', []))
             if scene.get('demonstration'):
@@ -360,33 +365,38 @@ class EditorJobs:
         from backend.llm.gguf_llm import model_status
         return str(model_status().get('model', 'local model')).split('/')[-1][:60]
 
-    def measure_next_tokens(self, rows, folder, py):
-        """Measured next-token odds for next-token explainer prompts; cached, and never fatal.
+    def measure_explainers(self, rows, folder, py):
+        """Measured data for explainers: next-token odds and tokenizations; cached, and never fatal.
 
-        Cached prompts are read without loading the model. A missing model or a failed run
-        leaves those scenes in their labelled illustrative form instead of stopping the video.
+        Cached texts are read without loading the model. A missing model or a failed run leaves
+        next-token scenes illustrative (labelled) and tokenization scenes on their normal visual.
         """
         from backend.services.explainers import plan as plan_explainer
         from backend.services import next_token
-        prompts=list(dict.fromkeys(e['prompt'] for row in rows if not row['visual'].get('worked') and (e:=plan_explainer(row)) and e['kind']=='next_token'))
-        if not prompts:
-            return {}
+        plans=[e for row in rows if not row['visual'].get('worked') and (e:=plan_explainer(row))]
+        prompts=list(dict.fromkeys(e['prompt'] for e in plans if e['kind']=='next_token'))
+        texts=list(dict.fromkeys(e['text'] for e in plans if e['kind']=='tokens'))
+        results={'next':{},'tokens':{}}
+        if not prompts and not texts:
+            return results
         try:
             from backend.services.worked_examples import identity
             model=identity()
         except (OSError, ValueError, KeyError):
-            return {}
-        results={p:r for p in prompts if (r:=next_token.read(p,model))}
-        missing=[p for p in prompts if p not in results]
-        if missing:
-            src,out=folder/'next-token-prompts.json',folder/'next-token-results.json'
+            return results
+        results['next']={p:r for p in prompts if (r:=next_token.read(p,model))}
+        results['tokens']={t:r for t in texts if (r:=next_token.read_tokens(t,model))}
+        missing={'next':[p for p in prompts if p not in results['next']],'tokens':[t for t in texts if t not in results['tokens']]}
+        if missing['next'] or missing['tokens']:
+            src,out=folder/'explainer-measure-request.json',folder/'explainer-measure-results.json'
             write_json_atomic(src,missing)
             try:
                 py('next-token','measure_next_token.py',[src,out])
                 measured=json.loads(out.read_text(encoding='utf-8'))
-                results.update({p:next_token.validate(measured[p],p,model) for p in missing if p in measured})
+                results['next'].update({p:next_token.validate(measured['next'][p],p,model) for p in missing['next'] if p in measured['next']})
+                results['tokens'].update({t:next_token.validate_tokens(measured['tokens'][t],t,model) for t in missing['tokens'] if t in measured['tokens']})
             except (RuntimeError, OSError, ValueError, KeyError) as exc:
-                self.state['message']=f'Next-token odds were not measured ({str(exc)[:160]}); the example stays illustrative.'
+                self.state['message']=f'Model measurements were not made ({str(exc)[:160]}); those explainers stay illustrative or use the normal visual.'
         return results
 
     def voice(self, project_id):
