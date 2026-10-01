@@ -89,6 +89,8 @@ export type VideoData = {
     showOutro?: boolean;
     /** Topic rail and "Up next" bridge between scenes; on unless false. */
     topicMap?: boolean;
+    /** A quiet generated music bed under the narration, mixed when the audio track is assembled. */
+    music?: boolean;
     /** Narration voice; part of the style so a voice change invalidates renders. */
     voice?: string;
     /** Next lesson in a series playlist, shown on the outro. */

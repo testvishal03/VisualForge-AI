@@ -985,6 +985,7 @@ function spaceDialog(w) {
   // Show each workspace's real setting; new workspaces start with both bookends on.
   $("space-intro").checked = w ? w.show_intro === true : true;
   $("space-outro").checked = w ? w.show_outro === true : true;
+  $("space-music").checked = w ? w.music === true : false;
   $("space-voice-audio").pause();
   let swatch = $("theme-swatch");
   if (!swatch) {
@@ -1062,6 +1063,7 @@ $("space-form").onsubmit = (e) => {
       voice: $("space-voice").value,
       show_intro: $("space-intro").checked,
       show_outro: $("space-outro").checked,
+      music: $("space-music").checked,
     };
     const w = await api(
       state.editingSpace
