@@ -44,6 +44,10 @@ def assemble_audio(root, data, timeline, output):
                 for block in source.blocks(blocksize=rate*10,dtype='float32'):
                     dest.write(block);cursor+=len(block)
         silence(round(timeline['durationInFrames']/30*rate)-cursor)
+    if data.get('style',{}).get('music'):
+        from backend.services.music import mix
+        voice,_=sf.read(output,dtype='float64')
+        sf.write(output,mix(voice,rate),rate,subtype='PCM_16',format='WAV')
 
 
 def render_cached(jobs, project, data, props, pending, profile, render):

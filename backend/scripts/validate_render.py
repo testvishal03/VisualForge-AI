@@ -38,6 +38,10 @@ def validate(video: Path, metadata: Path | None = None, profile='final') -> dict
     rate = first.samplerate
     decoded, decoded_rate = sf.read(io.BytesIO(run(BIN / "ffmpeg.exe", "-v", "error", "-i", video, "-vn", "-ar", rate, "-ac", "1", "-c:a", "pcm_s16le", "-f", "wav", "-")), dtype="float32")
     assert decoded_rate == rate
+    # With a music bed the padding holds quiet music, never narration: the bed stays below 0.03 RMS,
+    # while narration running into the padding measures about 0.1.
+    style = json.loads(Path(metadata).read_text(encoding='utf-8'))['videoData'].get('style', {}) if metadata else {}
+    padding_limit = 0.035 if style.get('music') else 0.001
     results = []
     for entry in timeline["scenes"]:
         scene = entry["scene"]
@@ -63,7 +67,7 @@ def validate(video: Path, metadata: Path | None = None, profile='final') -> dict
         # Exclude 100 ms of normal codec filter ringing around the speech boundary.
         gap = decoded[start + len(source) + round(0.1 * rate):end]
         gap_rms = float(np.sqrt(np.mean(gap ** 2)))
-        assert len(gap) > 0 and gap_rms < 0.001, f"Scene {scene['id']} narration overlaps its end padding"
+        assert len(gap) > 0 and gap_rms < padding_limit, f"Scene {scene['id']} narration overlaps its end padding"
         results.append({"id": scene["id"], "wav": scene["audio"], "duration": len(source) / rate,
                         "startFrame": entry["from"], "frames": entry["durationInFrames"],
                         "sourceCorrelation": correlation, "paddingRms": gap_rms,

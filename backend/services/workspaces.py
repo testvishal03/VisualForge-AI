@@ -43,7 +43,7 @@ class Workspaces:
     def new(name, kind, episodes=None):
         return dict(id=uuid.uuid4().hex[:12], name=name, kind=kind, episodes=episodes or [],
                     theme='ocean', audience='beginners', brand='VISUALFORGE / LEARN', voice=RECOMMENDED_VOICE, deleted=False,
-                    show_intro=True, show_outro=True,
+                    show_intro=True, show_outro=True, music=False,
                     topics=list(GENERATIVE_AI_TOPICS) if name.casefold().strip() == 'generative ai visualized' and kind == 'series' else [], current_topic='')
 
     def list(self):
@@ -95,7 +95,7 @@ class Workspaces:
             raise ValueError('Unsupported workspace settings')
         if w['kind']=='single' and len(w['episodes'])>1:
             raise ValueError('A single-video workspace can contain only one video')
-        for key in ('show_intro', 'show_outro'):
+        for key in ('show_intro', 'show_outro', 'music'):
             if key in w and not isinstance(w[key], bool):
                 raise ValueError(f'{key} must be true or false')
 
@@ -103,7 +103,7 @@ class Workspaces:
         with self.store.lock:
             catalog=self.read()
             w=self.new(body.get('name',''), body.get('kind','single'))
-            for key in ('theme','audience','brand','voice','show_intro','show_outro','topics','current_topic'):
+            for key in ('theme','audience','brand','voice','show_intro','show_outro','music','topics','current_topic'):
                 if key in body: w[key]=body[key]
             self.validate(w)
             catalog.append(w)
@@ -137,8 +137,8 @@ class Workspaces:
             elif action=='trash': w['deleted']=True
             elif w['deleted']: raise ValueError('Restore this workspace first')
             elif action=='save':
-                old_style = {key:w.get(key) for key in ('theme','brand','voice','show_intro','show_outro')}
-                for key in ('name','kind','theme','audience','brand','voice','show_intro','show_outro','topics','current_topic'):
+                old_style = {key:w.get(key) for key in ('theme','brand','voice','show_intro','show_outro','music')}
+                for key in ('name','kind','theme','audience','brand','voice','show_intro','show_outro','music','topics','current_topic'):
                     if key in body: w[key]=body[key]
                 self.validate(w)
                 if old_style != {key:w.get(key) for key in old_style}:
@@ -154,7 +154,7 @@ class Workspaces:
                 w['episodes']=order
             elif action=='duplicate':
                 duplicate=self.new(w['name'][:110]+' (copy)',w['kind'])
-                for key in ('theme','audience','brand','show_intro','show_outro'): duplicate[key]=w.get(key,False)
+                for key in ('theme','audience','brand','show_intro','show_outro','music'): duplicate[key]=w.get(key,False)
                 duplicate['voice']=w.get('voice',DEFAULT_VOICE)
                 for project_id in w['episodes']:
                     p=self.store.load(project_id)
@@ -182,6 +182,9 @@ class Workspaces:
         if w:
             style = {key: w[key] for key in ('theme', 'brand') if key in w} | \
                     {'showIntro':w.get('show_intro',False),'showOutro':w.get('show_outro',False),'voice':w.get('voice',DEFAULT_VOICE)}
+            # Music is added when the narration track is assembled; old workspaces stay without it.
+            if w.get('music'):
+                style['music'] = True
             # A series outro can point viewers to the next lesson in the playlist sequence.
             if w['kind'] == 'series' and project_id in w['episodes']:
                 through = w['episodes'][:w['episodes'].index(project_id)+1]
