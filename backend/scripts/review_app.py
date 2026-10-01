@@ -329,6 +329,13 @@ def make_server(port=8765, root=ROOT, directory=None):
                             minutes = 2 if automatic else body.get('minutes', 1)
                             if mode == 'script':
                                 title = normalize_topic(body['title']) if body.get('title') else None
+                                from backend.services.page_script import looks_like_markdown, page_to_script
+                                if looks_like_markdown(text):
+                                    # A pasted page or production script is converted to its spoken words; the
+                                    # narration is still reviewed before anything renders.
+                                    converted = page_to_script(text)
+                                    text = converted['script']
+                                    title = title or (normalize_topic(converted['title']) if converted['title'] else None)
                                 from backend.services.script_projects import create as create_script
                                 project = create_script(store, title, text, {'mode':mode,'text':text,'profile':profile,
                                     'review_first':reviewed or not bool(body.get('render_now') or automatic),
