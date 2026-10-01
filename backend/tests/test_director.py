@@ -133,3 +133,23 @@ class DirectorTests(unittest.TestCase):
 
 
 if __name__=='__main__':unittest.main()
+
+
+class HeadlineTests(unittest.TestCase):
+    def test_headlines_end_at_natural_boundaries_in_the_sentences_own_words(self):
+        from backend.schemas.video_schema import words
+        from backend.services.director import headline_for
+        cases = {
+            'We cannot send every document to the language model whenever a user asks a question.': 'We cannot send every document to the language model',
+            'Think of embeddings as points in a huge mathematical space.': 'Embeddings as points in a huge mathematical space',
+            'But tokens are still just IDs.': 'Tokens are still just IDs',
+            "Here's the secret: it's a next-word guesser.": "It's a next-word guesser",
+            'Imagine you have 100,000 documents.': 'Imagine you have 100,000 documents',
+            'Printed books work without batteries and can be shared in person.': 'Printed books work without batteries',
+        }
+        for sentence, expected in cases.items():
+            self.assertEqual(headline_for(sentence), expected)
+        for sentence in ['A real embedding can contain hundreds or even thousands of values.', '0.21, 0.84, minus 0.13, 0.52, 0.77, 0.12, and so on.']:
+            result = headline_for(sentence)
+            self.assertLessEqual(len(words(result)), 9)
+            self.assertNotIn(result.split()[-1].lower(), {'the', 'a', 'or', 'even', 'of', 'to'})
