@@ -1,3 +1,4 @@
+from backend.tests.render_stubs import stub_output, stub_props
 from backend.tests.render_stubs import cached as cached_render_stub
 import copy
 import json
@@ -95,7 +96,7 @@ class WorkspaceTests(unittest.TestCase):
                     Path(args[1]).write_text(json.dumps(plan))
                 elif fail: raise ValueError('Fixture validation failure')
             def execute(command,**kwargs):
-                commands.append(command);Path(command[4]).write_bytes(b'draft' if '--scale=0.6666666666666666' in command else b'final')
+                commands.append(command);stub_output(command).write_bytes(b'draft' if '--scale=0.6666666666666666' in command else b'final')
             with patch('backend.services.editor_jobs.python_stage',side_effect=stage),patch('backend.services.editor_jobs.execute',side_effect=execute),patch('backend.services.editor_jobs.node_executable',return_value='node'),patch('backend.services.scene_cache.render_cached',side_effect=cached_render_stub),patch('backend.services.scene_cache.thumbnails'):
                 for action in ('generate','render'):
                     jobs.start(p['id'],action);jobs.thread.join(5);self.assertEqual(jobs.status()['status'],'complete',jobs.status())

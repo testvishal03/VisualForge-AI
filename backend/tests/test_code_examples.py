@@ -1,3 +1,4 @@
+from backend.tests.render_stubs import stub_output, stub_props
 from backend.tests.render_stubs import cached as cached_render_stub
 import copy
 import unittest
@@ -75,8 +76,8 @@ class ExampleWorkflowTests(unittest.TestCase):
             if script.name=='generate_audio.py':
                 generate_incremental(Path(args[1]),Path(args[3]),self.root/'renderer/public',synthesizer=fake_speech,directed=True)
         def render(command,**kwargs):
-            props=Path(str(command[5]).split('=',1)[1]);captured.append(json.loads(props.read_text()))
-            Path(command[4]).write_bytes(b'preview fixture')
+            if 'bundle' not in command:props=stub_props(command);captured.append(json.loads(props.read_text()))
+            stub_output(command).write_bytes(b'preview fixture')
         with patch('backend.services.editor_jobs.python_stage',side_effect=stage),patch('backend.services.editor_jobs.execute',side_effect=render),patch('backend.services.editor_jobs.node_executable',return_value='node'),patch('backend.services.scene_cache.render_cached',side_effect=cached_render_stub),patch('backend.services.scene_cache.thumbnails'):
             self.jobs._perform(p,'motion',uid,'',self.store.folder(p['id']))
         scene=captured[0]['videoData']['scenes'][0]

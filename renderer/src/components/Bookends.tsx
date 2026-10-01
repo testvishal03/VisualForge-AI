@@ -1,14 +1,14 @@
 import {AbsoluteFill, useCurrentFrame, useVideoConfig} from 'remotion';
 import type {Scene, VideoData} from '../types';
 import {palette} from '../presentation';
-import {EXIT_SECONDS, clamp01, easeOut, isIllustrated} from '../transitions';
+import {EXIT_SECONDS, clamp01, easeOut, isIllustrated, lightVideo} from '../transitions';
 import {fitLabel} from '../labels';
 
 type Look = {base:string;ink:string;muted:string;accent:string;panel:string;line:string};
 
 /** Bookends match the stage they sit next to: the light board or the themed dark stage. */
-function look(scene:Scene|undefined, theme?:string):Look {
-  if (isIllustrated(scene)) return {base:'#fbfaf5', ink:'#173044', muted:'#54707b', accent:'#087e81', panel:'#ffffff', line:'#d7e3e0'};
+function look(scene:Scene|undefined, theme?:string, light=false):Look {
+  if (light || isIllustrated(scene)) return {base:'#fbfaf5', ink:'#173044', muted:'#54707b', accent:'#087e81', panel:'#ffffff', line:'#d7e3e0'};
   const p = palette(theme);
   return {base:p.base, ink:'#f4f3e9', muted:p.muted, accent:p.accent, panel:p.panel, line:`${p.accent}33`};
 }
@@ -38,12 +38,14 @@ function TopicList({titles, t, start, step, colors, mark}:{titles:string[];t:num
 }
 
 /** Topics of the whole lesson: chapter titles for chapter videos, otherwise scene headlines. */
-const agendaOf = (data:VideoData) => data.style?.agenda?.length ? data.style.agenda : data.scenes.map(s => s.headline);
+// The opening scene often repeats the video title; listing it as a topic would be redundant.
+const agendaOf = (data:VideoData) => (data.style?.agenda?.length ? data.style.agenda : data.scenes.map(s => s.headline))
+  .filter(topic => topic.trim().toLowerCase() !== data.title.trim().toLowerCase());
 
 /** Opening title: brand, lesson title, and the topics this video covers. */
 export function IntroScene({data}:{data:VideoData}) {
   const frame = useCurrentFrame(), {fps, durationInFrames} = useVideoConfig(), t = frame/fps, total = durationInFrames/fps;
-  const colors = look(data.scenes[0], data.style?.theme);
+  const colors = look(data.scenes[0], data.style?.theme, lightVideo(data.scenes));
   const exit = easeOut((t - (total - EXIT_SECONDS))/EXIT_SECONDS);
   const title = easeOut(t/.55), rule = easeOut((t - .25)/.6);
   const fit = fitLabel(data.title, 1500, 84, 52);
@@ -66,7 +68,7 @@ export function IntroScene({data}:{data:VideoData}) {
 /** Closing card: a recap of what was covered, then thanks and what comes next. */
 export function OutroScene({data}:{data:VideoData}) {
   const frame = useCurrentFrame(), {fps} = useVideoConfig(), t = frame/fps;
-  const colors = look(data.scenes.at(-1), data.style?.theme);
+  const colors = look(data.scenes.at(-1), data.style?.theme, lightVideo(data.scenes));
   const enter = easeOut(t/.4);
   // The recap holds for the first half, then yields to the sign-off.
   const recapOut = easeOut((t - 2.4)/.4), thanks = easeOut((t - 2.7)/.5), nextCard = easeOut((t - 3.2)/.5);

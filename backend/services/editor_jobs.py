@@ -1,6 +1,8 @@
 """One local task at a time, with subprocess isolation and explicit cancellation."""
 import copy
 import json
+import shutil
+from backend.services.render_assets import RENDER_CONCURRENCY
 import math
 from pathlib import Path
 import threading
@@ -262,6 +264,7 @@ class EditorJobs:
             ids={s['id'] for s in preview_scenes(candidates)}
             selected=[s for s in video.scenes if s.id in ids]
         worked_results=prepare_worked([document['scenes'][s.id-1] for s in selected]) if action!='audio' else {}
+        next_tokens=self.measure_next_tokens([document['scenes'][s.id-1] for s in selected],folder,py) if action!='audio' else {}
         selected_source = folder/'speech-source.json'
         write_json_atomic(selected_source, {'title': video.title, 'topic': video.topic, 'scenes': [s.model_dump() for s in selected]})
         metadata = folder/'speech.generated.json'
@@ -297,6 +300,16 @@ class EditorJobs:
                 from backend.services.code_examples import timed_example
                 demonstration = timed_example({**authored,'topic':document['topic']},scene['beats'])
                 if demonstration:scene['demonstration']=demonstration
+                # Narration that explains next-token prediction, noise-to-image, judge-vs-create
+                # or limitations gets its dedicated explainer animation.
+                from backend.services.explainers import plan as plan_explainer, timed as timed_explainer
+                explainer = None if demonstration or authored['visual'].get('worked') else plan_explainer(authored)
+                if explainer and explainer['kind']=='next_token' and explainer['prompt'] in next_tokens:
+                    # Measured odds from the installed model replace the illustrative example.
+                    from backend.services.next_token import shown
+                    tokens,probs=shown(next_tokens[explainer['prompt']])
+                    if tokens:explainer.update(candidates=tokens,probs=probs,measured=True,model=self.model_name())
+                if explainer:scene['explainer']=timed_explainer(explainer,scene['beats'])
             scene['visual'] = timed_visual(document['scenes'][scene['id']-1]['visual'], scene['narration'], scene.get('beats', []))
             if scene.get('demonstration'):
                 scene['visual'] = {'kind':'example','items':[],'directed':True,'revealAt':[],'transition':'fade'}
@@ -328,7 +341,7 @@ class EditorJobs:
                 from backend.services.scene_cache import render_cached
                 render_cached(self,project,data,props,pending,profile,render)
             else:
-                render(['render', 'VisualForgeVideo', pending, f'--props={props}', '--concurrency=2', *(['--scale=0.6666666666666666'] if profile=='draft' else [])], 'render')
+                render(['render', 'VisualForgeVideo', pending, f'--props={props}', f'--concurrency={RENDER_CONCURRENCY}', *(['--scale=0.6666666666666666'] if profile=='draft' else [])], 'render')
             py('validate', 'validate_render.py', [pending, '--metadata', props, '--report', folder/f'{name}-validation.json', '--profile', profile])
         if action in {'render','motion'}:
             from backend.services.scene_cache import thumbnails
@@ -343,6 +356,39 @@ class EditorJobs:
             phase('thumbnail')
             publish_safely(self, project, folder, data, render, profile)
 
+    def model_name(self):
+        from backend.llm.gguf_llm import model_status
+        return str(model_status().get('model', 'local model')).split('/')[-1][:60]
+
+    def measure_next_tokens(self, rows, folder, py):
+        """Measured next-token odds for next-token explainer prompts; cached, and never fatal.
+
+        Cached prompts are read without loading the model. A missing model or a failed run
+        leaves those scenes in their labelled illustrative form instead of stopping the video.
+        """
+        from backend.services.explainers import plan as plan_explainer
+        from backend.services import next_token
+        prompts=list(dict.fromkeys(e['prompt'] for row in rows if not row['visual'].get('worked') and (e:=plan_explainer(row)) and e['kind']=='next_token'))
+        if not prompts:
+            return {}
+        try:
+            from backend.services.worked_examples import identity
+            model=identity()
+        except (OSError, ValueError, KeyError):
+            return {}
+        results={p:r for p in prompts if (r:=next_token.read(p,model))}
+        missing=[p for p in prompts if p not in results]
+        if missing:
+            src,out=folder/'next-token-prompts.json',folder/'next-token-results.json'
+            write_json_atomic(src,missing)
+            try:
+                py('next-token','measure_next_token.py',[src,out])
+                measured=json.loads(out.read_text(encoding='utf-8'))
+                results.update({p:next_token.validate(measured[p],p,model) for p in missing if p in measured})
+            except (RuntimeError, OSError, ValueError, KeyError) as exc:
+                self.state['message']=f'Next-token odds were not measured ({str(exc)[:160]}); the example stays illustrative.'
+        return results
+
     def voice(self, project_id):
         """Narration voice from the render style, so stand-in catalogues that only provide style() work."""
         from backend.tts.kokoro_tts import DEFAULT_VOICE
@@ -352,6 +398,10 @@ class EditorJobs:
         """Run one Remotion CLI command for a project, retrying once after a transient browser failure."""
         from backend.services.render_assets import with_public_dir
         command = with_public_dir(self.root, folder, command)
+        bundle = self.bundle(folder, command)
+        if bundle:
+            # Rendering from a prepared bundle skips webpack and the public-dir copy on every call.
+            command = [command[0], str(bundle), *[a for a in command[1:] if not str(a).startswith('--public-dir=')]]
         for attempt in range(2):
             try:
                 return execute([node_executable(), self.root/'renderer/node_modules/@remotion/cli/remotion-cli.js', *command],
@@ -359,6 +409,39 @@ class EditorJobs:
             except RuntimeError:
                 if attempt:
                     raise
+
+    def bundle(self, folder, command):
+        """A renderer bundle for this job's narration, built once and reused by every segment and still.
+
+        Keyed by renderer code and the exact public files, so a code or narration change rebuilds it.
+        Any failure falls back to the normal per-command bundling rather than failing the render.
+        """
+        public = next((str(a).split('=', 1)[1] for a in command if str(a).startswith('--public-dir=')), None)
+        if not command or command[0] not in {'render', 'still'} or not public:
+            return None
+        from backend.services.run_state import fingerprint
+        files = sorted((p.relative_to(public).as_posix(), p.stat().st_size) for p in Path(public).rglob('*') if p.is_file())
+        key = fingerprint(['render-bundle-v1', self.version, files])
+        target = folder/'render-bundle'
+        marker = target/'bundle-key.txt'
+        try:
+            if marker.is_file() and marker.read_text(encoding='utf-8') == key and (target/'index.html').is_file():
+                return target
+            pending = folder/'render-bundle.pending'
+            shutil.rmtree(pending, ignore_errors=True)
+            execute([node_executable(), self.root/'renderer/node_modules/@remotion/cli/remotion-cli.js', 'bundle', 'src/index.ts',
+                     f'--public-dir={public}', f'--out-dir={pending}', '--log=error'],
+                    cwd=self.root/'renderer', log=folder/'logs'/'bundle.log', cancel_event=self.cancel)
+            if not (pending/'index.html').is_file():
+                return None
+            (pending/'bundle-key.txt').write_text(key, encoding='utf-8')
+            shutil.rmtree(target, ignore_errors=True)
+            pending.replace(target)
+            return target
+        except InterruptedError:
+            raise
+        except Exception:  # noqa: BLE001 - bundling is an optimisation; per-command bundling still works
+            return None
 
     def close(self):
         self.cancel.set()

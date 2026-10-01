@@ -4,10 +4,11 @@ import {test} from 'node:test';
 import {buildTimeline, FPS, SCENE_END_PADDING_SECONDS, validateVideoData} from '../src/timeline.ts';
 import {environmentFor} from '../src/motion.ts';
 import {activeWord,captionPhrases,sceneTransition,palette} from '../src/presentation.ts';
-import {BRIDGE_HEADLINE_DELAY,BRIDGE_SECONDS,bridgedFrom,carriedLabels,ENTER_SECONDS,enterProgress,EXIT_SECONDS,exitProgress,sceneSeconds,teaserWindow} from '../src/transitions.ts';
+import {BRIDGE_HEADLINE_DELAY,BRIDGE_SECONDS,bridgedFrom,carriedLabels,lightCard,lightVideo,ENTER_SECONDS,enterProgress,EXIT_SECONDS,exitProgress,sceneSeconds,teaserWindow} from '../src/transitions.ts';
 import {idleOffset,mentionPulse,mentionTimes,sceneDrift} from '../src/emphasis.ts';
 import {fitLabel,objectScale,textWidth} from '../src/labels.ts';
 import {along,chipKind} from '../src/flow.ts';
+import {after,inside,noise} from '../src/explainer.ts';
 import {animationTiming,activeConcept,sharedConcept} from '../src/animation.ts';
 import {isContextWindow,contextCues} from '../src/context-window.ts';
 import {validateTeaching,teachingStage,type TeachingPlan} from '../src/teaching-plan.ts';
@@ -358,6 +359,30 @@ test('items travel the connection curve and look like what they become',()=>{
   assert.equal(chipKind('tokens'),'chip');assert.equal(chipKind('Token IDs'),'chip');
   assert.equal(chipKind('retrieved documents'),'page');
   assert.equal(chipKind('video ideas'),'dot','no accidental match on "id" inside words');
+});
+
+test('explainer animations validate their cues and draw recognisable shapes',()=>{
+  const base={...scene(1,8),narration:'It is a next-word guesser.'};
+  const next={kind:'next_token' as const,prompt:'the cat sat on the',source:'example' as const,candidates:['mat','floor','sofa'],at:{type:0,guess:1,repeat:4},end:8};
+  validateVideoData({title:'E',scenes:[{...base,explainer:next}]});
+  for(const bad of [{...next,candidates:['a','b','c','d']},{...next,at:{guess:9}},{...next,end:20}])
+    assert.throws(()=>validateVideoData({title:'E',scenes:[{...base,explainer:bad}]}),/explainer/);
+  assert.throws(()=>validateVideoData({title:'E',scenes:[{...base,explainer:{kind:'denoise',subject:'dragon',named:true,at:{},end:8}}]}),/explainer/);
+  validateVideoData({title:'E',scenes:[{...base,explainer:{kind:'caveats',cards:[{key:'wrong',title:'Can be wrong'},{key:'bias',title:'Copies bias'}],at:{wrong:1,bias:3},end:8}}]});
+  assert.ok(inside('heart',0,0)&&!inside('heart',.95,.95));
+  assert.ok(inside('star',0,0)&&!inside('star',.9,.9));
+  assert.equal(noise(3,4,7),noise(3,4,7),'noise is deterministic per frame');
+  assert.notEqual(noise(3,4,7),noise(3,4,8),'and churns between frames');
+  assert.equal(after(1,undefined),0);assert.equal(after(2,1,.5),1);
+});
+
+test('mostly light videos keep their title and takeaway cards light',()=>{
+  const plain=(kind:string)=>({...scene(1,4),visual:{kind:kind as 'title',items:[]}});
+  const board={...scene(2,4),explainer:{kind:'caveats' as const,cards:[{key:'wrong' as const,title:'Can be wrong'},{key:'bias' as const,title:'Copies bias'}],at:{},end:4}};
+  assert.equal(lightVideo([plain('title'),board,board,plain('takeaway')]),true);
+  assert.equal(lightCard(plain('title'),true),true);
+  assert.equal(lightCard(plain('explanation'),true),false,'only title and takeaway cards switch');
+  assert.equal(lightVideo([plain('title'),plain('explanation'),plain('process'),board]),false);
 });
 
 test('caption phrases preserve every word within measured sentence boundaries',()=>{

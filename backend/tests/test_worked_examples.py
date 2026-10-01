@@ -1,3 +1,4 @@
+from backend.tests.render_stubs import stub_output, stub_props
 from backend.tests.render_stubs import cached as cached_render_stub
 import copy
 import json
@@ -99,7 +100,7 @@ class WorkedJobsTests(unittest.TestCase):
             order.append(script.name)
             if script.name=='prepare_examples.py':Path(args[1]).write_text(json.dumps({'Hi':result()}))
             if script.name=='generate_audio.py':generate_incremental(Path(args[1]),Path(args[3]),self.root/'renderer/public',synthesizer=fake_speech,directed=True)
-        def render(command,**kwargs):Path(command[4]).write_bytes(b'fixture')
+        def render(command,**kwargs):stub_output(command).write_bytes(b'fixture')
         with patch('backend.services.editor_jobs.python_stage',side_effect=stage),patch('backend.services.editor_jobs.model_dependency',return_value=MODEL),patch('backend.services.editor_jobs.execute',side_effect=render),patch('backend.services.editor_jobs.node_executable',return_value='node'),patch('backend.services.scene_cache.render_cached',side_effect=cached_render_stub),patch('backend.services.scene_cache.thumbnails'):
             self.jobs.start(self.p['id'],'motion',uid);self.jobs.thread.join(5)
             self.assertEqual(self.jobs.status()['status'],'complete',self.jobs.status())

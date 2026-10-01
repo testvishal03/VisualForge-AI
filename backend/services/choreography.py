@@ -78,7 +78,9 @@ def compile_scene(scene, visual=None):
         grown = False
     # Generic explanation and example scenes draw the concepts their own summary and narration name.
     if len(objects) < 2 and visual.get('kind') in {'explanation', 'example'}:
-        objects, grown = key_terms(scene.get('headline', ''), scene.get('body', ''), parts), True
+        chosen = model_concepts(visual.get('concepts'), parts)
+        # Concepts picked by the planning model are used as chosen; otherwise rules extract them.
+        objects, grown = (chosen, False) if len(chosen) >= 2 else (key_terms(scene.get('headline', ''), scene.get('body', ''), parts), True)
     if grown and len(budget) != 3:
         objects = grow(objects, key_terms(scene.get('headline', ''), scene.get('body', ''), parts), parts)
     if len(objects) < 2:return None
@@ -118,6 +120,19 @@ def compile_scene(scene, visual=None):
     except ValueError:
         # An automatic plan that cannot be fully grounded keeps the scene's existing card or diagram.
         return None
+
+
+def model_concepts(concepts, parts):
+    """Planner-chosen concepts that are still verbatim in their sentence; stale ones are dropped after a narration edit."""
+    if not isinstance(concepts, list):
+        return []
+    result = []
+    for c in concepts[:6]:
+        if isinstance(c, dict) and isinstance(c.get('label'), str) and type(c.get('sentence')) is int and 0 <= c['sentence'] < len(parts) \
+                and 1 <= len(c['label']) <= 36 and c['label'].casefold() in parts[c['sentence']].casefold() \
+                and c['label'].casefold() not in [o['label'].casefold() for o in result]:
+            result.append({'label': c['label'], 'sentence': c['sentence']})
+    return sorted(result, key=lambda o: (o['sentence'], parts[o['sentence']].casefold().find(o['label'].casefold())))
 
 
 def grow(objects, terms, parts, limit=6):

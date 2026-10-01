@@ -72,3 +72,100 @@ class SemanticDirectorTests(unittest.TestCase):
         self.assertEqual(plan['scenes'][0]['id'],1)
 
 if __name__ == '__main__': unittest.main()
+
+
+class ConceptSelectionTests(unittest.TestCase):
+    """The planning model chooses which narrated concepts an explanation scene shows."""
+    def setUp(self):
+        self.scene = Scene(id=1, headline='We cannot send every document to the model', body='Documents are split into smaller pieces first.',
+            narration='We cannot send every document to the language model. Instead we split each document into smaller pieces. Each chunk is stored in a vector database.')
+        self.data = {'kind':'explanation','icon':'book','elements':[],'layout':'auto','treatment':'build','concepts':[
+            {'label':'language model','sentence':0},{'label':'smaller pieces','sentence':1},{'label':'vector database','sentence':2}]}
+
+    def test_chosen_concepts_are_offered_phrases_in_spoken_order(self):
+        row = validate_decision(self.data, self.scene, 0)
+        self.assertEqual([c['label'] for c in row['concepts']], ['language model', 'smaller pieces', 'vector database'])
+        for bad in ([{'label':'human consciousness','sentence':0},{'label':'smaller pieces','sentence':1}],
+                    [{'label':'smaller pieces','sentence':1},{'label':'language model','sentence':0}],
+                    [{'label':'split','sentence':1},{'label':'vector database','sentence':2}]):
+            with self.assertRaises(ValueError):
+                validate_decision({**self.data,'concepts':bad}, self.scene, 0)
+        with self.assertRaisesRegex(ValueError,'Only explanation'):
+            validate_decision({'kind':'process','icon':'chip','elements':[{'label':'every document','sentence':0,'icon':'book'},
+                {'label':'smaller pieces','sentence':1,'icon':'book'},{'label':'vector database','sentence':2,'icon':'database'}],
+                'concepts':[{'label':'language model','sentence':0}]}, self.scene, 0)
+
+    def test_planner_offers_only_noun_phrases_and_the_scene_draws_the_choice(self):
+        prompts = []
+        def generate_json(prompt, schema, max_new_tokens):
+            prompts.append((prompt, schema))
+            return json.dumps(self.data)
+        engine = SimpleNamespace(generate_json=generate_json, cache_identity='fake')
+        video = VideoScript(title='RAG', topic='Retrieval', scenes=[self.scene])
+        with tempfile.TemporaryDirectory() as directory:
+            plan = plan_video(video, engine=engine, cache=Path(directory))
+        prompt, schema = prompts[0]
+        offered = [o['properties']['label']['enum'] for o in schema['$defs']['Concept']['anyOf']]
+        self.assertIn('vector database', offered[2])
+        self.assertNotIn('split', offered[1], 'verbs are never offered as concepts')
+        row = plan['scenes'][0]
+        self.assertEqual([o['label'] for o in row['choreography']['objects']], ['language model', 'smaller pieces', 'vector database'])
+        document = document_from_video(video, {'scenes':[row]})
+        validate_document(document)
+
+    def test_stale_concepts_after_a_narration_edit_fall_back_to_rules(self):
+        from backend.services.choreography import compile_scene
+        scene = {'narration':'A query becomes a vector. The database returns the closest chunks.', 'headline':'Search', 'body':'A query vector finds chunks.',
+                 'visual':{'kind':'explanation','items':[],'concepts':[{'label':'language model','sentence':0},{'label':'smaller pieces','sentence':1}]}}
+        plan = compile_scene(scene)
+        for obj in plan['objects']:
+            self.assertNotIn(obj['label'], ('language model', 'smaller pieces'))
+
+
+class SalvageTests(unittest.TestCase):
+    def test_duplicate_picks_become_concepts_instead_of_another_attempt(self):
+        from backend.services.semantic_director import decide
+        scene = Scene(id=1, headline='Chunking documents', body='Documents are split into chunks.',
+            narration='Each document is split into chunks. Every chunk becomes an embedding. The embeddings go into a vector database.')
+        data = {'kind':'process','icon':'book','layout':'auto','treatment':'build','concepts':[],'elements':[
+            {'label':'chunks','sentence':0,'icon':'book'},{'label':'chunk','sentence':1,'icon':'book'},{'label':'vector database','sentence':2,'icon':'database'}]}
+        row = decide(data, scene, 0)
+        self.assertEqual(row['kind'], 'explanation')
+        self.assertEqual([c['label'] for c in row['concepts']], ['chunks', 'vector database'])
+        with self.assertRaises(ValueError):
+            decide({**data, 'elements':[{'label':'nonsense words','sentence':0,'icon':'book'}]*3}, scene, 0)
+
+
+class ProcessBiasTests(unittest.TestCase):
+    def test_process_without_narrated_order_becomes_an_explanation_of_its_concepts(self):
+        from backend.services.semantic_director import decide
+        scene = Scene(id=1, headline='Comparing vectors', body='The system compares a query vector with document vectors.',
+            narration='The system compares the query vector with all the document vectors. Similar meanings sit close together. The closest chunks are returned.')
+        data = {'kind':'process','icon':'chip','layout':'auto','treatment':'build','concepts':[],'elements':[
+            {'label':'query vector','sentence':0,'icon':'network'},{'label':'Similar meanings','sentence':1,'icon':'idea'},
+            {'label':'closest chunks','sentence':2,'icon':'database'}]}
+        row = decide(data, scene, 0)
+        self.assertEqual(row['kind'], 'explanation')
+        self.assertEqual([c['label'] for c in row['concepts']], ['query vector', 'Similar meanings', 'closest chunks'])
+        ordered = scene.model_copy(update={'narration': 'First, the system embeds the query vector. Next, similar meanings are found. Finally, the closest chunks are returned.'})
+        self.assertEqual(decide({**data, 'elements':[{'label':'query vector','sentence':0,'icon':'network'},
+            {'label':'similar meanings','sentence':1,'icon':'idea'},{'label':'closest chunks','sentence':2,'icon':'database'}]}, ordered, 0)['kind'], 'process')
+
+
+class ExplainerSkipTests(unittest.TestCase):
+    def test_scenes_drawn_by_explainers_are_not_sent_to_the_model(self):
+        prompts = []
+        def generate_json(prompt, schema, max_new_tokens):
+            prompts.append(prompt)
+            return json.dumps({'kind':'explanation','icon':'book','elements':[],'layout':'auto','treatment':'build','concepts':[]})
+        engine = SimpleNamespace(generate_json=generate_json, cache_identity='fake')
+        # First and last scenes are the title and takeaway cards, which never get explainers.
+        video = VideoScript(title='AI', topic='AI', scenes=[
+            Scene(id=1, headline='Data and parameters', body='Training tunes parameters.', narration='Training data shapes millions of parameters inside the model during a long learning process.'),
+            Scene(id=2, headline='A next-word guesser', body='It predicts the next token.', narration='It is a next-word guesser. It picks the next token and then repeats the process many times.'),
+            Scene(id=3, headline='Keep checking', body='Review the output.', narration='Always review what the model writes before you share it with other people online.')])
+        with tempfile.TemporaryDirectory() as directory:
+            plan = plan_video(video, engine=engine, cache=Path(directory))
+        self.assertEqual(len(prompts), 2, 'only scenes without an explainer are planned by the model')
+        self.assertTrue(all('next-word guesser' not in p for p in prompts))
+        self.assertTrue(all(row['planned'] for row in plan['scenes']))

@@ -32,10 +32,11 @@ time times together close earlier later well really actually simply clearly dire
 us imagine imagines bring brings brought measure measures measured forever active
 instead point points related closer relative whereas rather despite yet minus plus capture captures captured
 various certain amount dimensional two-dimensional three-dimensional
-cannot can't send sends sent like likes given tend tends exist exists inside fit fits'''.split())
+cannot can't send sends sent like likes given tend tends exist exists inside fit fits
+suppose consider notice remember note recall picture'''.split())
 # Describing words that are poor labels alone but fine inside a phrase ("relevant information").
 SOLO_STOP = set('''different similar relevant individual common longer shorter higher lower bigger larger smaller
-faster slower better worse'''.split())
+faster slower better worse closest nearest farthest best largest smallest highest lowest'''.split())
 # After a noun, an -s word followed by one of these is the sentence's verb ("the model analyzes the text").
 OBJECT_START = {'the', 'a', 'an', 'that', 'this', 'these', 'those', 'its', 'their', 'our', 'your', 'them', 'it', 'to',
                 'how', 'for', 'whether', 'which', 'what', 'if', 'through', 'with'}
@@ -45,8 +46,9 @@ NOT_NOUN = ('ed', 'ing', 'ly', 'ize', 'ise', 'ive', 'ous', 'ful', 'able', 'ible'
 
 def noun_like(phrase):
     return not phrase.split()[-1].lower().endswith(NOT_NOUN)
-# A lone word right after these is being used as a verb ("may select", "to follow").
-VERB_CONTEXT = {'to', 'can', 'could', 'may', 'might', 'will', 'would', 'should', 'must', 'not', 'also'}
+# A lone word right after these is being used as a verb ("may select", "to follow", "we split").
+VERB_CONTEXT = {'to', 'can', 'could', 'may', 'might', 'will', 'would', 'should', 'must', 'not', 'also',
+                'we', 'you', 'they', 'i', 'he', 'she', 'it'}
 MAX_LABEL = 36
 
 
@@ -54,17 +56,35 @@ def _words(text):
     return re.findall(r"[A-Za-z][A-Za-z0-9'-]*", text.replace('’', "'"))
 
 
-def candidates(text):
-    """Runs of one to three content words, in reading order; lone words used as verbs are skipped."""
+def split_verb(run):
+    """Split "tokenizer splits input text" into subject and object around its -s verb."""
+    if len(run) >= 3:
+        for k in range(1, len(run) - 1):
+            word, prior = run[k].lower(), run[k-1].lower()
+            if word.endswith('s') and not word.endswith('ss') and not prior.endswith('s'):
+                return [run[:k], run[k+1:]]
+    return [run]
+
+
+def candidates(text, alternatives=False):
+    """Runs of one to three content words, in reading order; lone words used as verbs are skipped.
+
+    With `alternatives`, a run split around a possible verb also offers its unsplit opening
+    ("Similar meanings" as well as "Similar"), since a plural noun can look like a verb.
+    """
     found, run, before = [], [], None
     for word in [*_words(text), '.']:
         if word.lower() in STOP or word == '.':
             if len(run) >= 2 and word.lower() in OBJECT_START and run[-1].lower().endswith('s') and not run[-1].lower().endswith('ss'):
                 run = run[:-1]
-            lone_verb = len(run) == 1 and (before in VERB_CONTEXT or run[0].lower() in SOLO_STOP)
-            phrase = ' '.join(run[-3:])
-            if run and not lone_verb and noun_like(phrase):
-                found.append(phrase)
+            pieces = split_verb(run)
+            if alternatives and len(pieces) == 2:
+                pieces = [*pieces, run[:len(pieces[0]) + 1]]
+            for piece in pieces:
+                lone_verb = len(piece) == 1 and ((before in VERB_CONTEXT and piece is run) or piece[0].lower() in SOLO_STOP)
+                phrase = ' '.join(piece[-3:])
+                if piece and not lone_verb and noun_like(phrase):
+                    found.append(phrase)
             run, before = [], word.lower()
         else:
             run.append(word)

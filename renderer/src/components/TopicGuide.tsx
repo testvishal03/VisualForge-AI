@@ -4,7 +4,8 @@ import {BRIDGE_HEADLINE_DELAY, BRIDGE_SECONDS, bridgedFrom, clamp01, easeInOut, 
 import {fitLabel} from '../labels';
 
 type Colors = {ink:string;muted:string;accent:string;card:string;line:string};
-const CARD = {width:520, right:95, bottom:185};
+// A compact row in the strip under the caption, so it never covers the stage.
+const CARD = {width:600, right:95, bottom:12, height:66};
 
 /**
  * Where the viewer is in the lesson, and what comes next. The rail shows every topic
@@ -42,16 +43,16 @@ function TopicRail({count, index, progress, colors}:{count:number;index:number;p
 }
 
 function CardBody({scene, colors, fontSize}:{scene:Scene;colors:Colors;fontSize?:number}) {
-  const fit = fitLabel(scene.headline, CARD.width - 60, fontSize ?? 30, 20);
-  return <>
-    <div style={{display:'flex', alignItems:'center', gap:10, fontSize:15, letterSpacing:3, fontWeight:700, color:colors.accent, marginBottom:10}}>
+  const fit = fitLabel(scene.headline, CARD.width - 200, fontSize ?? 26, 16);
+  return <div style={{display:'flex', alignItems:'center', gap:18, height:'100%'}}>
+    <div style={{display:'flex', alignItems:'center', gap:8, fontSize:15, letterSpacing:3, fontWeight:700, color:colors.accent, flex:'none'}}>
       UP NEXT <svg width="26" height="14" viewBox="0 0 26 14"><path d="M1 7h21M16 1l6 6-6 6" fill="none" stroke={colors.accent} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
     </div>
-    <div style={{fontSize:fit.fontSize, lineHeight:1.18, fontWeight:700, color:colors.ink}}>{fit.lines.map((line, i) => <div key={i}>{line}</div>)}</div>
-  </>;
+    <div style={{fontSize:fit.fontSize, lineHeight:1.1, fontWeight:700, color:colors.ink}}>{fit.lines.map((line, i) => <div key={i}>{line}</div>)}</div>
+  </div>;
 }
 
-const cardStyle = (colors:Colors) => ({position:'absolute' as const, width:CARD.width, padding:'20px 30px 24px', boxSizing:'border-box' as const, borderRadius:18,
+const cardStyle = (colors:Colors) => ({position:'absolute' as const, width:CARD.width, height:CARD.height, padding:'0 26px', boxSizing:'border-box' as const, borderRadius:16,
   background:colors.card, border:`2px solid ${colors.accent}55`, boxShadow:'0 14px 34px #0b1d2a26', fontFamily:'Segoe UI, Arial, sans-serif'});
 
 function UpNext({scene, colors, enter}:{scene:Scene;colors:Colors;enter:number}) {
@@ -66,7 +67,7 @@ function UpNext({scene, colors, enter}:{scene:Scene;colors:Colors;enter:number})
  */
 function Bridge({scene, colors, p}:{scene:Scene;colors:Colors;p:number}) {
   const e = easeInOut(p);
-  const fromLeft = 1920 - CARD.right - CARD.width, fromTop = 1080 - CARD.bottom - 150;
+  const fromLeft = 1920 - CARD.right - CARD.width, fromTop = 1080 - CARD.bottom - CARD.height;
   const fade = BRIDGE_HEADLINE_DELAY/BRIDGE_SECONDS;
   return <div style={{...cardStyle(colors), left:fromLeft + (95 - fromLeft)*e, top:fromTop + (100 - fromTop)*e,
     transform:`scale(${1 + .35*e})`, transformOrigin:'top left', opacity:1 - easeOut((p - fade*.55)/(fade*.45))}}>

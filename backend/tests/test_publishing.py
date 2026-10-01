@@ -95,3 +95,31 @@ class WorkspaceVoiceTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class BundleOnceTests(unittest.TestCase):
+    def test_segments_share_one_bundle_until_narration_changes(self):
+        from unittest.mock import patch
+        from backend.services.editor_jobs import EditorJobs
+        from backend.tests.render_stubs import stub_output
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            store = EditorStore(root/'store'); jobs = EditorJobs(Path(__file__).resolve().parents[2], store)
+            folder = root/'project'; (folder/'logs').mkdir(parents=True)
+            public = root/'renderer/public/audio/a'; public.mkdir(parents=True); (public/'scene-1.wav').write_bytes(b'RIFF')
+            jobs.root = root
+            props = root/'props.json'
+            props.write_text(json.dumps({'videoData': {'scenes': [{'audio': 'audio/a/scene-1.wav'}]}}))
+            calls = []
+            def execute(command, **kwargs):
+                calls.append([str(a) for a in command]); stub_output(command).write_bytes(b'x')
+            with patch('backend.services.editor_jobs.execute', side_effect=execute), patch('backend.services.editor_jobs.node_executable', return_value='node'):
+                for n in range(3):
+                    jobs.remotion(folder, ['render', 'VisualForgeVideo', str(folder/f'part-{n}.mp4'), f'--props={props}'], 'render')
+                bundles = [c for c in calls if 'bundle' in c]
+                self.assertEqual(len(bundles), 1, 'three segments, one bundle')
+                renders = [c for c in calls if 'bundle' not in c]
+                self.assertTrue(all(c[3] == str(folder/'render-bundle') for c in renders), 'renders use the prepared bundle')
+                (public/'scene-1.wav').write_bytes(b'RIFF changed')
+                jobs.remotion(folder, ['still', 'VisualForgeThumbnail', str(folder/'t.png'), f'--props={props}'], 'thumbnail')
+                self.assertEqual(len([c for c in calls if 'bundle' in c]), 2, 'changed narration rebuilds the bundle')
