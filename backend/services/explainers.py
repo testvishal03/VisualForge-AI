@@ -48,8 +48,9 @@ def quoted(text):
 
 def plan(scene):
     """The explainer this narration calls for, or None. Cues are sentence indices plus spoken patterns."""
-    # Opening and closing cards keep their own treatment, even when they echo a lesson's key phrase.
-    if scene.get('visual', {}).get('kind') in {'title', 'takeaway'}:
+    # The opening card keeps its title treatment. A closing scene may still be explained, since
+    # every explainer needs a specific signal (a bare "autocomplete" metaphor no longer counts).
+    if scene.get('visual', {}).get('kind') == 'title':
         return None
     text, parts = scene['narration'], sentences(scene['narration'])
     if re.search(NEXT_TOKEN, text, re.I):
