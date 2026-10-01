@@ -148,7 +148,8 @@ class EditorJobs:
         if action == 'generate':
             # Both prompt-generated and pasted scripts pass through the semantic visual planner.
             # Long scripts (>16 scenes) use extractive evidence-based direction to avoid 50+ min CPU delays.
-            if len(project['document']['scenes']) > 16:
+            from backend.services.script_check import MODEL_PLANNING_LIMIT
+            if len(project['document']['scenes']) > MODEL_PLANNING_LIMIT:
                 revised = copy.deepcopy(project['document'])
                 for s in revised['scenes']:
                     s['visual']['planned'] = True

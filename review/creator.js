@@ -13,6 +13,37 @@ function updateCreatorInput(){
   $('script-stats').textContent=`${words.toLocaleString()} words | Duration follows your narration`;
   $('auto-length-note').textContent=script?(words?`About ${Math.max(1,Math.round(words/135*60))} seconds of speech, plus pauses. Final length is measured from the narration.`:'Video length follows your script. Paste it to see an estimate.'):'AI drafts to the scope of your idea. Final duration follows the script and recorded narration.';
   rememberCreator();
+  scheduleScriptCheck();
+}
+/** Check the pasted script as the user types: same scene rules as Prepare, plus pronunciation checks. */
+let scriptCheckTimer=null,scriptCheckSeq=0;
+function scheduleScriptCheck(){
+  clearTimeout(scriptCheckTimer);
+  const text=$('studio-script').value;
+  if(creatorMode!=='script'||!text.trim()){$('script-check').hidden=true;return;}
+  scriptCheckTimer=setTimeout(async()=>{
+    const seq=++scriptCheckSeq;
+    try{const result=await api('/api/check-script',{text,title:$('studio-title').value.trim()||null});if(seq===scriptCheckSeq)renderScriptCheck(result);}
+    catch{if(seq===scriptCheckSeq)$('script-check').hidden=true;}
+  },700);
+}
+function renderScriptCheck(r){
+  const box=$('script-check');box.replaceChildren();box.hidden=false;
+  const counts=['error','warning'].map(l=>r.issues.filter(i=>i.level===l).length);
+  const minutes=r.minutes>=1?`about ${r.minutes} min`:`about ${Math.round(r.minutes*60)} s`;
+  box.append(element('h3',`Script check · ${r.scenes||0} scene${r.scenes===1?'':'s'} · ${minutes} of narration`));
+  if(!r.issues.length)box.append(element('p','No problems found. Every word will be narrated as written.','check-good'));
+  const list=element('ul');
+  for(const issue of r.issues){
+    const li=element('li',undefined,issue.level);
+    if(issue.scene)li.append(element('span',`Scene ${issue.scene}`,'check-scene'));
+    li.append(document.createTextNode(issue.message));
+    if(issue.excerpt)li.append(element('q',issue.excerpt));
+    list.append(li);
+  }
+  if(r.issues.length)box.append(list);
+  if(r.highlights?.length)box.append(element('p','Animations: '+r.highlights.map(h=>`scene ${h.scene} ${h.label.toLowerCase()} (${h.note})`).join(' · '),'check-highlights'));
+  if(counts[0])box.append(element('p',`Fix the ${counts[0]===1?'error':'errors'} above before preparing.`,'helper'));
 }
 function newCreator(){
   if(state.busy||state.pending)return;
