@@ -22,23 +22,49 @@ def short(text, limit=70):
     return text[:limit-3].rsplit(' ', 1)[0].rstrip(' ,;:') + '...'
 
 
+# Openers that add nothing to a headline: discourse fillers and step words.
+HEADLINE_LEAD_IN = re.compile(r"^(?:(?:so|but|and|now|then|also|of course|in simple terms|in other words|think of|first|second|third|next|"
+                              r"finally|lastly|here's the (?:secret|idea|key)|remember that)\b[,:]?\s*)+", re.I)
+# A headline never ends on these: articles, prepositions, conjunctions, auxiliaries and loose modifiers.
+DANGLING_END = set("""a an the and or but nor so yet of to in on at by for from with into onto over under about as than
+that this these those which who whom whose what when where why how if is are was were be been being am do does did has have
+had can could will would should may might must shall not no very even just only also too more most less least much many few
+some any each every all both such same other own entire whole huge tiny little big small large great next last first second
+third its their our your my his her we you they it i""".split())
+# Cutting just before one of these keeps a whole phrase ("every document | to the language model").
+PHRASE_BOUNDARY = set('to in on at for with by from into about that which who whose when whenever where while because and or but so than until as if'.split())
+
+
+def ends_well(token):
+    word = re.sub(r"[^\w'-]", '', token).lower()
+    return bool(word) and word not in DANGLING_END and not word.endswith('ly')
+
+
 def headline_for(sentence):
-    text = re.sub(r'^(?:(?:first|second|third|next|then|finally)[,:]?\s+|remember that\s+)', '', sentence, flags=re.I).rstrip('.!?')
-    if len(words(text)) > 10 or len(text) > 80:
-        clauses = re.split(r',|;|\b(?:and|while|because|which|depends on|leads to)\b', text, maxsplit=1, flags=re.I)
-        if len(words(clauses[0])) >= 3:
-            text = clauses[0].strip()
-    tokens = text.split()[:9]
-    # Count words the way the schema does ("0.21" is two words), leaving room for a " - N" suffix.
-    while len(tokens) > 1 and len(words(' '.join(tokens))) > HEADLINE_WORDS:
-        tokens.pop()
-    while tokens and tokens[-1].lower().strip('.,:;') in {'and','or','to','an','a','the','is','are','can','may','of','for','with','from','in','on','at','that','its'}:
-        tokens.pop()
-    result = short(' '.join(tokens), 76).rstrip('.,:;!?')
-    return result[:1].upper()+result[1:]
+    """A short headline in the sentence's own words that ends at a natural boundary.
+
+    Fillers are dropped; a sentence that fits is kept whole; otherwise its main clause, or the
+    longest prefix ending on a content word, preferably right before a joining word.
+    """
+    text = sentence.strip().replace('\u2019', "'").rstrip('.!?').strip()
+    text = HEADLINE_LEAD_IN.sub('', text).strip() or text
+    if len(words(text)) > HEADLINE_WORDS:
+        clause = re.split(r',\s+(?=[A-Za-z"\u201c])|;\s|:\s|\s(?:and|but|which|because|while|whereas|so that)\s', text, maxsplit=1)[0].strip()
+        if 3 <= len(words(clause)) <= HEADLINE_WORDS:
+            text = clause
+        else:
+            tokens = text.split()
+            fits = lambda part: len(words(' '.join(part))) <= HEADLINE_WORDS and ends_well(part[-1])
+            choice = next((tokens[:n] for n in range(len(tokens) - 1, 2, -1)
+                           if fits(tokens[:n]) and tokens[n].lower().strip(',') in PHRASE_BOUNDARY), None)
+            choice = choice or next((tokens[:n] for n in range(len(tokens), 1, -1) if fits(tokens[:n])), tokens[:2])
+            text = ' '.join(choice)
+    result = short(text, 76).rstrip('.,:;!?')
+    return result[:1].upper() + result[1:]
 
 
-HEADLINE_WORDS = 8
+# Nine words, leaving room for a " - N" duplicate suffix within the schema limit of ten.
+HEADLINE_WORDS = 9
 # Openings that introduce the video rather than name its subject.
 FILLER_OPENING = re.compile(r"^(?:in (?:the|this|today's) (?:previous |last |next )?(?:video|lesson|episode)|welcome|hi|hello|hey|today|let's|so,|okay|alright)\b", re.I)
 
