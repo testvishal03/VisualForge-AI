@@ -29,10 +29,44 @@ def headline_for(sentence):
         if len(words(clauses[0])) >= 3:
             text = clauses[0].strip()
     tokens = text.split()[:9]
+    # Count words the way the schema does ("0.21" is two words), leaving room for a " - N" suffix.
+    while len(tokens) > 1 and len(words(' '.join(tokens))) > HEADLINE_WORDS:
+        tokens.pop()
     while tokens and tokens[-1].lower().strip('.,:;') in {'and','or','to','an','a','the','is','are','can','may','of','for','with','from','in','on','at','that','its'}:
         tokens.pop()
     result = short(' '.join(tokens), 76).rstrip('.,:;!?')
     return result[:1].upper()+result[1:]
+
+
+HEADLINE_WORDS = 8
+# Openings that introduce the video rather than name its subject.
+FILLER_OPENING = re.compile(r"^(?:in (?:the|this|today's) (?:previous |last |next )?(?:video|lesson|episode)|welcome|hi|hello|hey|today|let's|so,|okay|alright)\b", re.I)
+
+
+def title_for(paragraphs):
+    """An untitled script is named after its opening, unless that opening is filler; then after the
+    concept the narration repeats most (for example "Embeddings"), which is still the script's own word."""
+    first = sentences(paragraphs[0])[0]
+    if not FILLER_OPENING.match(first.strip()):
+        return headline_for(first)
+    from collections import Counter
+    from backend.services.key_terms import candidates
+    text = ' '.join(paragraphs)
+    # Count every mention of each concept, singular and plural together ("embedding", "embeddings").
+    stems = {re.sub(r'(?:es|s)$', '', phrase.casefold()) for phrase in candidates(text) if len(phrase) >= 5}
+    counts = {stem: Counter(m.casefold() for m in re.findall(rf'\b{re.escape(stem)}(?:s|es)?\b', text, re.I)) for stem in stems}
+    ranked = sorted(((sum(c.values()), len(stem), stem) for stem, c in counts.items()), reverse=True)
+    if not ranked or ranked[0][0] < 3:
+        return headline_for(first)
+    form = counts[ranked[0][2]].most_common(1)[0][0]
+    return form[:1].upper() + form[1:]
+
+
+def headline_sentence(narration):
+    """The first sentence with real words to headline a scene; a list of numbers makes a poor title."""
+    parts = sentences(narration)
+    readable = lambda part: len(re.findall(r'[A-Za-z]{3,}', part)) >= 3 and len(re.findall(r'\d', part)) * 3 < len(part)
+    return next((part for part in parts if readable(part)), parts[0])
 
 
 def script_to_video(title, script, max_words=None, max_scenes=120):
@@ -48,7 +82,7 @@ def script_to_video(title, script, max_words=None, max_scenes=120):
         except Exception:
             pass
     paragraphs = [re.sub(r'\s+', ' ', p).strip() for p in re.split(r'\n\s*\n', script.strip()) if p.strip()]
-    title = title or headline_for(sentences(paragraphs[0])[0])
+    title = title or title_for(paragraphs)
     count = len(words(' '.join(paragraphs)))
     if count < 1 or max_words is not None and count > max_words:
         raise ValueError(f'Use 30–{max_words} spoken words. Separate teaching points with blank lines.')
@@ -66,7 +100,7 @@ def script_to_video(title, script, max_words=None, max_scenes=120):
     scenes = []
     for index, narration in enumerate(chunks, 1):
         first = sentences(narration)[0]
-        headline = short(title, 76) if index == 1 else headline_for(first)
+        headline = (short(title, 76) if len(words(title)) <= HEADLINE_WORDS else headline_for(title)) if index == 1 else headline_for(headline_sentence(narration))
         if any(s['headline'].casefold() == headline.casefold() for s in scenes):
             headline = short(headline, 65) + f' — {index}'
         body = short(first, 180)

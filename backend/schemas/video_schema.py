@@ -44,8 +44,6 @@ class Scene(StrictContent):
             raise ValueError("narration must contain 15–60 words; aim for 20–45")
         if not re.search(r"[.!?:;…][\"'\u201d\u2019]?$", value):
             raise ValueError("narration must end as a complete sentence")
-        if re.search(r"\b(?:in this (?:scene|video)|we(?: will|'ll)? explore)\b", value, re.IGNORECASE):
-            raise ValueError("Narrate the subject directly; omit meta introductions about the scene or video")
         return value
 
     @model_validator(mode="after")
@@ -119,4 +117,8 @@ class NarrationDraft(StrictContent):
     def spoken_text(cls, value: str) -> str:
         if len(words(value)) < 15:
             raise ValueError('narration must contain 15-60 words when drafting a lesson')
+        # Model-written narration teaches the subject directly. Authored scripts may introduce
+        # their own video ("In this video, we'll...") and are preserved as written.
+        if re.search(r"\b(?:in this (?:scene|video)|we(?: will|'ll)? explore)\b", value, re.IGNORECASE):
+            raise ValueError("Narrate the subject directly; omit meta introductions about the scene or video")
         return Scene.spoken_paragraph(Scene.plain_text(value))

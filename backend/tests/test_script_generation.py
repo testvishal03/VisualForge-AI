@@ -59,11 +59,14 @@ class FakeLLM:
 
 
 class SchemaTests(unittest.TestCase):
-    def test_narration_teaches_directly_without_meta_introduction(self):
-        data = valid_script()
-        data["scenes"][0]["narration"] = "In this scene, we explore how a library organizes books and helps people discover useful information for their research."
+    def test_generated_narration_teaches_directly_but_authored_scripts_are_kept(self):
+        from backend.schemas.video_schema import NarrationDraft
+        intro = "In this scene, we explore how a library organizes books and helps people discover useful information for their research."
         with self.assertRaisesRegex(ValidationError, "meta introductions"):
-            VideoScript.model_validate(data)
+            NarrationDraft.model_validate({"narration": intro})
+        data = valid_script()
+        data["scenes"][0]["narration"] = intro
+        VideoScript.model_validate(data)  # a pasted script keeps the author's own introduction
 
     def test_accuracy_guarantees_are_rejected_but_negated_limitations_are_allowed(self):
         data = valid_script()
