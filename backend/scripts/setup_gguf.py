@@ -1,4 +1,4 @@
-"""Install a pinned Windows CPU runtime and Qwen GGUF inside this project."""
+"""Install a pinned Windows CPU runtime, the Qwen GGUF and a small embedding model inside this project."""
 import hashlib
 import json
 from pathlib import Path
@@ -14,6 +14,7 @@ from concurrent.futures import ThreadPoolExecutor
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from backend.llm.gguf_llm import CONFIG, MODEL_FILE, MODEL_REVISION, MODEL_SHA256
+from backend.services import embeddings
 
 RUNTIME = 'b11206'
 ARCHIVE_SHA256 = 'c17f1e3233fc5f5b8915472affa939adee0c95785882503b106d5b14aba01002'
@@ -139,6 +140,8 @@ def main():
         staged.replace(model)
     else:
         download(f'https://huggingface.co/unsloth/Qwen3-4B-Instruct-2507-GGUF/resolve/{MODEL_REVISION}/{MODEL_FILE}', model, MODEL_SHA256, 2497281120)
+    # bge-small-en-v1.5 (MIT, 37 MB) measures the embedding-map explainer.
+    download(embeddings.MODEL_URL, embeddings.MODEL_PATH, embeddings.MODEL_SHA256)
     subprocess.run([str(server), '--version'], check=True, timeout=30,
                    creationflags=subprocess.CREATE_NO_WINDOW)
     config = {'backend': 'gguf', 'model': model.relative_to(ROOT).as_posix(),

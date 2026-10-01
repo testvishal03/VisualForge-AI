@@ -7,7 +7,7 @@ import {cameraAt,shotPosition} from '../shot-direction';
 import {ActionStage} from './ActionStage';
 import {BRIDGE_HEADLINE_DELAY,backgroundProgress,bridgedFrom,carriedLabels,easeInOut,enterProgress,exitProgress,isIllustrated,sceneSeconds} from '../transitions';
 import {idleOffset,mentionPulse,mentionTimes,sceneDrift} from '../emphasis';
-import {fitLabel,objectScale} from '../labels';
+import {fitLabel,headlineFont,objectScale} from '../labels';
 
 const ink='#173044', teal='#087e81', coral='#e7805e', paper='#fbfaf5';
 
@@ -62,7 +62,7 @@ export function IllustratedStory({scene,style,previous,next,first,guide}:{scene:
     <AbsoluteFill style={{background:paper,opacity:background}}/>
     <div style={{position:'absolute',top:0,left:0,right:0,height:16,background:teal,opacity:background}}/>
     <div style={{position:'absolute',top:52,left:95,right:95,display:'flex',justifyContent:'space-between',fontSize:18,letterSpacing:3,fontWeight:700,color:teal,opacity:background}}><span>{style?.brand??'VISUALFORGE AI'}</span>{!guide&&<span>EXPLAINED VISUALLY</span>}</div>
-    <h1 style={{position:'absolute',top:113,left:95,right:95,margin:0,fontSize:65,lineHeight:1.12,letterSpacing:-2.5,fontWeight:750,...move(headline)}}>{scene.headline}</h1>
+    <h1 style={{position:'absolute',top:113,left:95,right:95,margin:0,fontSize:headlineFont(scene.headline),lineHeight:1.12,letterSpacing:-2.5,fontWeight:750,...move(headline)}}>{scene.headline}</h1>
     <p style={{position:'absolute',top:212,left:98,right:98,margin:0,color:'#54707b',fontSize:29,...move(body)}}>{scene.body}</p>
     <svg viewBox="0 0 1600 500" style={{position:'absolute',left:95,top:303,width:1730,height:540,opacity:stageIn}} role="img" aria-label={`${layout} illustration synchronized to spoken words`}>
       <defs><marker id="story-arrow" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><path d="M2 2l8 4-8 4" fill="none" stroke={coral} strokeWidth="2"/></marker><clipPath id={`story-stage-${scene.id}`}><rect x="6" y="6" width="1588" height="483" rx="30"/></clipPath></defs>

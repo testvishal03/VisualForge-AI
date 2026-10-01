@@ -28,3 +28,9 @@ export function fitLabel(label:string, maxWidth:number, maxFont:number, minFont 
 
 /** Few objects get larger shapes so a sparse stage is not mostly empty space. */
 export const objectScale = (count:number) => count <= 2 ? 1.25 : count === 3 ? 1.12 : 1;
+
+/** Font size that keeps a scene headline on one line across `width`, down to `minFont`. */
+export const headlineFont = (text:string, width = 1730, maxFont = 65, minFont = 44) => {
+  for (let size = maxFont; size > minFont; size--) if (textWidth(text, size)*.92 <= width) return size;
+  return minFont;
+};

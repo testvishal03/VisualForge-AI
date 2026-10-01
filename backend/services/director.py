@@ -23,7 +23,7 @@ def short(text, limit=70):
 
 
 # Openers that add nothing to a headline: discourse fillers and step words.
-HEADLINE_LEAD_IN = re.compile(r"^(?:(?:so|but|and|now|then|also|of course|in simple terms|in other words|think of|first|second|third|next|"
+HEADLINE_LEAD_IN = re.compile(r"^(?:(?:so|but|and|now|then|also|of course|in simple terms|in other words|think of (?:it|this|that) (?:like|as)|think of|first|second|third|next|"
                               r"finally|lastly|here's the (?:secret|idea|key)|remember that)\b[,:]?\s*)+", re.I)
 # A headline never ends on these: articles, prepositions, conjunctions, auxiliaries and loose modifiers.
 DANGLING_END = set("""a an the and or but nor so yet of to in on at by for from with into onto over under about as than
@@ -32,7 +32,7 @@ had can could will would should may might must shall not no very even just only 
 some any each every all both such same other own entire whole huge tiny little big small large great next last first second
 third its their our your my his her we you they it i""".split())
 # Cutting just before one of these keeps a whole phrase ("every document | to the language model").
-PHRASE_BOUNDARY = set('to in on at for with by from into about that which who whose when whenever where while because and or but so than until as if'.split())
+PHRASE_BOUNDARY = set('to in on at for with by from into about that which who whose when whenever where while because and or but so than until as if called named'.split())
 
 
 def ends_well(token):
@@ -48,13 +48,13 @@ def headline_for(sentence):
     """
     text = sentence.strip().replace('\u2019', "'").rstrip('.!?').strip()
     text = HEADLINE_LEAD_IN.sub('', text).strip() or text
-    if len(words(text)) > HEADLINE_WORDS:
+    if len(words(text)) > HEADLINE_WORDS or len(text) > HEADLINE_CHARS:
         clause = re.split(r',\s+(?=[A-Za-z"\u201c])|;\s|:\s|\s(?:and|but|which|because|while|whereas|so that)\s', text, maxsplit=1)[0].strip()
-        if 3 <= len(words(clause)) <= HEADLINE_WORDS:
+        if 3 <= len(words(clause)) <= HEADLINE_WORDS and len(clause) <= HEADLINE_CHARS:
             text = clause
         else:
             tokens = text.split()
-            fits = lambda part: len(words(' '.join(part))) <= HEADLINE_WORDS and ends_well(part[-1])
+            fits = lambda part: len(words(' '.join(part))) <= HEADLINE_WORDS and len(' '.join(part)) <= HEADLINE_CHARS and ends_well(part[-1])
             choice = next((tokens[:n] for n in range(len(tokens) - 1, 2, -1)
                            if fits(tokens[:n]) and tokens[n].lower().strip(',') in PHRASE_BOUNDARY), None)
             choice = choice or next((tokens[:n] for n in range(len(tokens), 1, -1) if fits(tokens[:n])), tokens[:2])
@@ -65,6 +65,8 @@ def headline_for(sentence):
 
 # Nine words, leaving room for a " - N" duplicate suffix within the schema limit of ten.
 HEADLINE_WORDS = 9
+# About one line of a scene title at a readable size.
+HEADLINE_CHARS = 60
 # Openings that introduce the video rather than name its subject.
 FILLER_OPENING = re.compile(r"^(?:in (?:the|this|today's) (?:previous |last |next )?(?:video|lesson|episode)|welcome|hi|hello|hey|today|let's|so,|okay|alright)\b", re.I)
 
@@ -84,7 +86,10 @@ def title_for(paragraphs):
     ranked = sorted(((sum(c.values()), len(stem), stem) for stem, c in counts.items()), reverse=True)
     if not ranked or ranked[0][0] < 3:
         return headline_for(first)
-    form = counts[ranked[0][2]].most_common(1)[0][0]
+    top = ranked[0]
+    # A longer concept built on the top word, carrying a good share of its mentions, names the topic better.
+    longer = [r for r in ranked if r[2].startswith(top[2] + ' ') and r[0] >= max(3, .4 * top[0])]
+    form = counts[(longer[0] if longer else top)[2]].most_common(1)[0][0]
     return form[:1].upper() + form[1:]
 
 
@@ -216,7 +221,14 @@ def _extract_scene(scene, index, total, recent_icons=None):
     elif relation:
         for i, part in enumerate(parts):
             link = re.search(r'\b(?:leads to|flows to|connects to|depends on|causes)\b', part, re.I)
-            if link and part[:link.start()].strip():
+            if not link:
+                continue
+            # Both ends must be concepts: not a pronoun-like subject ("Choosing one", "It") or a
+            # personal object ("your needs"), which would draw a sentence split in two.
+            subject, target = part[:link.start()].strip(), part[link.end():].strip()
+            vague = re.search(r"^(?:it|this|that|these|those|everything|choosing|picking|deciding)\b|\b(?:one|it|this|that)$", subject, re.I) \
+                or re.match(r'(?:your|our|their|my|his|her|its|what|how|whether)\b', target, re.I)
+            if subject and not vague:
                 kind, cues = 'relationship', [i, i]
                 items = [short(part[:link.start()].strip()), short(part[link.start():])]
                 break
