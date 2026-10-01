@@ -71,3 +71,18 @@ class ExplainerTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class ExplainerPlanTests(unittest.TestCase):
+    def test_metaphors_do_not_trigger_and_review_panel_knows_explainers(self):
+        self.assertIsNone(plan(scene('Generative AI is a super-powered autocomplete. It is a great co-pilot.')),
+                          'calling AI an "autocomplete" is not an explanation of next-token prediction')
+        from backend.services.visual_storytelling import plan_document
+        narrations = ['Old-school AI judges a cat or a dog. Generative AI creates a cat in a hoodie.',
+                      'It is a next-word guesser. It picks the next token, then repeats.',
+                      'Image models start with static noise and clean it up step by step, like a heart.']
+        document = {'topic': 'AI', 'scenes': [{'uid': str(i), 'headline': f'Scene {i}', 'body': 'Summary.', 'narration': n,
+                                               'visual': {'kind': 'explanation', 'items': []}} for i, n in enumerate(narrations)]}
+        result = plan_document(document)
+        self.assertEqual([r['explainer'] for r in result['scenes']], ['contrast', 'next_token', 'denoise'])
+        self.assertEqual(result['warnings'], [], 'distinct explainers are neither fallbacks nor repetition')

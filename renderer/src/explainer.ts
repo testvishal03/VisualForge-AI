@@ -6,7 +6,7 @@ import type {Scene} from './types.ts';
  * example the narration quotes. Candidate bars are illustrative, never measured odds.
  */
 export type Explainer =
-  | {kind:'next_token';prompt:string;source:'narration'|'example';candidates:string[];at:{type?:number;guess?:number;repeat?:number};end:number}
+  | {kind:'next_token';prompt:string;source:'narration'|'example';candidates:string[];probs?:number[];measured?:boolean;model?:string;at:{type?:number;guess?:number;repeat?:number};end:number}
   | {kind:'denoise';subject:string;named:boolean;at:{noise?:number;clean?:number};end:number}
   | {kind:'contrast';left:{title:string;verb:string};right:{title:string;verb:string};bins:string[];hoodie?:boolean;at:{left?:number;right?:number};end:number}
   | {kind:'caveats';cards:{key:'wrong'|'bias'|'editor'|'privacy';title:string}[];at:Record<string,number>;end:number}
@@ -22,6 +22,9 @@ export function validateExplainer(scene:Scene){
   for(const t of Object.values(e.at??{}))if(!Number.isFinite(t)||t<0||t>scene.duration)fail();
   if(e.kind==='next_token'){
     if(!text(e.prompt,80)||!['narration','example'].includes(e.source)||!Array.isArray(e.candidates)||e.candidates.length>3||e.candidates.some(c=>!text(c,20)))fail();
+    // Measured odds must come with their model and match the candidates one to one, highest first.
+    if(e.measured!==undefined&&(typeof e.measured!=='boolean'||e.measured&&(!text(e.model,60)||!Array.isArray(e.probs))))fail();
+    if(e.probs!==undefined&&(!Array.isArray(e.probs)||e.probs.length!==e.candidates.length||e.probs.some((v,i)=>!Number.isFinite(v)||v<0||v>1||(i>0&&v>e.probs![i-1]+1e-9))))fail();
   }else if(e.kind==='denoise'){
     if(!SHAPES.includes(e.subject)||typeof e.named!=='boolean')fail();
   }else if(e.kind==='contrast'){

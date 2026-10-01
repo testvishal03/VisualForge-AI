@@ -66,14 +66,21 @@ def split_verb(run):
     return [run]
 
 
-def candidates(text):
-    """Runs of one to three content words, in reading order; lone words used as verbs are skipped."""
+def candidates(text, alternatives=False):
+    """Runs of one to three content words, in reading order; lone words used as verbs are skipped.
+
+    With `alternatives`, a run split around a possible verb also offers its unsplit opening
+    ("Similar meanings" as well as "Similar"), since a plural noun can look like a verb.
+    """
     found, run, before = [], [], None
     for word in [*_words(text), '.']:
         if word.lower() in STOP or word == '.':
             if len(run) >= 2 and word.lower() in OBJECT_START and run[-1].lower().endswith('s') and not run[-1].lower().endswith('ss'):
                 run = run[:-1]
-            for piece in split_verb(run):
+            pieces = split_verb(run)
+            if alternatives and len(pieces) == 2:
+                pieces = [*pieces, run[:len(pieces[0]) + 1]]
+            for piece in pieces:
                 lone_verb = len(piece) == 1 and ((before in VERB_CONTEXT and piece is run) or piece[0].lower() in SOLO_STOP)
                 phrase = ' '.join(piece[-3:])
                 if piece and not lone_verb and noun_like(phrase):

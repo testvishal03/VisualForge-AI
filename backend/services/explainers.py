@@ -12,7 +12,7 @@ import re
 from backend.services.director import sentences
 from backend.utils.word_timing import cue_time, pattern_time
 
-NEXT_TOKEN = r'\bnext[- ](?:word|token|piece)s?\b|\bpredict\w*\b.{0,30}\bnext\b|\bautocomplete\b|\bguess\w*\b.{0,30}\bnext\b'
+NEXT_TOKEN = r'\bnext[- ](?:word|token|piece)s?\b|\bpredict\w*\b.{0,30}\bnext\b|\bguess\w*\b.{0,30}\bnext\b'
 NOISE = r'\b(?:noise|static|noisy)\b'
 IMAGE = r'\b(?:image|images|picture|pictures|pic|pics|art|artwork|diffusion|photo|photos)\b'
 OLD_AI = r'\b(?:old[- ]school|traditional|classic|older|discriminative|regular)\s+(?:AI|models?|machine learning)\b'

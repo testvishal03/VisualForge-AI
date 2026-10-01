@@ -251,6 +251,14 @@ def make_server(port=8765, root=ROOT, directory=None):
             # cross-origin callers and non-browser clients still require the token.
             same_origin_tab = bool(supplied) and self.headers.get('Sec-Fetch-Site') == 'same-origin' and self.headers.get('Origin') == 'http://'+self.headers.get('Host', '')
             if not self.allowed() or not (secrets.compare_digest(supplied, token) or same_origin_tab):
+                # Drain a bounded body first: closing with unread data makes Windows reset the
+                # connection, and the client then sees a reset instead of this 403.
+                try:
+                    pending = int(self.headers.get('Content-Length', '0'))
+                    if 0 < pending <= 2000000:
+                        self.rfile.read(pending)
+                except (ValueError, OSError):
+                    pass
                 return self.json_response({'error': 'Local editor token required'}, 403)
             try:
                 size = int(self.headers.get('Content-Length', '0'))

@@ -14,10 +14,34 @@ from backend.utils.scene_data import load_source
 from backend.utils.word_timing import ALIGNMENT_VERSION, estimate_words, offset_words, validate_words
 
 
+# Natural pacing: a beat after each statement, a longer one after a question so it can land.
+PAUSES = {'?': .45, '!': .32, '.': .28, ':': .22, ';': .22}
+DEFAULT_PAUSE = .28
+# Scenes are levelled to one loudness so narration does not jump in volume between sentences or scenes.
+TARGET_RMS, MAX_GAIN, MIN_GAIN, PEAK = .1, 4.0, .25, .97
+TIMING = 'sentences-v2-natural-pauses-levelled'
+
+
+def pause_after(text):
+    return PAUSES.get(text.rstrip('"\'\u201d\u2019 ')[-1:], DEFAULT_PAUSE)
+
+
+def level(pcm: bytes) -> bytes:
+    """Scale 16-bit speech to a common loudness, limited so peaks never clip."""
+    import numpy as np
+    audio = np.frombuffer(pcm, dtype='<i2').astype(np.float64) / 32768
+    voiced = audio[np.abs(audio) > .01]
+    if not len(voiced):
+        return pcm
+    rms, peak = float(np.sqrt(np.mean(voiced**2))), float(np.max(np.abs(audio)))
+    gain = min(MAX_GAIN, max(MIN_GAIN, TARGET_RMS / rms), PEAK / peak)
+    return np.round(np.clip(audio * gain, -1, 32767/32768) * 32768).astype('<i2').tobytes()
+
+
 def speech_key(narration, voice=DEFAULT_VOICE, directed=False):
     settings = {'narration': narration, 'voice': voice, 'engine': 'kokoro-onnx-0.6.1-v1.0', 'speed': 1, 'seed': SEED}
     if directed:
-        settings['timing'] = 'sentences-v1-pause120ms'
+        settings['timing'] = TIMING
     return fingerprint(settings)
 
 
@@ -77,11 +101,12 @@ def sentence_speech(narration, pending, voice, synthesizer):
                       'words': offset_words(local, start, end)})
         cursor += frames
         if index < len(parts)-1:
-            samples.append(b'\0\0'*2880)
-            cursor += 2880
+            gap = round(pause_after(text) * 24000)
+            samples.append(b'\0\0'*gap)
+            cursor += gap
     with wave.open(str(pending), 'wb') as writer:
         writer.setparams((*params, 0, 'NONE', 'not compressed'))
-        writer.writeframes(b''.join(samples))
+        writer.writeframes(level(b''.join(samples)))
     return beats
 
 

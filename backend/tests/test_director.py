@@ -77,10 +77,10 @@ class DirectorTests(unittest.TestCase):
                 calls.append(text);fake_speech(text,path,voice)
             data=generate_incremental(source,output,root/'public',synthesizer=synth,directed=True)
             second=data['scenes'][1]
-            self.assertAlmostEqual(second['duration'],3.24)
-            self.assertEqual([b['start'] for b in second['beats']], [0,1.12,2.24])
+            self.assertAlmostEqual(second['duration'],3.56)  # 3 x 1 s sentences + two 0.28 s pauses
+            self.assertEqual([b['start'] for b in second['beats']], [0,1.28,2.56])
             visual=timed_visual(build_direction(video)['scenes'][1],second['narration'],second['beats'])
-            self.assertEqual(visual['revealAt'],[0,1.12,2.24])
+            self.assertEqual(visual['revealAt'],[0,1.28,2.56])
             count=len(calls)
             again=generate_incremental(source,output,root/'public',synthesizer=synth,directed=True)
             self.assertEqual(again['cache']['generated_scene_ids'],[]);self.assertEqual(len(calls),count)
@@ -118,7 +118,7 @@ class DirectorTests(unittest.TestCase):
                     Path(args[1]).write_text(json.dumps(plan))
                 else:
                     props=json.loads(Path(args[2]).read_text())['videoData']
-                    self.assertEqual(props['scenes'][1]['visual']['revealAt'],[0,1.12,2.24])
+                    self.assertEqual(props['scenes'][1]['visual']['revealAt'],[0,1.28,2.56])
                     Path(args[4]).write_text('{"fullDecode":"fixture"}')
             def execute(command,**kwargs): Path(command[4]).write_bytes(b'fixture MP4')
             with patch('backend.services.editor_jobs.python_stage',side_effect=stage),patch('backend.services.editor_jobs.execute',side_effect=execute),patch('backend.services.editor_jobs.node_executable',return_value='node'),patch('backend.services.scene_cache.render_cached',side_effect=cached_render_stub),patch('backend.services.scene_cache.thumbnails'):

@@ -134,3 +134,19 @@ class SalvageTests(unittest.TestCase):
         self.assertEqual([c['label'] for c in row['concepts']], ['chunks', 'vector database'])
         with self.assertRaises(ValueError):
             decide({**data, 'elements':[{'label':'nonsense words','sentence':0,'icon':'book'}]*3}, scene, 0)
+
+
+class ProcessBiasTests(unittest.TestCase):
+    def test_process_without_narrated_order_becomes_an_explanation_of_its_concepts(self):
+        from backend.services.semantic_director import decide
+        scene = Scene(id=1, headline='Comparing vectors', body='The system compares a query vector with document vectors.',
+            narration='The system compares the query vector with all the document vectors. Similar meanings sit close together. The closest chunks are returned.')
+        data = {'kind':'process','icon':'chip','layout':'auto','treatment':'build','concepts':[],'elements':[
+            {'label':'query vector','sentence':0,'icon':'network'},{'label':'Similar meanings','sentence':1,'icon':'idea'},
+            {'label':'closest chunks','sentence':2,'icon':'database'}]}
+        row = decide(data, scene, 0)
+        self.assertEqual(row['kind'], 'explanation')
+        self.assertEqual([c['label'] for c in row['concepts']], ['query vector', 'Similar meanings', 'closest chunks'])
+        ordered = scene.model_copy(update={'narration': 'First, the system embeds the query vector. Next, similar meanings are found. Finally, the closest chunks are returned.'})
+        self.assertEqual(decide({**data, 'elements':[{'label':'query vector','sentence':0,'icon':'network'},
+            {'label':'similar meanings','sentence':1,'icon':'idea'},{'label':'closest chunks','sentence':2,'icon':'database'}]}, ordered, 0)['kind'], 'process')

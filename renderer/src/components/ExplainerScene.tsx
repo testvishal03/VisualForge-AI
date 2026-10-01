@@ -65,11 +65,12 @@ function NextToken({e,t}:{e:Extract<Explainer,{kind:'next_token'}>;t:number}){
       <text x={Math.max(70,chosen.length*24+36)/2} y="51" textAnchor="middle" fontSize="36" fontWeight="800" fill={ink}>{chosen}</text>
     </g>}
     {guess!==undefined&&(e.candidates.length?<g>
-      <text x="100" y="292" fontSize="22" fontWeight="700" letterSpacing="3" fill={muted}>LIKELY NEXT PIECES (ILLUSTRATIVE)</text>
-      {e.candidates.map((c,i)=>{const p=after(t,guess+i*.18,.5),len=[1,.56,.32][i]*520;
+      <text x="100" y="292" fontSize="22" fontWeight="700" letterSpacing="3" fill={muted}>{e.measured?`NEXT-TOKEN ODDS · MEASURED WITH ${e.model!.toUpperCase()}`:'LIKELY NEXT PIECES (ILLUSTRATIVE)'}</text>
+      {e.candidates.map((c,i)=>{const p=after(t,guess+i*.18,.5),share=e.measured&&e.probs?e.probs[i]:[1,.56,.32][i],len=Math.max(6,share*620);
         return <g key={c} transform={`translate(100 ${318+i*52})`} opacity={p*(i===0?1-joined*.5:1)}>
           <text x="0" y="30" fontSize="28" fontWeight="700" fill={ink}>{c}</text>
-          <rect x="150" y="8" width={len*easeOut(p)} height="30" rx="8" fill={i===0?coral:'#a4cfca'}/>
+          <rect x="170" y="8" width={len*easeOut(p)} height="30" rx="8" fill={i===0?coral:'#a4cfca'}/>
+          {e.measured&&e.probs&&<text x={182+len*easeOut(p)} y="32" fontSize="24" fontWeight="700" fill={muted} opacity={p}>{(e.probs[i]*100).toFixed(e.probs[i]<.1?1:0)}%</text>}
         </g>;})}
     </g>:<text x="100" y="330" fontSize="30" fill={muted} opacity={after(t,guess)}>The model picks the most likely next piece.</text>)}
     {extra>0&&<g>
@@ -193,4 +194,31 @@ function Steps({e,t}:{e:Extract<Explainer,{kind:'steps'}>;t:number}){
         {detail.lines.map((line,k)=><text key={k} y={105+k*(detail.fontSize+6)} textAnchor="middle" fontSize={detail.fontSize} fill={muted}>{line}</text>)}
       </g>
     </g>;})}</g>;
+}
+
+/** Title and takeaway cards on the light board, so a light video does not flip to the dark stage. */
+export function LightCard({scene,style,previous,first,guide}:{scene:Scene;style?:VideoData['style'];previous?:Scene;first:boolean;guide:boolean}){
+  const frame=useCurrentFrame(),{fps}=useVideoConfig(),t=frame/fps;
+  const exit=exitProgress(t,sceneSeconds(scene,fps)),background=backgroundProgress(t,first);
+  const lead=bridgedFrom(previous,scene,fps,guide)?BRIDGE_HEADLINE_DELAY:.12;
+  const headline=enterProgress(t,lead,first),body=enterProgress(t,lead+.25,first),mark=enterProgress(t,lead+.45,first);
+  const takeaway=scene.visual?.kind==='takeaway';
+  const title=fitLabel(scene.headline,1500,takeaway?72:86,48);
+  const move=(p:number)=>({opacity:p*(1-exit),transform:`translateY(${(1-p)*30-exit*18}px)`});
+  return <AbsoluteFill style={{color:ink,fontFamily:'Segoe UI, Arial, sans-serif',overflow:'hidden'}}>
+    <AbsoluteFill style={{background:paper,opacity:background}}/>
+    <div style={{position:'absolute',top:0,left:0,right:0,height:16,background:teal,opacity:background}}/>
+    <div style={{position:'absolute',top:52,left:95,fontSize:18,letterSpacing:3,fontWeight:700,color:teal,opacity:background}}>{style?.brand??'VISUALFORGE AI'}</div>
+    <div style={{position:'absolute',left:150,right:150,top:takeaway?250:300}}>
+      {takeaway&&<div style={{display:'flex',alignItems:'center',gap:16,fontSize:24,letterSpacing:5,fontWeight:800,color:coral,marginBottom:28,...move(mark)}}>
+        <svg width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="20" fill={coral}/><path d="M12 23l7 7 13-15" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/></svg>KEY TAKEAWAY</div>}
+      <div style={{fontSize:title.fontSize,lineHeight:1.08,fontWeight:800,letterSpacing:-2.5,...move(headline)}}>{title.lines.map((l,i)=><div key={i}>{l}</div>)}</div>
+      <div style={{width:`${easeOut(mark)*220}px`,height:8,borderRadius:4,background:coral,margin:'34px 0',opacity:1-exit}}/>
+      <p style={{fontSize:34,lineHeight:1.45,color:muted,maxWidth:1300,margin:0,...move(body)}}>{scene.body}</p>
+    </div>
+    <div style={{opacity:1-exit}}>
+      <Caption scene={scene} t={t} highlight={teal} style={{position:'absolute',bottom:83,left:210,right:210,textAlign:'center',fontSize:29,lineHeight:1.35,fontWeight:550}} boxStyle={{background:'#fff',border:'1px solid #d7e3e0',boxShadow:'0 8px 22px #17304413',padding:'11px 22px',borderRadius:12}}/>
+    </div>
+    <div style={{position:'absolute',bottom:0,left:0,height:7,width:`${Math.min(100,t/scene.duration*100)}%`,background:teal,opacity:background}}/>
+  </AbsoluteFill>;
 }

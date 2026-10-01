@@ -1,6 +1,7 @@
 import {DirectedDemonstration} from './DirectedDemonstration';
 import {IllustratedStory} from './IllustratedStory';
-import {ExplainerScene} from './ExplainerScene';
+import {ExplainerScene, LightCard} from './ExplainerScene';
+import {lightCard} from '../transitions';
 import {AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig} from 'remotion';
 import type {Scene, VideoData} from '../types';
 import {Icon} from './VisualScene';
@@ -27,8 +28,10 @@ import {semanticMotion,semanticTransition} from '../semantic-motion';
 import {SemanticDemonstration} from './SemanticDemonstration';
 
 const clamp={extrapolateLeft:'clamp',extrapolateRight:'clamp'} as const;
-export function MotionScene({scene,style,globalFrame,first,previous,next,guide=false}:{scene:Scene;style?:VideoData['style'];globalFrame:number;first:boolean;previous?:Scene;next?:Scene;guide?:boolean}) {
+export function MotionScene({scene,style,globalFrame,first,previous,next,guide=false,light=false}:{scene:Scene;style?:VideoData['style'];globalFrame:number;first:boolean;previous?:Scene;next?:Scene;guide?:boolean;light?:boolean}) {
   const frame=useCurrentFrame(); const {fps}=useVideoConfig(); const t=frame/fps;
+  if(lightCard(scene,light))
+    return <LightCard scene={scene} style={style} previous={previous} first={first} guide={guide}/>;
   if(scene.explainer)
     return <ExplainerScene scene={scene} style={style} previous={previous} next={next} first={first} guide={guide}/>;
   if(scene.choreography && !['intro','outro','budget'].includes(scene.choreography.layout))

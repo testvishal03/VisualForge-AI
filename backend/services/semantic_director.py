@@ -31,7 +31,11 @@ MAX_CONCEPTS = 5
 def concept_options(part):
     """Noun phrases the model may choose for one sentence, exactly as they are spoken."""
     from backend.services.key_terms import candidates, spoken
-    return sorted({label for c in candidates(part) if 3 <= len(c) <= 36 and (label := spoken(part, c))})
+    return sorted({label for c in candidates(part, alternatives=True) if 3 <= len(c) <= 36 and (label := spoken(part, c))})
+
+
+# Words a cut-off phrase tends to stop on ("millions of tiny", "work a little", "clean it up").
+DANGLING_END = {'tiny', 'little', 'big', 'small', 'huge', 'large', 'up', 'down', 'out', 'off', 'away', 'back'}
 
 
 def element_options(part):
@@ -41,7 +45,8 @@ def element_options(part):
         words = c.split()
         return (2 <= len(words) <= 4 and len(words[0]) >= 3 and words[0].isalpha() and words[0].lower() not in STOP
                 and words[1].lower() not in {'we', 'you', 'they', 'i'}
-                and words[-1].lower() not in STOP | SOLO_STOP and noun_like(c))  # never end mid-phrase
+                and words[-1].lower() not in STOP | SOLO_STOP | DANGLING_END and noun_like(c)  # never end mid-phrase
+                and not any(w.lower() in {'that', 'which', 'who', 'whose'} for w in words))
     actions = [c for c in label_candidates(part) if whole(c)]
     return sorted(set(concept_options(part)) | set(actions))
 
@@ -153,9 +158,17 @@ def salvage(data, scene, index):
         return None
 
 
+SEQUENCE = r'\b(?:first(?:ly)?|second(?:ly)?|third|next|then|finally|lastly|afterwards?|before|once|step|stages?|begins?|starts?|ends?|until)\b'
+
+
 def decide(data, scene, index):
     try:
-        return validate_decision(data, scene, index)
+        row = validate_decision(data, scene, index)
+        # Small models call most scenes a "process". Without narrated sequence words there are no
+        # ordered steps to show, so the model's own noun picks become the scene's concepts instead.
+        if row['kind'] == 'process' and not re.search(SEQUENCE, scene.narration, re.I):
+            return salvage(data, scene, index) or row
+        return row
     except ValueError as exc:
         if 'distinct' in str(exc) or 'order' in str(exc):
             row = salvage(data, scene, index)

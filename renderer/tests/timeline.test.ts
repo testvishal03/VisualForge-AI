@@ -4,7 +4,7 @@ import {test} from 'node:test';
 import {buildTimeline, FPS, SCENE_END_PADDING_SECONDS, validateVideoData} from '../src/timeline.ts';
 import {environmentFor} from '../src/motion.ts';
 import {activeWord,captionPhrases,sceneTransition,palette} from '../src/presentation.ts';
-import {BRIDGE_HEADLINE_DELAY,BRIDGE_SECONDS,bridgedFrom,carriedLabels,ENTER_SECONDS,enterProgress,EXIT_SECONDS,exitProgress,sceneSeconds,teaserWindow} from '../src/transitions.ts';
+import {BRIDGE_HEADLINE_DELAY,BRIDGE_SECONDS,bridgedFrom,carriedLabels,lightCard,lightVideo,ENTER_SECONDS,enterProgress,EXIT_SECONDS,exitProgress,sceneSeconds,teaserWindow} from '../src/transitions.ts';
 import {idleOffset,mentionPulse,mentionTimes,sceneDrift} from '../src/emphasis.ts';
 import {fitLabel,objectScale,textWidth} from '../src/labels.ts';
 import {along,chipKind} from '../src/flow.ts';
@@ -374,6 +374,15 @@ test('explainer animations validate their cues and draw recognisable shapes',()=
   assert.equal(noise(3,4,7),noise(3,4,7),'noise is deterministic per frame');
   assert.notEqual(noise(3,4,7),noise(3,4,8),'and churns between frames');
   assert.equal(after(1,undefined),0);assert.equal(after(2,1,.5),1);
+});
+
+test('mostly light videos keep their title and takeaway cards light',()=>{
+  const plain=(kind:string)=>({...scene(1,4),visual:{kind:kind as 'title',items:[]}});
+  const board={...scene(2,4),explainer:{kind:'caveats' as const,cards:[{key:'wrong' as const,title:'Can be wrong'},{key:'bias' as const,title:'Copies bias'}],at:{},end:4}};
+  assert.equal(lightVideo([plain('title'),board,board,plain('takeaway')]),true);
+  assert.equal(lightCard(plain('title'),true),true);
+  assert.equal(lightCard(plain('explanation'),true),false,'only title and takeaway cards switch');
+  assert.equal(lightVideo([plain('title'),plain('explanation'),plain('process'),board]),false);
 });
 
 test('caption phrases preserve every word within measured sentence boundaries',()=>{

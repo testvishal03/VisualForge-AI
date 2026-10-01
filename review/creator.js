@@ -163,11 +163,12 @@ $('script-approve').onclick=()=>guarded(async()=>{
 });
 $('script-expand').onclick=()=>guarded(async()=>{await saveReviewedScript();const p=state.project;await api(`/api/projects/${p.id}/task`,{revision:p.revision,action:'expand_script'});state.busy=true;await poll();});
 
+const EXPLAINER_NAMES={next_token:'Next-token animation',denoise:'Noise-to-image animation',contrast:'Judge vs. create animation',steps:'Learning steps animation',caveats:'Limitations animation'};
 function renderVisualPlan(p){
   const box=$('visual-plan-list');box.replaceChildren();
   const plan=p.visual_plan;if(!plan){box.append(element('p','Prepare your script to see the visual plan.'));return;}
   for(const [i,row] of plan.scenes.entries()){
-    const card=element('details',undefined,'visual-plan-row');card.append(element('summary',`${i+1}. ${row.title} - ${row.kind==='fallback'?'Review fallback':row.kind==='authored'?'Existing demonstration':row.kind.replaceAll('-',' ')}`));
+    const card=element('details',undefined,'visual-plan-row');card.append(element('summary',`${i+1}. ${row.title} - ${row.explainer?EXPLAINER_NAMES[row.explainer]||'Explainer animation':row.kind==='fallback'?'Review fallback':row.kind==='authored'?'Existing demonstration':row.kind.replaceAll('-',' ')}`));
     card.append(element('p',row.question),element('p',`Objects: ${(row.choreography?.objects.map(o=>o.label)||row.objects).join(', ')||'Source text'} | View: ${row.choreography?.layout||row.view} | Transition: ${row.transition}`,'helper'));
     if(row.carry)card.append(element('p',`Continue the example: ${row.carry}`,'helper'));
     for(const step of row.steps)card.append(element('p',`Sentence ${step.sentence+1}: ${step.action} - ${step.text}`));

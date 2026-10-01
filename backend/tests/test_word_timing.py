@@ -84,8 +84,8 @@ class WordTimingTests(unittest.TestCase):
 
             beats = generate_incremental(source, output, root, synthesizer=timed, directed=True)['scenes'][0]['beats']
             self.assertEqual([b['wordTiming'] for b in beats], ['model', 'model'])
-            self.assertEqual(beats[1]['words'][0], {'text': 'Tokens', 'start': 1.12, 'end': 1.37})
-            self.assertEqual(beats[1]['words'][-1]['start'], 1.72)
+            self.assertEqual(beats[1]['words'][0], {'text': 'Tokens', 'start': 1.28, 'end': 1.53})
+            self.assertEqual(beats[1]['words'][-1]['start'], 1.88)
 
             estimated = generate_incremental(source, output, root, synthesizer=fake_speech, directed=True)
             self.assertEqual(estimated['cache']['generated_scene_ids'], [])
@@ -159,3 +159,16 @@ class WordCueTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class PacingTests(unittest.TestCase):
+    def test_pauses_follow_punctuation_and_scenes_are_levelled(self):
+        import numpy as np
+        from backend.services.incremental_audio import level, pause_after
+        self.assertGreater(pause_after('Why does this work?'), pause_after('It works.'))
+        quiet = (np.sin(np.linspace(0, 200, 24000)) * 1500).astype('<i2')
+        loud = (np.sin(np.linspace(0, 200, 24000)) * 30000).astype('<i2')
+        rms = lambda pcm: float(np.sqrt(np.mean((np.frombuffer(pcm, '<i2') / 32768.0) ** 2)))
+        self.assertGreater(rms(level(quiet.tobytes())), rms(quiet.tobytes()) * 2, 'quiet narration is raised')
+        self.assertLessEqual(np.abs(np.frombuffer(level(loud.tobytes()), '<i2')).max(), 32767 * .98, 'loud narration never clips')
+        self.assertEqual(level(np.zeros(100, '<i2').tobytes()), np.zeros(100, '<i2').tobytes())

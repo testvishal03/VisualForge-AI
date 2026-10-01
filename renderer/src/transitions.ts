@@ -44,6 +44,13 @@ export function isIllustrated(scene?:Scene) {
   return !!scene?.explainer || !!scene?.choreography && !['intro','outro','budget'].includes(scene.choreography.layout);
 }
 
+/** A video drawn mostly on the light board keeps its title, takeaway and bookends light too. */
+export const lightVideo = (scenes:Scene[]) => scenes.filter(isIllustrated).length*2 >= scenes.length;
+
+/** Title and takeaway cards that join a light video instead of switching to the dark stage. */
+export const lightCard = (scene:Scene, light:boolean) =>
+  light && !scene.choreography && !scene.explainer && ['title','takeaway'].includes(scene.visual?.kind ?? '');
+
 /** Lower-case object labels this scene hands to the next one; those stay on stage through the cut. */
 export function carriedLabels(scene:Scene, next?:Scene) {
   const own = new Set(scene.choreography?.objects.map(o => o.label.toLowerCase()) ?? []);

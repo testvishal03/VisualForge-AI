@@ -50,8 +50,10 @@ def plan_document(document):
         carry=next((o for o in objects if previous and o in previous['objects']),None)
         same=bool(previous and previous['kind']==kind and kind in TITLES)
         from backend.services.choreography import compile_scene
+        from backend.services.explainers import plan as plan_explainer
         choreography=compile_scene(scene)
-        rows.append({'choreography':choreography, 'uid':scene['uid'],'kind':kind,'title':TITLES.get(kind,scene['headline']),
+        explainer=None if scene['visual'].get('worked') else plan_explainer(scene)
+        rows.append({'choreography':choreography, 'explainer':explainer and explainer['kind'], 'uid':scene['uid'],'kind':kind,'title':TITLES.get(kind,scene['headline']),
             'question':f"How does this work: {scene['headline'].rstrip('.?!')}?", 'objects':objects[:8],
             'steps':[{'sentence':i,'action':ACTIONS.get(kind,'explain'),'text':part} for i,part in enumerate(sentences(scene['narration']))],
             'view':'detail' if same and previous['view']=='overview' else 'overview',
@@ -59,11 +61,14 @@ def plan_document(document):
             'transition':'continue' if same else 'zoom' if kind=='dimensions' else 'flow' if kind in {'rag','encoding','vector-database'} else 'fade'})
     warnings=[]
     for i,row in enumerate(rows):
+        if row.get('explainer'):
+            # A dedicated explainer animation is neither a fallback nor a repeated mechanism.
+            continue
         if row.get('choreography'):
             if len(row['choreography']['objects'])>4:warnings.append({'scene':i+1,'message':'Several objects share this scene. Check label readability in the preview.'})
         elif row['kind']=='fallback':warnings.append({'scene':i+1,'message':'No specialized demonstration matches this passage. Review the existing diagram or card in the preview.'})
         # Repetition is worth flagging whether or not the scenes are illustrated.
-        if i>=2 and row['kind']==rows[i-1]['kind']==rows[i-2]['kind']:
+        if i>=2 and row['kind']==rows[i-1]['kind']==rows[i-2]['kind'] and not rows[i-1].get('explainer') and not rows[i-2].get('explainer'):
             warnings.append({'scene':i+1,'message':'This visual mechanism repeats across three scenes. Detail views vary the focus; consider combining repeated explanations.'})
     return {'scenes':rows,'warnings':warnings,'specialized':sum(r['kind'] in TITLES for r in rows),'total':len(rows)}
 

@@ -262,6 +262,7 @@ class EditorJobs:
             ids={s['id'] for s in preview_scenes(candidates)}
             selected=[s for s in video.scenes if s.id in ids]
         worked_results=prepare_worked([document['scenes'][s.id-1] for s in selected]) if action!='audio' else {}
+        next_tokens=self.measure_next_tokens([document['scenes'][s.id-1] for s in selected],folder,py) if action!='audio' else {}
         selected_source = folder/'speech-source.json'
         write_json_atomic(selected_source, {'title': video.title, 'topic': video.topic, 'scenes': [s.model_dump() for s in selected]})
         metadata = folder/'speech.generated.json'
@@ -301,6 +302,11 @@ class EditorJobs:
                 # or limitations gets its dedicated explainer animation.
                 from backend.services.explainers import plan as plan_explainer, timed as timed_explainer
                 explainer = None if demonstration or authored['visual'].get('worked') else plan_explainer(authored)
+                if explainer and explainer['kind']=='next_token' and explainer['prompt'] in next_tokens:
+                    # Measured odds from the installed model replace the illustrative example.
+                    from backend.services.next_token import shown
+                    tokens,probs=shown(next_tokens[explainer['prompt']])
+                    if tokens:explainer.update(candidates=tokens,probs=probs,measured=True,model=self.model_name())
                 if explainer:scene['explainer']=timed_explainer(explainer,scene['beats'])
             scene['visual'] = timed_visual(document['scenes'][scene['id']-1]['visual'], scene['narration'], scene.get('beats', []))
             if scene.get('demonstration'):
@@ -347,6 +353,39 @@ class EditorJobs:
             from backend.services.publishing import publish_safely
             phase('thumbnail')
             publish_safely(self, project, folder, data, render, profile)
+
+    def model_name(self):
+        from backend.llm.gguf_llm import model_status
+        return str(model_status().get('model', 'local model')).split('/')[-1][:60]
+
+    def measure_next_tokens(self, rows, folder, py):
+        """Measured next-token odds for next-token explainer prompts; cached, and never fatal.
+
+        Cached prompts are read without loading the model. A missing model or a failed run
+        leaves those scenes in their labelled illustrative form instead of stopping the video.
+        """
+        from backend.services.explainers import plan as plan_explainer
+        from backend.services import next_token
+        prompts=list(dict.fromkeys(e['prompt'] for row in rows if not row['visual'].get('worked') and (e:=plan_explainer(row)) and e['kind']=='next_token'))
+        if not prompts:
+            return {}
+        try:
+            from backend.services.worked_examples import identity
+            model=identity()
+        except (OSError, ValueError, KeyError):
+            return {}
+        results={p:r for p in prompts if (r:=next_token.read(p,model))}
+        missing=[p for p in prompts if p not in results]
+        if missing:
+            src,out=folder/'next-token-prompts.json',folder/'next-token-results.json'
+            write_json_atomic(src,missing)
+            try:
+                py('next-token','measure_next_token.py',[src,out])
+                measured=json.loads(out.read_text(encoding='utf-8'))
+                results.update({p:next_token.validate(measured[p],p,model) for p in missing if p in measured})
+            except (RuntimeError, OSError, ValueError, KeyError) as exc:
+                self.state['message']=f'Next-token odds were not measured ({str(exc)[:160]}); the example stays illustrative.'
+        return results
 
     def voice(self, project_id):
         """Narration voice from the render style, so stand-in catalogues that only provide style() work."""
