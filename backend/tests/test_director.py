@@ -146,6 +146,8 @@ class HeadlineTests(unittest.TestCase):
             "Here's the secret: it's a next-word guesser.": "It's a next-word guesser",
             'Imagine you have 100,000 documents.': 'Imagine you have 100,000 documents',
             'Printed books work without batteries and can be shared in person.': 'Printed books work without batteries',
+            'Think of it like finding a book in a library.': 'Finding a book in a library',
+            'So vector databases use a smarter trick called Approximate Nearest Neighbor search, or ANN.': 'Vector databases use a smarter trick',
         }
         for sentence, expected in cases.items():
             self.assertEqual(headline_for(sentence), expected)
@@ -153,3 +155,26 @@ class HeadlineTests(unittest.TestCase):
             result = headline_for(sentence)
             self.assertLessEqual(len(words(result)), 9)
             self.assertNotIn(result.split()[-1].lower(), {'the', 'a', 'or', 'even', 'of', 'to'})
+
+    def test_headlines_fit_on_one_line(self):
+        from backend.services.director import HEADLINE_CHARS, headline_for
+        result = headline_for('Retrieval-augmented generation retrieves authoritative organisational documentation automatically.')
+        self.assertLessEqual(len(result), HEADLINE_CHARS)
+
+
+class TitleAndRelationshipTests(unittest.TestCase):
+    def test_untitled_script_is_named_after_its_main_concept_phrase(self):
+        from backend.services.director import title_for
+        paragraphs = ['In the last video, we turned text into embeddings.',
+                      'A vector database stores embeddings. Each vector has an ID. A vector database finds the closest vector fast.',
+                      'Vector databases use indexes. Vector databases filter on metadata.']
+        self.assertEqual(title_for(paragraphs), 'Vector database')
+
+    def test_vague_dependencies_are_not_drawn_as_relationships(self):
+        from backend.schemas.video_schema import Scene
+        from backend.services.director import direct_scene
+        scene = Scene(id=2, headline='Choosing one depends on your needs', body='Pick a store that fits.',
+                      narration='Choosing one depends on your needs. Chroma is great for quick local prototypes.')
+        self.assertNotEqual(direct_scene(scene, 1, 3)['kind'], 'relationship')
+        concrete = scene.model_copy(update={'narration': 'Search quality depends on the embedding model. Chroma is great for quick local prototypes.'})
+        self.assertEqual(direct_scene(concrete, 1, 3)['kind'], 'relationship')
