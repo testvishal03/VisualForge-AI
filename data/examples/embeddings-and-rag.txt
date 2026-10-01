@@ -1,0 +1,9 @@
+Embeddings turn meaning into numbers that AI systems can compare. Let's see how text becomes tokens, how embeddings place meaning in space, and how retrieval uses them.
+
+Before a model can read anything, text is broken into tokens. For example, "Embeddings turn meaning into geometry" becomes several tokens. Each token is then mapped to a token ID, a number the model can use.
+
+Think of embeddings as points in a huge mathematical space. If two concepts are similar in meaning, their vectors tend to be closer together. “Cat” and “Dog” may appear close together. “King” and “Queen” may also be close. But “Banana” may be much farther away from “Database.”
+
+Now a user asks a question. The question is converted into an embedding. The vector database searches for the closest chunks. Those relevant chunks are retrieved and given to the language model, which writes the answer.
+
+So embeddings allow AI systems to represent meaning as geometry, and retrieval uses that geometry to find the right information for every question.

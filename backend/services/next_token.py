@@ -82,3 +82,43 @@ def shown(result, limit=3):
     rows = [(visible(c['token']), c['prob']) for c in result['candidates']]
     rows = [(token, prob) for token, prob in rows if token][:limit]
     return [t for t, _ in rows], [p for _, p in rows]
+
+
+def tokens_key(text, model):
+    return fingerprint(['tokens-v1', text, model])
+
+
+def validate_tokens(result, text=None, model=None):
+    if not isinstance(result, dict) or result.get('mode') != 'tokens':
+        raise ValueError('Invalid tokenization measurement')
+    if text is not None and (result.get('input') != text or result.get('model') != model or result.get('key') != tokens_key(text, model)):
+        raise ValueError('Tokenization belongs to another text or model')
+    pieces, ids = result.get('pieces'), result.get('ids')
+    if not isinstance(pieces, list) or not isinstance(ids, list) or not 1 <= len(pieces) == len(ids) <= 40:
+        raise ValueError('Expected 1-40 tokens with one ID each')
+    if any(not isinstance(p, str) for p in pieces) or any(type(i) is not int or i < 0 for i in ids):
+        raise ValueError('Invalid token piece or ID')
+    if ''.join(pieces) != result['input']:
+        raise ValueError('Token pieces must rebuild the exact text')
+    return result
+
+
+def read_tokens(text, model, cache=CACHE):
+    try:
+        return validate_tokens(json.loads((cache/f'{tokens_key(text, model)}.json').read_text(encoding='utf-8')), text, model)
+    except (OSError, ValueError, KeyError, TypeError):
+        return None
+
+
+def measure_tokens(text, engine, model, cache=CACHE):
+    """The installed model's own tokenization of `text`: pieces and IDs that rebuild it exactly."""
+    cached = read_tokens(text, model, cache)
+    if cached:
+        return cached
+    engine._load()
+    rows = engine._request('/tokenize', {'content': text, 'add_special': False, 'parse_special': False, 'with_pieces': True})['tokens']
+    pieces = [r['piece'] if isinstance(r['piece'], str) else bytes(r['piece']).decode('utf-8', 'replace') for r in rows]
+    result = validate_tokens({'mode': 'tokens', 'input': text, 'model': model, 'key': tokens_key(text, model),
+                              'pieces': pieces, 'ids': [r['id'] for r in rows]}, text, model)
+    write_json_atomic(cache/f'{result["key"]}.json', result)
+    return result

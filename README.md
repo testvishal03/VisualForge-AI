@@ -29,8 +29,11 @@ First-time setup (Python 3.12 environment, model downloads, `npm install`) is de
   - **Judge vs. create:** an item drops into the bins the narration names; the other side draws something new.
   - **Learning steps:** numbered "Feed it / Find patterns / Prompt it" cards.
   - **Limitations:** cards for wrong answers, bias and fact-checking.
+  - **Tokenization:** a sentence from the narration splits into the local model's real tokens, and then their real token IDs appear.
+  - **Embedding map:** concepts appear as they are named, and those the narration calls close gather together. This map is labelled illustrative: the local chat model's embeddings matched only 3 of 5 meaning tests, so they are not shown as measurements.
+  - **Retrieval:** question, embedding, vector search, closest chunks, language model and answer light up in order, but only the stages the narration names.
 
-  Title and takeaway cards keep their own design. Try `data/examples/generative-ai-explained.txt` with **Paste a script** to see all five.
+  Title and takeaway cards keep their own design. Try `data/examples/generative-ai-explained.txt` and `data/examples/embeddings-and-rag.txt` with **Paste a script**.
 - **Notes to narration.** In **Paste a script**, paste notes or a Markdown page and click **Convert notes to narration**. The page title becomes the video title, and each `##` section becomes a scene. Bullets become sentences, numbered steps are read as "First / Next / Finally", and bare example lines are read as quoted examples, which the explainers can use. Emoji, arrows and Markdown marks are removed so the voice does not read them out. Your wording is kept, and the result stays editable before you generate. A blank line after any paragraph of 15 or more words now always starts a new scene.
 - **Faster renders.** Each render receives only the narration it uses, instead of Remotion copying the whole shared audio cache on every call, and narration synthesis uses up to four CPU threads. Both changes produce bit-identical output.
 

@@ -86,3 +86,48 @@ class ExplainerPlanTests(unittest.TestCase):
         result = plan_document(document)
         self.assertEqual([r['explainer'] for r in result['scenes']], ['contrast', 'next_token', 'denoise'])
         self.assertEqual(result['warnings'], [], 'distinct explainers are neither fallbacks nor repetition')
+
+
+class ExplainerPackTwoTests(unittest.TestCase):
+    def test_embedding_map_groups_only_what_the_narration_calls_close(self):
+        text = ('If two concepts are similar, their vectors sit closer together. “Cat” and “Dog” may appear close together. '
+                '“King” and “Queen” may also be close. But “Banana” may be much farther away from “Database.”')
+        spec = plan(scene(text))
+        self.assertEqual(spec['kind'], 'embedding_map')
+        groups = {p['label']: p['group'] for p in spec['points']}
+        self.assertEqual(groups['Cat'], groups['Dog'])
+        self.assertEqual(groups['King'], groups['Queen'])
+        self.assertNotEqual(groups['Cat'], groups['King'])
+        self.assertNotEqual(groups['Banana'], groups['Database'], '"farther away" is not a grouping')
+        self.assertIsNone(plan(scene('A record stores an embedding plus “Department”, “Title”, “Date” and “Source” as metadata fields.')),
+                          'a list of fields without closeness is not a map')
+
+    def test_retrieval_draws_only_the_stages_the_narration_names(self):
+        text = ('The user question is converted into an embedding. The vector database searches for the closest chunks. '
+                'Those chunks are retrieved and given to the language model, which writes the answer.')
+        spec = plan(scene(text))
+        self.assertEqual([s['key'] for s in spec['stages']], ['question', 'embedding', 'search', 'chunks', 'llm', 'answer'])
+        self.assertIsNone(plan(scene('Retrieval helps, but a long answer still needs careful review by people.')))
+
+    def test_tokenization_uses_a_quoted_or_narrated_sentence(self):
+        spec = plan(scene('Text is broken into tokens before a model reads it. For example, "Embeddings turn meaning into geometry" becomes several tokens.'))
+        self.assertEqual((spec['kind'], spec['text']), ('tokens', 'Embeddings turn meaning into geometry'))
+        self.assertEqual((spec['pieces'], spec['ids']), ([], []), 'pieces come only from the model measurement')
+
+    def test_tokenization_measurement_rebuilds_the_exact_text(self):
+        import tempfile
+        from pathlib import Path
+        from backend.services.next_token import measure_tokens, read_tokens, validate_tokens
+        class Engine:
+            calls = 0
+            def _load(self): pass
+            def _request(self, route, payload, timeout=10):
+                Engine.calls += 1
+                return {'tokens': [{'id': 1, 'piece': 'Emb'}, {'id': 2, 'piece': 'eddings'}, {'id': 3, 'piece': ' work'}]}
+        with tempfile.TemporaryDirectory() as d:
+            result = measure_tokens('Embeddings work', Engine(), {'model': 'm'}, Path(d))
+            self.assertEqual((result['pieces'], result['ids']), (['Emb', 'eddings', ' work'], [1, 2, 3]))
+            self.assertEqual(read_tokens('Embeddings work', {'model': 'm'}, Path(d)), result)
+            self.assertIsNone(read_tokens('Embeddings work', {'model': 'other'}, Path(d)))
+        with self.assertRaises(ValueError):
+            validate_tokens({**result, 'pieces': ['Emb', 'edding', ' work']})
