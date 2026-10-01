@@ -9,6 +9,10 @@ import os
 from pathlib import Path
 import shutil
 
+# One Chromium worker per core, up to four: on a 4-core laptop a 360-frame segment rendered in
+# 14.4 s with four workers versus 21.7 s with two. The language model has exited before rendering.
+RENDER_CONCURRENCY = max(1, min(4, os.cpu_count() or 2))
+
 
 def referenced_audio(props: Path):
     data = json.loads(props.read_text(encoding='utf-8'))['videoData']

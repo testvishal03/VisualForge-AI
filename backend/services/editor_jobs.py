@@ -1,6 +1,8 @@
 """One local task at a time, with subprocess isolation and explicit cancellation."""
 import copy
 import json
+import shutil
+from backend.services.render_assets import RENDER_CONCURRENCY
 import math
 from pathlib import Path
 import threading
@@ -339,7 +341,7 @@ class EditorJobs:
                 from backend.services.scene_cache import render_cached
                 render_cached(self,project,data,props,pending,profile,render)
             else:
-                render(['render', 'VisualForgeVideo', pending, f'--props={props}', '--concurrency=2', *(['--scale=0.6666666666666666'] if profile=='draft' else [])], 'render')
+                render(['render', 'VisualForgeVideo', pending, f'--props={props}', f'--concurrency={RENDER_CONCURRENCY}', *(['--scale=0.6666666666666666'] if profile=='draft' else [])], 'render')
             py('validate', 'validate_render.py', [pending, '--metadata', props, '--report', folder/f'{name}-validation.json', '--profile', profile])
         if action in {'render','motion'}:
             from backend.services.scene_cache import thumbnails
@@ -396,6 +398,10 @@ class EditorJobs:
         """Run one Remotion CLI command for a project, retrying once after a transient browser failure."""
         from backend.services.render_assets import with_public_dir
         command = with_public_dir(self.root, folder, command)
+        bundle = self.bundle(folder, command)
+        if bundle:
+            # Rendering from a prepared bundle skips webpack and the public-dir copy on every call.
+            command = [command[0], str(bundle), *[a for a in command[1:] if not str(a).startswith('--public-dir=')]]
         for attempt in range(2):
             try:
                 return execute([node_executable(), self.root/'renderer/node_modules/@remotion/cli/remotion-cli.js', *command],
@@ -403,6 +409,39 @@ class EditorJobs:
             except RuntimeError:
                 if attempt:
                     raise
+
+    def bundle(self, folder, command):
+        """A renderer bundle for this job's narration, built once and reused by every segment and still.
+
+        Keyed by renderer code and the exact public files, so a code or narration change rebuilds it.
+        Any failure falls back to the normal per-command bundling rather than failing the render.
+        """
+        public = next((str(a).split('=', 1)[1] for a in command if str(a).startswith('--public-dir=')), None)
+        if not command or command[0] not in {'render', 'still'} or not public:
+            return None
+        from backend.services.run_state import fingerprint
+        files = sorted((p.relative_to(public).as_posix(), p.stat().st_size) for p in Path(public).rglob('*') if p.is_file())
+        key = fingerprint(['render-bundle-v1', self.version, files])
+        target = folder/'render-bundle'
+        marker = target/'bundle-key.txt'
+        try:
+            if marker.is_file() and marker.read_text(encoding='utf-8') == key and (target/'index.html').is_file():
+                return target
+            pending = folder/'render-bundle.pending'
+            shutil.rmtree(pending, ignore_errors=True)
+            execute([node_executable(), self.root/'renderer/node_modules/@remotion/cli/remotion-cli.js', 'bundle', 'src/index.ts',
+                     f'--public-dir={public}', f'--out-dir={pending}', '--log=error'],
+                    cwd=self.root/'renderer', log=folder/'logs'/'bundle.log', cancel_event=self.cancel)
+            if not (pending/'index.html').is_file():
+                return None
+            (pending/'bundle-key.txt').write_text(key, encoding='utf-8')
+            shutil.rmtree(target, ignore_errors=True)
+            pending.replace(target)
+            return target
+        except InterruptedError:
+            raise
+        except Exception:  # noqa: BLE001 - bundling is an optimisation; per-command bundling still works
+            return None
 
     def close(self):
         self.cancel.set()

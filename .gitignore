@@ -32,3 +32,6 @@ Thumbs.db
 Desktop.ini
 .DS_Store
 data/next-token-cache/
+
+# Remotion's downloaded browser, if a render is started from the project root
+.remotion/

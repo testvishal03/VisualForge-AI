@@ -150,3 +150,22 @@ class ProcessBiasTests(unittest.TestCase):
         ordered = scene.model_copy(update={'narration': 'First, the system embeds the query vector. Next, similar meanings are found. Finally, the closest chunks are returned.'})
         self.assertEqual(decide({**data, 'elements':[{'label':'query vector','sentence':0,'icon':'network'},
             {'label':'similar meanings','sentence':1,'icon':'idea'},{'label':'closest chunks','sentence':2,'icon':'database'}]}, ordered, 0)['kind'], 'process')
+
+
+class ExplainerSkipTests(unittest.TestCase):
+    def test_scenes_drawn_by_explainers_are_not_sent_to_the_model(self):
+        prompts = []
+        def generate_json(prompt, schema, max_new_tokens):
+            prompts.append(prompt)
+            return json.dumps({'kind':'explanation','icon':'book','elements':[],'layout':'auto','treatment':'build','concepts':[]})
+        engine = SimpleNamespace(generate_json=generate_json, cache_identity='fake')
+        # First and last scenes are the title and takeaway cards, which never get explainers.
+        video = VideoScript(title='AI', topic='AI', scenes=[
+            Scene(id=1, headline='Data and parameters', body='Training tunes parameters.', narration='Training data shapes millions of parameters inside the model during a long learning process.'),
+            Scene(id=2, headline='A next-word guesser', body='It predicts the next token.', narration='It is a next-word guesser. It picks the next token and then repeats the process many times.'),
+            Scene(id=3, headline='Keep checking', body='Review the output.', narration='Always review what the model writes before you share it with other people online.')])
+        with tempfile.TemporaryDirectory() as directory:
+            plan = plan_video(video, engine=engine, cache=Path(directory))
+        self.assertEqual(len(prompts), 2, 'only scenes without an explainer are planned by the model')
+        self.assertTrue(all('next-word guesser' not in p for p in prompts))
+        self.assertTrue(all(row['planned'] for row in plan['scenes']))

@@ -202,6 +202,17 @@ def plan_video(video, *, engine, cache: Path, instructions=""):
             # Numeric data comes only from the existing literal percentage parser.
             rows.append(improve_visual(scene, {'id': scene.id, **extracted, 'planned': True}, rows))
             continue
+        from backend.services.explainers import plan as plan_explainer
+        if plan_explainer({'narration': scene.narration, 'visual': {'kind': extracted['kind']}}):
+            # An explainer animation draws this scene, so a model plan would be discarded:
+            # keep the narration-based direction and skip about a minute of CPU inference.
+            row = improve_visual(scene, {'id': scene.id, **extracted, 'planned': True}, rows)
+            from backend.services.choreography import compile_scene
+            demonstration = compile_scene(scene.model_dump(), row)
+            if demonstration:row['choreography']=demonstration
+            rows.append(row)
+            print(f"Visual scene {scene.id}: explainer animation; model planning skipped", flush=True)
+            continue
         parts = sentences(scene.narration)
         # Let the model select source phrases rather than generate paraphrases
         # and repeatedly fail exact-grounding checks on a small CPU model.

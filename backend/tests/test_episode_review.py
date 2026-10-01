@@ -1,3 +1,4 @@
+from backend.tests.render_stubs import stub_output, stub_props
 import copy
 import json
 import unittest
@@ -71,7 +72,7 @@ class EpisodeReviewTests(unittest.TestCase):
         published=folder/f'motion-{uid}.mp4';published.write_bytes(b'previous verified clip')
         def stage(script,args,**kwargs):
             if script.name=='generate_audio.py':generate_incremental(Path(args[1]),Path(args[3]),self.root/'renderer/public',synthesizer=fake_speech,directed=True)
-        def render(command,**kwargs):Path(command[4]).write_bytes(b'new unpublished clip')
+        def render(command,**kwargs):stub_output(command).write_bytes(b'new unpublished clip')
         with patch('backend.services.editor_jobs.python_stage',side_effect=stage),patch('backend.services.editor_jobs.execute',side_effect=render),patch('backend.services.scene_cache.thumbnails',side_effect=ValueError('Thumbnail fixture failure')):
             with self.assertRaisesRegex(ValueError,'Thumbnail'):self.jobs._perform(p,'motion',uid,'',folder)
         self.assertEqual(published.read_bytes(),b'previous verified clip')

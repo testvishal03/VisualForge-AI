@@ -7,6 +7,7 @@ import subprocess
 from backend.services.run_state import fingerprint, file_hash
 from backend.services.script_generator import write_json_atomic
 from backend.services.process_runner import execute, node_executable
+from backend.services.render_assets import RENDER_CONCURRENCY
 
 
 def segments(data, timeline, version, profile):
@@ -56,7 +57,7 @@ def render_cached(jobs, project, data, props, pending, profile, render):
         jobs.state.update(scene_index=index+1,scene_total=len(plan),message=f"Scene clip {index+1}/{len(plan)}; {len(reused)} reused")
         if intact(cache,key):reused.append(part['id']);continue
         temporary=cache/f'{key}.pending.mp4'
-        render(['render','VisualForgeVideo',temporary,f'--props={props}',f"--frames={part['from']}-{part['from']+part['frames']-1}",'--muted','--concurrency=2',*(['--scale=0.6666666666666666'] if profile=='draft' else [])],'render')
+        render(['render','VisualForgeVideo',temporary,f'--props={props}',f"--frames={part['from']}-{part['from']+part['frames']-1}",'--muted',f'--concurrency={RENDER_CONCURRENCY}',*(['--scale=0.6666666666666666'] if profile=='draft' else [])],'render')
         binary=root/'renderer/node_modules/@remotion/compositor-win32-x64-msvc'
         probe=json.loads(subprocess.check_output([str(binary/'ffprobe.exe'),'-v','error','-show_streams','-of','json',str(temporary)]))
         video=next(s for s in probe['streams'] if s['codec_type']=='video')

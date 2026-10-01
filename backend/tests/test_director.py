@@ -1,3 +1,4 @@
+from backend.tests.render_stubs import stub_output, stub_props
 from backend.tests.render_stubs import cached as cached_render_stub
 import copy
 import json
@@ -120,7 +121,7 @@ class DirectorTests(unittest.TestCase):
                     props=json.loads(Path(args[2]).read_text())['videoData']
                     self.assertEqual(props['scenes'][1]['visual']['revealAt'],[0,1.28,2.56])
                     Path(args[4]).write_text('{"fullDecode":"fixture"}')
-            def execute(command,**kwargs): Path(command[4]).write_bytes(b'fixture MP4')
+            def execute(command,**kwargs): stub_output(command).write_bytes(b'fixture MP4')
             with patch('backend.services.editor_jobs.python_stage',side_effect=stage),patch('backend.services.editor_jobs.execute',side_effect=execute),patch('backend.services.editor_jobs.node_executable',return_value='node'),patch('backend.services.scene_cache.render_cached',side_effect=cached_render_stub),patch('backend.services.scene_cache.thumbnails'):
                 jobs.start(project['id'],'generate');jobs.thread.join(10)
                 self.assertEqual(jobs.status()['status'],'complete',jobs.status())
