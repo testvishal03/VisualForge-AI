@@ -8,7 +8,7 @@ import {BRIDGE_HEADLINE_DELAY,BRIDGE_SECONDS,bridgedFrom,carriedLabels,lightCard
 import {idleOffset,mentionPulse,mentionTimes,sceneDrift} from '../src/emphasis.ts';
 import {fitLabel,objectScale,textWidth} from '../src/labels.ts';
 import {along,chipKind} from '../src/flow.ts';
-import {after,chipRows,inside,mapLayout,noise} from '../src/explainer.ts';
+import {after,chipRows,inside,mapLayout,measuredLayout,noise} from '../src/explainer.ts';
 import {animationTiming,activeConcept,sharedConcept} from '../src/animation.ts';
 import {isContextWindow,contextCues} from '../src/context-window.ts';
 import {validateTeaching,teachingStage,type TeachingPlan} from '../src/teaching-plan.ts';
@@ -399,6 +399,22 @@ test('pack two explainers accept only faithful data',()=>{
   const d=(a:number[],b:number[])=>Math.hypot(a[0]-b[0],a[1]-b[1]);
   assert.ok(d(placed[0],placed[1])<d(placed[0],placed[2]),'grouped points sit closer than other groups');
   assert.equal(chipRows([500,500,500],1200)[2].y>0,true,'chips wrap to a new row');
+});
+
+test('measured maps keep real positions and links between real points',()=>{
+  const base={...scene(1,8),narration:'Cat and Dog are close.'};
+  const xy:[number,number][]=[[-.5,-.1],[-.4,-.05],[.5,.1],[.3,.2]];
+  const map={kind:'embedding_map' as const,points:['Cat','Dog','King','Banana'].map((label,i)=>({label,group:i>1?i-1:0,xy:xy[i]})),
+    links:[{a:0,b:1,sim:.73},{a:2,b:3,sim:.61}],measured:true,model:'bge-small-en-v1.5',at:{},end:8};
+  validateVideoData({title:'E',scenes:[{...base,explainer:map}]});
+  for(const bad of [{...map,links:[{a:0,b:9,sim:.5}]},{...map,links:undefined},{...map,points:map.points.map(({xy:_,...p})=>p)},{...map,model:''}])
+    assert.throws(()=>validateVideoData({title:'E',scenes:[{...base,explainer:bad}]}),/explainer/);
+  const {places,sides}=measuredLayout(xy,{x:0,y:0,w:900,h:300});
+  assert.deepEqual([Math.min(...places.map(p=>p[0])),Math.max(...places.map(p=>p[0]))],[0,900],'x fills the plot');
+  assert.deepEqual([Math.min(...places.map(p=>p[1])),Math.max(...places.map(p=>p[1]))],[0,300],'y fills the plot');
+  assert.equal(sides[0],'left','a label with a close neighbour on its right sits on the left');
+  assert.equal(sides[1],'right');
+  assert.equal(sides[2],'right','points without a close neighbour keep their label on the right');
 });
 
 test('caption phrases preserve every word within measured sentence boundaries',()=>{

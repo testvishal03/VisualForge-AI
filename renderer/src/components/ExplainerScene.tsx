@@ -1,8 +1,8 @@
 import {AbsoluteFill, useCurrentFrame, useVideoConfig} from 'remotion';
 import type {Scene, VideoData} from '../types';
-import {after, chipRows, inside, mapLayout, noise, type Explainer} from '../explainer';
+import {after, chipRows, inside, mapLayout, measuredLayout, noise, type Explainer} from '../explainer';
 import {backgroundProgress, bridgedFrom, BRIDGE_HEADLINE_DELAY, easeInOut, easeOut, enterProgress, exitProgress, isIllustrated, sceneSeconds} from '../transitions';
-import {fitLabel} from '../labels';
+import {fitLabel, headlineFont} from '../labels';
 import {Caption} from './Caption';
 import {Glyph} from './IllustratedStory';
 
@@ -22,7 +22,7 @@ export function ExplainerScene({scene,style,previous,first,guide}:{scene:Scene;s
     <AbsoluteFill style={{background:paper,opacity:background}}/>
     <div style={{position:'absolute',top:0,left:0,right:0,height:16,background:teal,opacity:background}}/>
     <div style={{position:'absolute',top:52,left:95,fontSize:18,letterSpacing:3,fontWeight:700,color:teal,opacity:background}}>{style?.brand??'VISUALFORGE AI'}</div>
-    <h1 style={{position:'absolute',top:113,left:95,right:95,margin:0,fontSize:65,lineHeight:1.12,letterSpacing:-2.5,fontWeight:750,...move(headline)}}>{scene.headline}</h1>
+    <h1 style={{position:'absolute',top:113,left:95,right:95,margin:0,fontSize:headlineFont(scene.headline),lineHeight:1.12,letterSpacing:-2.5,fontWeight:750,...move(headline)}}>{scene.headline}</h1>
     <p style={{position:'absolute',top:212,left:98,right:98,margin:0,color:muted,fontSize:29,...move(body)}}>{scene.body}</p>
     <svg viewBox="0 0 1600 500" style={{position:'absolute',left:95,top:303,width:1730,height:540,opacity:stageIn*(1-exit)}} role="img" aria-label={`${e.kind} explainer synchronized to narration`}>
       <rect x="5" y="5" width="1590" height="485" rx="32" fill="#fff" stroke="#d7e3e0" strokeWidth="2"/>
@@ -247,14 +247,28 @@ function Tokens({e,t}:{e:Extract<Explainer,{kind:'tokens'}>;t:number}){
   </g>;
 }
 
-/** Concepts appear as they are named; ones the narration calls close gather in one region. */
+/**
+ * Concepts appear as they are named. Measured maps place them by the embedding model's own vectors
+ * and join each to its nearest neighbour with the real cosine similarity; illustrative maps gather
+ * the ones the narration calls close in one region.
+ */
 function EmbeddingMap({e,t}:{e:Extract<Explainer,{kind:'embedding_map'}>;t:number}){
   const at=e.points.map((_,i)=>e.at[`p${i}`]??i*.6);
-  const places=mapLayout(e.points.map(pt=>pt.group));
-  const groups=[...new Set(e.points.map(pt=>pt.group))].filter(g=>e.points.filter(pt=>pt.group===g).length>1);
+  const measured=Boolean(e.measured&&e.links);
+  const layout=measured?measuredLayout(e.points.map(pt=>pt.xy!)):null;
+  const places=layout?layout.places:mapLayout(e.points.map(pt=>pt.group));
+  const groups=measured?[]:[...new Set(e.points.map(pt=>pt.group))].filter(g=>e.points.filter(pt=>pt.group===g).length>1);
   return <g>
-    <text x="100" y="60" fontSize="22" fontWeight="700" letterSpacing="3" fill={teal}>MEANING AS DISTANCE · ILLUSTRATIVE MAP, NOT MEASURED</text>
+    <text x="100" y="60" fontSize="22" fontWeight="700" letterSpacing="3" fill={teal}>{measured?`MEANING AS DISTANCE · MEASURED WITH ${e.model!.toUpperCase()}`:'MEANING AS DISTANCE · ILLUSTRATIVE MAP, NOT MEASURED'}</text>
     <path d="M300 440H1300M300 440V80" stroke="#e1e9e7" strokeWidth="3"/>
+    {measured&&e.links!.map((l,k)=>{
+      const p=after(t,Math.max(at[l.a],at[l.b]),.6),[x1,y1]=places[l.a],[x2,y2]=places[l.b];
+      return <g key={`l${k}`} opacity={p}>
+        <path d={`M${x1} ${y1}L${x1+(x2-x1)*easeOut(p)} ${y1+(y2-y1)*easeOut(p)}`} stroke={teal} strokeWidth="3" strokeDasharray="8 7"/>
+        <text x={(x1+x2)/2} y={(y1+y2)/2-12} textAnchor="middle" fontSize="22" fontWeight="700" fill={muted}>{l.sim.toFixed(2)}</text>
+      </g>;
+    })}
+    {measured&&<text x="100" y="480" fontSize="20" fill={muted}>2D projection of the real vectors, stretched to fill the plot · lines join nearest neighbours, labelled with cosine similarity</text>}
     {groups.map(g=>{
       const members=e.points.map((pt,i)=>pt.group===g?i:-1).filter(i=>i>=0);
       const second=Math.min(...members.map(i=>at[i]).sort((a,b)=>a-b).slice(1));
@@ -265,7 +279,7 @@ function EmbeddingMap({e,t}:{e:Extract<Explainer,{kind:'embedding_map'}>;t:numbe
       const p=after(t,at[i],.5),[x,y]=places[i];
       return <g key={i} transform={`translate(${x} ${y}) scale(${.6+.4*pop(p)})`} opacity={Math.min(1,p*1.6)}>
         <circle r="16" fill={pt.group%2?coral:teal}/>
-        <text x="26" y="10" fontSize="30" fontWeight="800" fill={ink}>{pt.label}</text>
+        <text x={layout?.sides[i]==='left'?-26:26} y="10" textAnchor={layout?.sides[i]==='left'?'end':'start'} fontSize="30" fontWeight="800" fill={ink}>{pt.label}</text>
       </g>;
     })}
   </g>;

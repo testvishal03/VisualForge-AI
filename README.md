@@ -30,7 +30,7 @@ First-time setup (Python 3.12 environment, model downloads, `npm install`) is de
   - **Learning steps:** numbered "Feed it / Find patterns / Prompt it" cards.
   - **Limitations:** cards for wrong answers, bias and fact-checking.
   - **Tokenization:** a sentence from the narration splits into the local model's real tokens, and then their real token IDs appear.
-  - **Embedding map:** concepts appear as they are named, and those the narration calls close gather together. This map is labelled illustrative: the local chat model's embeddings matched only 3 of 5 meaning tests, so they are not shown as measurements.
+  - **Embedding map:** concepts appear as they are named. Their positions are measured with a small local embedding model (bge-small-en-v1.5, 37 MB, installed by `setup_gguf.py`): a 2D projection of the real vectors, with each concept joined to its nearest neighbour and labelled with the cosine similarity. Without that model the map falls back to an illustrative layout that groups the concepts the narration calls close, and says so on screen.
   - **Retrieval:** question, embedding, vector search, closest chunks, language model and answer light up in order, but only the stages the narration names.
 
   Title and takeaway cards keep their own design. Try `data/examples/generative-ai-explained.txt` and `data/examples/embeddings-and-rag.txt` with **Paste a script**.

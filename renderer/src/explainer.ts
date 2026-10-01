@@ -12,7 +12,7 @@ export type Explainer =
   | {kind:'caveats';cards:{key:'wrong'|'bias'|'editor'|'privacy';title:string}[];at:Record<string,number>;end:number}
   | {kind:'steps';steps:{key:'feed'|'patterns'|'prompt'|'step';title:string;detail:string}[];at:Record<string,number>;end:number}
   | {kind:'tokens';text:string;pieces:string[];ids:number[];model:string;at:{split?:number;ids?:number};end:number}
-  | {kind:'embedding_map';points:{label:string;group:number}[];at:Record<string,number>;end:number}
+  | {kind:'embedding_map';points:{label:string;group:number;xy?:[number,number]}[];links?:{a:number;b:number;sim:number}[];measured?:boolean;model?:string;at:Record<string,number>;end:number}
   | {kind:'retrieval';stages:{key:RetrievalStage;title:string}[];at:Record<string,number>;end:number};
 
 export type RetrievalStage='question'|'embedding'|'search'|'chunks'|'llm'|'answer';
@@ -45,6 +45,9 @@ export function validateExplainer(scene:Scene){
       e.pieces.join('')!==e.text||e.ids.some(id=>!Number.isInteger(id)||id<0))fail();
   }else if(e.kind==='embedding_map'){
     if(!Array.isArray(e.points)||e.points.length<4||e.points.length>8||e.points.some(pt=>!text(pt.label,24)||!Number.isInteger(pt.group)||pt.group<0||pt.group>7))fail();
+    // A measured map carries a position for every point and links between real points.
+    if(e.measured&&(!text(e.model,60)||e.points.some(pt=>!Array.isArray(pt.xy)||pt.xy.length!==2||pt.xy.some(v=>!Number.isFinite(v)||Math.abs(v)>.51))||
+      !Array.isArray(e.links)||e.links.some(l=>!Number.isInteger(l.a)||!Number.isInteger(l.b)||l.a===l.b||!e.points[l.a]||!e.points[l.b]||!Number.isFinite(l.sim)||Math.abs(l.sim)>1)))fail();
   }else if(e.kind==='retrieval'){
     if(!Array.isArray(e.stages)||e.stages.length<4||e.stages.length>6||e.stages.some(st=>!STAGE_KEYS.includes(st.key)||!text(st.title,30)))fail();
   }else fail();
@@ -80,6 +83,18 @@ export function inside(shape:string,x:number,y:number){
 export function chipRows(widths:number[],width:number,gap=10,row=96){
   let x=0,y=0;
   return widths.map(w=>{if(x>0&&x+w>width){x=0;y+=row;}const at={x,y};x+=w+gap;return at;});
+}
+
+/**
+ * Measured 2D positions stretched to fill the plot on each axis (similarities between short words
+ * are close together, so one shared scale would crowd them), plus the side each label sits on:
+ * away from a neighbour it would otherwise run into. The plot leaves room for labels on both sides.
+ */
+export function measuredLayout(xy:[number,number][],box={x:350,y:110,w:980,h:300}){
+  const lo=(k:0|1)=>Math.min(...xy.map(p=>p[k])),span=(k:0|1)=>Math.max(1e-6,Math.max(...xy.map(p=>p[k]))-lo(k));
+  const places=xy.map(([x,y])=>[box.x+(x-lo(0))/span(0)*box.w,box.y+(y-lo(1))/span(1)*box.h] as [number,number]);
+  const sides=places.map(([x,y],i)=>places.some(([x2,y2],j)=>j!==i&&x2>x&&x2-x<280&&Math.abs(y2-y)<60)?'left' as const:'right' as const);
+  return {places,sides};
 }
 
 /** Cluster centres for an illustrative map: groups spread across the plane, members around each centre. */
