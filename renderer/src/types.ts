@@ -48,6 +48,7 @@ export type Visual = {
 
 export type Scene = {
   choreography?: import('./choreography').Choreography;
+  explainer?: import('./explainer').Explainer;
   actions?: import('./visual-actions').VisualActions;
   shots?: {sentence:number;text:string;mode:'wide'|'follow'|'detail';focus:number|null;label:string|null;start:number;end:number}[];
   visualPlan?: {kind:string;title:string;view:'overview'|'detail';carry:string|null;

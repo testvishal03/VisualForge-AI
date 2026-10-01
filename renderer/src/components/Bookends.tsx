@@ -38,7 +38,9 @@ function TopicList({titles, t, start, step, colors, mark}:{titles:string[];t:num
 }
 
 /** Topics of the whole lesson: chapter titles for chapter videos, otherwise scene headlines. */
-const agendaOf = (data:VideoData) => data.style?.agenda?.length ? data.style.agenda : data.scenes.map(s => s.headline);
+// The opening scene often repeats the video title; listing it as a topic would be redundant.
+const agendaOf = (data:VideoData) => (data.style?.agenda?.length ? data.style.agenda : data.scenes.map(s => s.headline))
+  .filter(topic => topic.trim().toLowerCase() !== data.title.trim().toLowerCase());
 
 /** Opening title: brand, lesson title, and the topics this video covers. */
 export function IntroScene({data}:{data:VideoData}) {

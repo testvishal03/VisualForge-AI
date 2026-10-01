@@ -8,6 +8,7 @@ import {validateCodeExample} from './code-example.ts';
 import {validateTeaching} from './teaching-plan.ts';
 import {validateVisualPlan} from './semantic-motion.ts';
 import {validateBeatWords} from './presentation.ts';
+import {validateExplainer} from './explainer.ts';
 
 export const FPS = 30;
 export const SCENE_END_PADDING_SECONDS = 0.5;
@@ -47,6 +48,7 @@ export function validateVideoData(value: unknown): asserts value is VideoData {
     validateShots(scene);
     validateVisualActions(scene);
     validateCodeExample(scene);
+    validateExplainer(scene);
     if (Array.isArray(scene.beats))
       for (const beat of scene.beats) validateBeatWords(beat, label);
     if (!Number.isFinite(scene.duration) || scene.duration <= 0) {

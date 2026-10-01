@@ -1,0 +1,13 @@
+Generative AI is the tech that makes text, pictures, music and code out of thin air. Well, kind of. Let's break down how it actually works.
+
+Old-school AI judges. It looks at a picture and asks: is this a cat or a dog? It sorts things into boxes. Generative AI creates. Ask it to draw a cat in a hoodie, and it makes something brand new.
+
+Here's the secret: it's a next-word guesser. Give it "the cat sat on the" and it picks the most likely next piece, called a token. Then it repeats that thousands of times. That's a whole essay.
+
+How does it get so good? First, it is fed billions of texts, images and code. Next, it finds patterns by tuning millions of tiny dials called parameters. Finally, you prompt it, and it remixes those patterns into something new.
+
+Images work a little differently. Image models start with pure static noise. Then they clean it up step by step until the picture matches your prompt, like a heart.
+
+Real talk, though. It can be confidently wrong, which is called a hallucination. It also copies bias from the human data it learned from. So you're the editor: fact-check it and add your own taste.
+
+Generative AI is a super-powered autocomplete. It's a great co-pilot for your ideas, but it is not the final boss.

@@ -297,6 +297,11 @@ class EditorJobs:
                 from backend.services.code_examples import timed_example
                 demonstration = timed_example({**authored,'topic':document['topic']},scene['beats'])
                 if demonstration:scene['demonstration']=demonstration
+                # Narration that explains next-token prediction, noise-to-image, judge-vs-create
+                # or limitations gets its dedicated explainer animation.
+                from backend.services.explainers import plan as plan_explainer, timed as timed_explainer
+                explainer = None if demonstration or authored['visual'].get('worked') else plan_explainer(authored)
+                if explainer:scene['explainer']=timed_explainer(explainer,scene['beats'])
             scene['visual'] = timed_visual(document['scenes'][scene['id']-1]['visual'], scene['narration'], scene.get('beats', []))
             if scene.get('demonstration'):
                 scene['visual'] = {'kind':'example','items':[],'directed':True,'revealAt':[],'transition':'fade'}

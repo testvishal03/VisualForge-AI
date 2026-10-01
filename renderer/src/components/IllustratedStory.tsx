@@ -50,7 +50,7 @@ export function IllustratedStory({scene,style,previous,next,first,guide}:{scene:
   const lead=bridgedFrom(previous,scene,fps,guide)?BRIDGE_HEADLINE_DELAY:.12;
   const headline=enterProgress(t,lead,first),body=enterProgress(t,lead+.12,first);
   const stageIn=first||isIllustrated(previous)?1:enterProgress(t,.3,first);
-  const keepDecor=isIllustrated(next)&&next!.choreography!.layout===layout&&!next!.actions===!scene.actions;
+  const keepDecor=!!next?.choreography&&!next.explainer&&next.choreography.layout===layout&&!next.actions===!scene.actions;
   const move=(p:number)=>({opacity:p*(1-exit),transform:`translateY(${(1-p)*28-exit*18}px)`});
   const person=/\b(chat box|chatbot|typed|current question|your question)\b/i.test(scene.narration)&&layout==='sequence';
   const states=c.objects.map((_,i)=>objectState(c,i,t));

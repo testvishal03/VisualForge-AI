@@ -41,7 +41,7 @@ export const backgroundProgress = (t:number, first:boolean) => first ? 1 : easeO
 
 /** The light illustrated stage; everything else uses the dark motion stage. */
 export function isIllustrated(scene?:Scene) {
-  return !!scene?.choreography && !['intro','outro','budget'].includes(scene.choreography.layout);
+  return !!scene?.explainer || !!scene?.choreography && !['intro','outro','budget'].includes(scene.choreography.layout);
 }
 
 /** Lower-case object labels this scene hands to the next one; those stay on stage through the cut. */

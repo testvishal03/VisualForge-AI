@@ -1,5 +1,6 @@
 import {DirectedDemonstration} from './DirectedDemonstration';
 import {IllustratedStory} from './IllustratedStory';
+import {ExplainerScene} from './ExplainerScene';
 import {AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig} from 'remotion';
 import type {Scene, VideoData} from '../types';
 import {Icon} from './VisualScene';
@@ -28,6 +29,8 @@ import {SemanticDemonstration} from './SemanticDemonstration';
 const clamp={extrapolateLeft:'clamp',extrapolateRight:'clamp'} as const;
 export function MotionScene({scene,style,globalFrame,first,previous,next,guide=false}:{scene:Scene;style?:VideoData['style'];globalFrame:number;first:boolean;previous?:Scene;next?:Scene;guide?:boolean}) {
   const frame=useCurrentFrame(); const {fps}=useVideoConfig(); const t=frame/fps;
+  if(scene.explainer)
+    return <ExplainerScene scene={scene} style={style} previous={previous} next={next} first={first} guide={guide}/>;
   if(scene.choreography && !['intro','outro','budget'].includes(scene.choreography.layout))
     return <IllustratedStory scene={scene} style={style} previous={previous} next={next} first={first} guide={guide}/>;
   const {accent,base,panel,muted}=palette(style?.theme);
