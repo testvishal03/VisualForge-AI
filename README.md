@@ -18,6 +18,7 @@
   - **Limitations:** cards for wrong answers, bias and fact-checking.
 
   Title and takeaway cards keep their own design. Try `data/examples/generative-ai-explained.txt` with **Paste a script** to see all five.
+- **Notes to narration.** In **Paste a script**, paste notes or a Markdown page and click **Convert notes to narration**. The page title becomes the video title, and each `##` section becomes a scene. Bullets become sentences, numbered steps are read as "First / Next / Finally", and bare example lines are read as quoted examples, which the explainers can use. Emoji, arrows and Markdown marks are removed so the voice does not read them out. Your wording is kept, and the result stays editable before you generate. A blank line after any paragraph of 15 or more words now always starts a new scene.
 - **Faster renders.** Each render receives only the narration it uses, instead of Remotion copying the whole shared audio cache on every call, and narration synthesis uses up to four CPU threads. Both changes produce bit-identical output.
 
 ## Illustrated story scenes

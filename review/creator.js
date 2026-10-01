@@ -215,3 +215,14 @@ $('publish-copy').onclick=async()=>{
   catch{$('publish-description').select();$('publish-copied').textContent='Selected. Press Ctrl+C to copy';}
   setTimeout(()=>{$('publish-copied').textContent='';},2500);
 };
+
+/** Turn pasted notes or a Markdown page into narration in the editor, for review before generating. */
+$('studio-convert').onclick=()=>guarded(async()=>{
+  const text=$('studio-script').value;
+  if(!text.trim()){message('Paste your notes or page into the script box first.');return;}
+  const result=await api('/api/page-to-script',{text});
+  $('studio-script').value=result.script;
+  if(result.title&&!$('studio-title').value.trim())$('studio-title').value=result.title;
+  $('convert-notes').textContent=`Converted into ${result.scenes} scene${result.scenes===1?'':'s'}, ${result.words} words. ${result.notes.join(' ')}`;
+  updateCreatorInput();$('studio-script').focus();
+});

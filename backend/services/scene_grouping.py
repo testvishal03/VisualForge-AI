@@ -12,7 +12,8 @@ def group_paragraphs(paragraphs):
             if len(words(part)) > 60 or len(part) > 600:
                 raise ValueError('One sentence is too long. Split sentences to at most 60 words and 600 characters.')
             atoms.append(part)
-        boundaries[len(atoms)] = len(words(paragraph)) >= 20
+        # Any paragraph long enough to be a scene (15+ words) ends an authored section.
+        boundaries[len(atoms)] = len(words(paragraph)) >= 15
     # A blank line after a substantial paragraph is an authored teaching break.
     # Short line-by-line scripts instead accumulate into coherent spoken beats.
     n = len(atoms)

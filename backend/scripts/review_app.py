@@ -271,6 +271,13 @@ def make_server(port=8765, root=ROOT, directory=None):
                 if path == '/api/cancel':
                     jobs.cancel.set()
                     return self.json_response({'status': 'cancelling'})
+                if path == '/api/page-to-script':
+                    # Formatting conversion only; the result returns to the editor for review.
+                    from backend.services.page_script import page_to_script
+                    text = body.get('text')
+                    if not isinstance(text, str) or len(text) > 64000:
+                        raise ValueError('Paste up to 64,000 characters of notes.')
+                    return self.json_response(page_to_script(text))
                 with store.lock:
                     if jobs.busy():
                         return self.json_response({'error': 'A task is running. Wait or cancel before changing a project.'}, 409)
