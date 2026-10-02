@@ -8,12 +8,16 @@ import {ActionStage} from './ActionStage';
 import {BRIDGE_HEADLINE_DELAY,backgroundProgress,bridgedFrom,carriedLabels,easeInOut,enterProgress,exitProgress,isIllustrated,sceneSeconds} from '../transitions';
 import {idleOffset,mentionPulse,mentionTimes,sceneDrift} from '../emphasis';
 import {fitLabel,headlineFont,objectScale} from '../labels';
+import {ConceptIcon,conceptIcon,drawProgress} from './ConceptIcon';
 
 const ink='#173044', teal='#087e81', coral='#e7805e', paper='#fbfaf5';
 
 /** These illustrations are drawn locally from editable SVG shapes. Labels and
  * action times come exclusively from the validated, sentence-cited plan. */
-export function Glyph({label}:{label:string}){
+export function Glyph({label,draw=1}:{label:string;draw?:number}){
+  // A matching Lucide icon draws itself in; the hand-drawn glyphs below cover the rest.
+  const icon=conceptIcon(label);
+  if(icon)return <ConceptIcon name={icon} draw={draw}/>;
   const word=label.toLowerCase();
   const stroke={stroke:ink,strokeWidth:4,strokeLinecap:'round' as const,strokeLinejoin:'round' as const,fill:'none'};
   if(/question|prompt|chat|message/.test(word))return <g {...stroke}><path d="M-38-28h76v49h-39l-16 14V21h-21z" fill="#ddf1eb"/><path d="M-15-8h31M-15 5h20"/></g>;
@@ -111,7 +115,7 @@ export function IllustratedStory({scene,style,previous,next,first,guide}:{scene:
             {focused&&<circle cy="-23" r={radius+13} fill="none" stroke={coral} strokeWidth="3" strokeDasharray="9 7"/>}
             {pulse>0&&<circle cy="-23" r={radius+8+14*pulse} fill="none" stroke={coral} strokeWidth="3" opacity={.55*pulse}/>}
             <circle cy="-23" r={radius} fill={lit?'#fff0e7':'#e9f4f0'} stroke={lit?coral:'#a4cfca'} strokeWidth={lit?4:2.5}/>
-            <g transform="translate(0 -23)"><Glyph label={object.label}/></g>
+            <g transform="translate(0 -23)"><Glyph label={object.label} draw={carried?1:drawProgress(t,s.start)}/></g>
             {fit.lines.map((line,k)=><text key={k} x="0" y={(workspace?44:77)+k*(fit.fontSize+3)/size} textAnchor="middle" fontSize={fit.fontSize/size} fontWeight="700" fill={ink}>{line}</text>)}
             {s.removed>0&&<text x="0" y="-113" textAnchor="middle" fontSize="20" fill={coral}>OUTSIDE THIS REQUEST</text>}
           </g>

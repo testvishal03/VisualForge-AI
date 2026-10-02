@@ -9,6 +9,7 @@ import {idleOffset,mentionPulse,mentionTimes,sceneDrift} from '../src/emphasis.t
 import {fitLabel,objectScale,textWidth} from '../src/labels.ts';
 import {along,chipKind} from '../src/flow.ts';
 import {after,chipRows,inside,mapLayout,measuredLayout,noise} from '../src/explainer.ts';
+import {iconFor} from '../src/icon-match.ts';
 import {animationTiming,activeConcept,sharedConcept} from '../src/animation.ts';
 import {isContextWindow,contextCues} from '../src/context-window.ts';
 import {validateTeaching,teachingStage,type TeachingPlan} from '../src/teaching-plan.ts';
@@ -494,4 +495,16 @@ test('topic visual actions retain sentence timing and reject unsupported changes
   assert.equal(activeAction(s,4)?.verb,'split');
   assert.notDeepEqual(actionPosition('split',0,2),actionPosition('split',1,2));
   const altered=structuredClone(s);altered.actions.beats[1].start=2;assert.throws(()=>validateVisualActions(altered),/spoken sentence/);
+});
+
+test('concept icons: specific concepts get a fitting icon, vague or unknown words get none',()=>{
+  const nodes=JSON.parse(readFileSync(new URL('../node_modules/lucide-static/icon-nodes.json',import.meta.url),'utf-8'));
+  const expected:Record<string,string|null>={
+    'vector database':'database','ten million documents':'files','similarity search':'search','language model':'brain-circuit',
+    'question':'message-circle-question-mark','LLM answer':'message-square-text','cluster centers':'boxes','Metadata':'tags',
+    'build an index':'list-tree','library':'library','cat':'cat','King':'crown',
+    // Vague, verb-like or unknown labels keep the neutral glyph rather than a misleading icon.
+    'smarter trick':null,'tiny bit':null,'built':null,'brute force':null,'single':null,'meaning lines':null,'HNSW':null,'Chroma':null};
+  for(const [label,icon] of Object.entries(expected))assert.equal(iconFor(label,nodes),icon,label);
+  for(const icon of Object.values(expected))if(icon)assert.ok(nodes[icon],`${icon} exists in this Lucide version`);
 });

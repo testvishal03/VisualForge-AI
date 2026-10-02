@@ -5,6 +5,7 @@ import {actionPosition,activeAction} from '../visual-actions';
 import {easeInOut} from '../transitions';
 import {idleOffset,mentionPulse,mentionTimes} from '../emphasis';
 import {fitLabel,objectScale} from '../labels';
+import {ConceptIcon,conceptIcon,drawProgress} from './ConceptIcon';
 
 const ink='#173044',teal='#087e81',coral='#e7805e';
 const colors=['#d9efea','#ffe5d5','#e8e3f8','#faedc5','#dce9f6','#e7efd9'];
@@ -72,14 +73,17 @@ export function ActionStage({scene,previous,time,shotIndex,exit=0,keep=new Set<s
       const opacity=arrived*(1-state.removed)*(dimmed?.75:1)*(1-leaving);
       const size=(form==='split'?165:form==='window'?190:form==='mapping'?220:form==='compare'?180:205)*objectScale(n);
       const fit=fitLabel(object.label,size-30,form==='flow'?27:24,16);
+      // A matching icon sits above the label and draws itself in when the concept is spoken.
+      const icon=conceptIcon(object.label),twoLines=fit.lines.length>1,textTop=icon?(twoLines?16:42):(twoLines?14:24);
       const nodeY=y+(1-arrived)*42-state.removed*100+idleOffset(time,i,state.active)*(1-leaving);
       const scale=(focused?1.07:1)*(1+.08*pulse),lit=focused||pulse>.05;
       return <g key={`${i}-${object.label}`} transform={`translate(${oldX+(x-oldX)*blend} ${oldY+(nodeY-oldY)*blend}) scale(${scale})`} opacity={opacity}>
         {focused&&<rect x={-size/2-10} y="-65" width={size+20} height="135" rx="23" fill="none" stroke={coral} strokeWidth="3" strokeDasharray="10 7"/>}
         {pulse>0&&<rect x={-size/2-6-10*pulse} y={-61-10*pulse} width={size+12+20*pulse} height={128+20*pulse} rx="26" fill="none" stroke={coral} strokeWidth="3" opacity={.55*pulse}/>}
         <rect x={-size/2} y="-55" width={size} height="116" rx={form==='split'?12:20} fill={colors[i%colors.length]} stroke={lit?coral:teal} strokeWidth={lit?4:2.5}/>
-        <g transform={`translate(${-size/2+30} -27) scale(1.45)`}><MiniGlyph label={object.label}/></g>
-        {fit.lines.map((line,k)=><text key={k} x="0" y={fit.lines.length===1?24:14+k*(fit.fontSize+3)} textAnchor="middle" fontSize={fit.fontSize} fill={ink} fontWeight="700">{line}</text>)}
+        {icon?<g transform={`translate(0 ${twoLines?-29:-18})`}><ConceptIcon name={icon} size={twoLines?34:46} draw={carried?1:drawProgress(time,state.start)}/></g>
+          :<g transform={`translate(${-size/2+30} -27) scale(1.45)`}><MiniGlyph label={object.label}/></g>}
+        {fit.lines.map((line,k)=><text key={k} x="0" y={textTop+k*(fit.fontSize+3)} textAnchor="middle" fontSize={fit.fontSize} fill={ink} fontWeight="700">{line}</text>)}
       </g>;
     })}
     <text x="800" y="475" textAnchor="middle" fontSize="18" fill="#68818a" opacity={keepStage?1:1-exit}>Illustrative diagram; spacing and movement are not model measurements</text>
