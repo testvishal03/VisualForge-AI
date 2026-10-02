@@ -1,0 +1,22 @@
+# Local environments, caches, models and outputs are rebuilt or downloaded inside the image.
+.git
+backend/.venv
+backend/.python
+backend/.bootstrap
+backend/.cache
+backend/models/*
+!backend/models/.gitkeep
+renderer/node_modules
+renderer/public/audio
+renderer/generated
+data/editor
+data/runs
+data/headless
+data/**/scene-cache
+data/**/*.mp4
+data/**/*.wav
+data/next-token-cache
+data/embedding-cache
+output
+**/__pycache__
+.remotion

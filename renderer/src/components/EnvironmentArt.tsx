@@ -31,7 +31,7 @@ export function EnvironmentArt({mode, time, accent}: {mode:Environment; time:num
       {mode==='clouds' && Array.from({length:16},(_,i)=><circle key={i} cx={365+(i%8)*43} cy={180+Math.floor(i/8)*35} r={5+Math.sin(time+i)*2} fill="#6a9eae" opacity=".5"/>)}</g>}
     {rain && <g stroke="#9adbf7" strokeWidth="4" strokeLinecap="round">{Array.from({length:28},(_,i)=>{const y=290+(time*145+i*39)%230;return <path key={i} d={`M${325+(i%14)*30} ${y}l-8 21`} opacity={.4+(i%3)*.2}/>;})}</g>}
     {(mode==='evaporation'||mode==='clouds'||mode==='plant') && <g fill={accent}>{Array.from({length:22},(_,i)=>{const p=(time*.13+i/22)%1;return <circle key={i} cx={(mode==='plant'?490:220)+(i%7)*56+Math.sin(p*7+i)*16} cy={510-p*270} r={3+p*4} opacity={Math.sin(p*Math.PI)*.7}/>;})}</g>}
-    <g fill="#dbe9e8" fontFamily="Segoe UI, sans-serif" fontSize="20" letterSpacing="3">
+    <g fill="#dbe9e8" fontFamily="'Segoe UI', Selawik, sans-serif" fontSize="20" letterSpacing="3">
       <text x="70" y="675">{mode==='ground'?'SURFACE / BELOW GROUND':mode==='plant'?'ROOTS / STEM / LEAVES':rain?'DROPLETS / PRECIPITATION':mode==='clouds'?'COOLING / CONDENSATION':'ENERGY / EVAPORATION'}</text>
     </g>
   </svg>;

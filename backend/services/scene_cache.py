@@ -62,13 +62,13 @@ def render_cached(jobs, project, data, props, pending, profile, render):
         if intact(cache,key):reused.append(part['id']);continue
         temporary=cache/f'{key}.pending.mp4'
         render(['render','VisualForgeVideo',temporary,f'--props={props}',f"--frames={part['from']}-{part['from']+part['frames']-1}",'--muted',f'--concurrency={RENDER_CONCURRENCY}',*(['--scale=0.6666666666666666'] if profile=='draft' else [])],'render')
-        binary=root/'renderer/node_modules/@remotion/compositor-win32-x64-msvc'
-        probe=json.loads(subprocess.check_output([str(binary/'ffprobe.exe'),'-v','error','-show_streams','-of','json',str(temporary)]))
+        from backend.services.media_tools import ffmpeg as ffmpeg_tool, ffprobe
+        probe=json.loads(subprocess.check_output([str(ffprobe(root)),'-v','error','-show_streams','-of','json',str(temporary)]))
         video=next(s for s in probe['streams'] if s['codec_type']=='video')
         if int(video['nb_frames'])!=part['frames']:raise ValueError('Cached scene has the wrong number of frames')
         if video['codec_name']!='h264' or video['r_frame_rate']!='30/1' or (video['width'],video['height'])!=((1280,720) if profile=='draft' else (1920,1080)):
             raise ValueError('Cached scene has an unexpected render format')
-        execute([binary/'ffmpeg.exe','-v','error','-xerror','-i',temporary,'-c:v','rawvideo','-f','null','-'],cwd=cache,log=folder/'logs/clip-validation.log',cancel_event=jobs.cancel)
+        execute([ffmpeg_tool(root),'-v','error','-xerror','-i',temporary,'-c:v','rawvideo','-f','null','-'],cwd=cache,log=folder/'logs/clip-validation.log',cancel_event=jobs.cancel)
         temporary.replace(clip)
         write_json_atomic(cache/f'{key}.json',{'sha256':file_hash(clip),'frames':part['frames']})
         built.append(part['id'])
@@ -76,7 +76,8 @@ def render_cached(jobs, project, data, props, pending, profile, render):
     listing.write_text('\n'.join(f"file '{part['key']}.mp4'" for part in plan),encoding='utf-8')
     audio=cache/'narration.wav';assemble_audio(root,data,timeline,audio)
     jobs.state.update(phase='assemble',message='Assembling scene clips with continuous narration')
-    ffmpeg=root/'renderer/node_modules/@remotion/compositor-win32-x64-msvc/ffmpeg.exe'
+    from backend.services.media_tools import ffmpeg as ffmpeg_tool
+    ffmpeg=ffmpeg_tool(root)
     execute([ffmpeg,'-y','-v','error','-f','concat','-safe','1','-i',listing,'-i',audio,'-map','0:v:0','-map','1:a:0','-c:v','copy','-c:a','libmp3lame','-b:a','192k','-ar','48000','-t',str(timeline['durationInFrames']/30),'-movflags','+faststart',pending],cwd=cache,log=folder/'logs/assemble.log',cancel_event=jobs.cancel)
     metrics={'rendered':built,'reused':reused,'seconds':round(time.monotonic()-started,2),'segments':len(plan),'profile':profile}
     jobs.state['scene_cache']=metrics
@@ -93,6 +94,7 @@ def thumbnails(jobs,project,data,final,profile):
         at=(offset+min(math.floor(scene['duration']*30),math.floor(scene['duration']*15)))/30
         if not jobs.artifact_ready(current,current.get('previews',{}).get(uid),uid):
             output=folder/f'preview-{uid}.png'
-            execute([jobs.root/'renderer/node_modules/@remotion/compositor-win32-x64-msvc/ffmpeg.exe','-y','-v','error','-ss',str(at),'-i',final,'-frames:v','1',output],cwd=folder,log=folder/'logs/thumbnails.log',cancel_event=jobs.cancel)
+            from backend.services.media_tools import ffmpeg as ffmpeg_tool
+            execute([ffmpeg_tool(jobs.root),'-y','-v','error','-ss',str(at),'-i',final,'-frames:v','1',output],cwd=folder,log=folder/'logs/thumbnails.log',cancel_event=jobs.cancel)
             jobs.store.update_artifact(project['id'],'preview',{'key':key,'file':output.name,'sha256':file_hash(output),'profile':'draft','styled':True},uid)
         offset+=math.ceil((scene['duration']+.5)*30)

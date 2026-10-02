@@ -36,3 +36,7 @@ data/embedding-cache/
 
 # Remotion's downloaded browser, if a render is started from the project root
 .remotion/
+
+# Headless generation (backend/scripts/make_video.py)
+data/headless/
+output/

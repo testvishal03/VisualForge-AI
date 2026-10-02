@@ -10,8 +10,10 @@ import numpy as np
 import soundfile as sf
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
+from backend.services.media_tools import compositor_dir, ffmpeg, ffprobe
 RENDERER = ROOT / "renderer"
-BIN = RENDERER / "node_modules/@remotion/compositor-win32-x64-msvc"
+BIN = compositor_dir()
 
 
 def run(*args):
@@ -23,7 +25,7 @@ def run(*args):
 
 def validate(video: Path, metadata: Path | None = None, profile='final') -> dict:
     timeline = json.loads(run("node", "--experimental-strip-types", RENDERER / "scripts/timeline.ts", *([metadata] if metadata else [])))
-    probe = json.loads(run(BIN / "ffprobe.exe", "-v", "error", "-show_streams", "-show_format", "-of", "json", video))
+    probe = json.loads(run(ffprobe(), "-v", "error", "-show_streams", "-show_format", "-of", "json", video))
     picture = next(s for s in probe["streams"] if s["codec_type"] == "video")
     speech = next(s for s in probe["streams"] if s["codec_type"] == "audio")
     assert profile in {'draft','final'}, 'Unknown render profile'
@@ -32,11 +34,11 @@ def validate(video: Path, metadata: Path | None = None, profile='final') -> dict
     assert picture["r_frame_rate"] == f"{timeline['fps']}/1", "Wrong FPS"
     assert int(picture["nb_frames"]) == timeline["durationInFrames"], "Wrong frame count"
     assert abs(float(picture["duration"]) - timeline["durationInFrames"] / timeline["fps"]) < 0.00001
-    run(BIN / "ffmpeg.exe", "-v", "error", "-xerror", "-i", video, "-c:v", "rawvideo", "-c:a", "pcm_s16le", "-f", "null", "-")
+    run(ffmpeg(), "-v", "error", "-xerror", "-i", video, "-c:v", "rawvideo", "-c:a", "pcm_s16le", "-f", "null", "-")
     # Match the source WAV sample rate so comparisons cover every narrated sample.
     first = sf.info(RENDERER / "public" / timeline["scenes"][0]["scene"]["audio"])
     rate = first.samplerate
-    decoded, decoded_rate = sf.read(io.BytesIO(run(BIN / "ffmpeg.exe", "-v", "error", "-i", video, "-vn", "-ar", rate, "-ac", "1", "-c:a", "pcm_s16le", "-f", "wav", "-")), dtype="float32")
+    decoded, decoded_rate = sf.read(io.BytesIO(run(ffmpeg(), "-v", "error", "-i", video, "-vn", "-ar", rate, "-ac", "1", "-c:a", "pcm_s16le", "-f", "wav", "-")), dtype="float32")
     assert decoded_rate == rate
     # With a music bed the padding holds quiet music, never narration: the bed stays below 0.03 RMS,
     # while narration running into the padding measures about 0.1.

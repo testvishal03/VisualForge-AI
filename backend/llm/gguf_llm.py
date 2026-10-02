@@ -17,6 +17,22 @@ MODEL_FILE = 'Qwen3-4B-Instruct-2507-Q4_K_M.gguf'
 MODEL_SHA256 = '3605803b982cb64aead44f6c1b2ae36e3acdb41d8e46c8a94c6533bc4c67e597'
 
 
+def gpu_layers():
+    """Model layers to place on an NVIDIA GPU (VISUALFORGE_GPU_LAYERS, e.g. 99 for all); 0 keeps the CPU."""
+    value = os.environ.get('VISUALFORGE_GPU_LAYERS', '0')
+    if not value.isdigit():
+        raise ValueError('VISUALFORGE_GPU_LAYERS must be a whole number.')
+    return int(value)
+
+
+def runtime_env(executable):
+    """Environment for a llama.cpp server: on Linux its bundled libraries sit beside it."""
+    env = dict(os.environ)
+    if os.name != 'nt':
+        env['LD_LIBRARY_PATH'] = f"{Path(executable).parent}:{env.get('LD_LIBRARY_PATH', '')}"
+    return env
+
+
 class GGUFLLM:
     def __init__(self, *, offline=False, threads=2, on_progress=None, config=None):
         if not 1 <= threads <= 8:
@@ -58,14 +74,14 @@ class GGUFLLM:
         self.log = log_path.open('w', encoding='utf-8')
         started = time.perf_counter()
         if self.on_progress:
-            self.on_progress('Loading Qwen3 4B Q4_K_M with llama.cpp (CPU, 4096-token context)...')
+            self.on_progress(f"Loading Qwen3 4B Q4_K_M with llama.cpp ({'GPU' if gpu_layers() else 'CPU'}, 4096-token context)...")
         try:
             self.process = subprocess.Popen([
                 str(executable), '-m', str(model), '--host', '127.0.0.1', '--port', str(port),
-                '-c', '4096', '-t', str(self.threads), '-tb', str(self.threads), '-ngl', '0',
+                '-c', '4096', '-t', str(self.threads), '-tb', str(self.threads), '-ngl', str(gpu_layers()),
                 '-np', '1', '-b', '256', '-ub', '128', '--api-key', self.key,
                 '--no-webui', '--no-context-shift',
-            ], stdout=self.log, stderr=subprocess.STDOUT,
+            ], stdout=self.log, stderr=subprocess.STDOUT, env=runtime_env(executable),
                 creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
             atexit.register(self.close)
             while time.perf_counter() - started < 180:

@@ -18,7 +18,7 @@ export function ExplainerScene({scene,style,previous,first,guide}:{scene:Scene;s
   const headline=enterProgress(t,lead,first),body=enterProgress(t,lead+.12,first);
   const stageIn=first||isIllustrated(previous)?1:enterProgress(t,.3,first);
   const move=(p:number)=>({opacity:p*(1-exit),transform:`translateY(${(1-p)*28-exit*18}px)`});
-  return <AbsoluteFill style={{color:ink,fontFamily:'Segoe UI, Arial, sans-serif',overflow:'hidden'}}>
+  return <AbsoluteFill style={{color:ink,fontFamily:"'Segoe UI', Selawik, Arial, sans-serif",overflow:'hidden'}}>
     <AbsoluteFill style={{background:paper,opacity:background}}/>
     <div style={{position:'absolute',top:0,left:0,right:0,height:16,background:teal,opacity:background}}/>
     <div style={{position:'absolute',top:52,left:95,fontSize:18,letterSpacing:3,fontWeight:700,color:teal,opacity:background}}>{style?.brand??'VISUALFORGE AI'}</div>
@@ -208,7 +208,7 @@ export function LightCard({scene,style,previous,first,guide}:{scene:Scene;style?
   const takeaway=scene.visual?.kind==='takeaway';
   const title=fitLabel(scene.headline,1500,takeaway?72:86,48);
   const move=(p:number)=>({opacity:p*(1-exit),transform:`translateY(${(1-p)*30-exit*18}px)`});
-  return <AbsoluteFill style={{color:ink,fontFamily:'Segoe UI, Arial, sans-serif',overflow:'hidden'}}>
+  return <AbsoluteFill style={{color:ink,fontFamily:"'Segoe UI', Selawik, Arial, sans-serif",overflow:'hidden'}}>
     <AbsoluteFill style={{background:paper,opacity:background}}/>
     <div style={{position:'absolute',top:0,left:0,right:0,height:16,background:teal,opacity:background}}/>
     <div style={{position:'absolute',top:52,left:95,fontSize:18,letterSpacing:3,fontWeight:700,color:teal,opacity:background}}>{style?.brand??'VISUALFORGE AI'}</div>

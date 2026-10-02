@@ -31,7 +31,7 @@ export function TopicGuide({scenes, index, colors}:{scenes:Scene[];index:number;
 function TopicRail({count, index, progress, colors}:{count:number;index:number;progress:number;colors:Colors}) {
   // Beyond a dozen topics the segments would be too small to read; show one bar instead.
   const compact = count > 12;
-  return <div style={{position:'absolute', top:46, right:95, display:'flex', alignItems:'center', gap:18, fontFamily:'Segoe UI, Arial, sans-serif'}}>
+  return <div style={{position:'absolute', top:46, right:95, display:'flex', alignItems:'center', gap:18, fontFamily:"'Segoe UI', Selawik, Arial, sans-serif"}}>
     <span style={{fontSize:17, letterSpacing:3, fontWeight:700, color:colors.accent}}>TOPIC {index + 1} / {count}</span>
     {compact
       ? <div style={{width:260, height:8, borderRadius:4, background:colors.line}}><div style={{width:`${(index + progress)/count*100}%`, height:'100%', borderRadius:4, background:colors.accent}}/></div>
@@ -53,7 +53,7 @@ function CardBody({scene, colors, fontSize}:{scene:Scene;colors:Colors;fontSize?
 }
 
 const cardStyle = (colors:Colors) => ({position:'absolute' as const, width:CARD.width, height:CARD.height, padding:'0 26px', boxSizing:'border-box' as const, borderRadius:16,
-  background:colors.card, border:`2px solid ${colors.accent}55`, boxShadow:'0 14px 34px #0b1d2a26', fontFamily:'Segoe UI, Arial, sans-serif'});
+  background:colors.card, border:`2px solid ${colors.accent}55`, boxShadow:'0 14px 34px #0b1d2a26', fontFamily:"'Segoe UI', Selawik, Arial, sans-serif"});
 
 function UpNext({scene, colors, enter}:{scene:Scene;colors:Colors;enter:number}) {
   return <div style={{...cardStyle(colors), right:CARD.right, bottom:CARD.bottom, opacity:enter, transform:`translateX(${(1 - enter)*60}px)`}}>

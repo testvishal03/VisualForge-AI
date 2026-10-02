@@ -77,6 +77,9 @@ class PipelineTests(unittest.TestCase):
     def test_real_generated_artifacts(self):
         generated = json.loads((PROJECT_ROOT / "data/video.generated.json").read_text())
         self.assertEqual(len(generated["scenes"]), len(self.source["scenes"]))
+        # The narration WAVs are a local, git-ignored cache; a fresh checkout has to generate them first.
+        if not all((PROJECT_ROOT / "renderer/public" / scene["audio"]).is_file() for scene in generated["scenes"]):
+            self.skipTest("demo narration not generated here; run backend/scripts/generate_audio.py")
         for source, scene in zip(self.source["scenes"], generated["scenes"]):
             self.assertEqual(scene["narration"], source["narration"])
             duration = audio_duration(PROJECT_ROOT / "renderer/public" / scene["audio"])
