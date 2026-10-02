@@ -40,6 +40,24 @@ def score(scene):
     return label_score(scene, scene['visual'])
 
 
+def verb_inside(label, narration):
+    """True when the grammar parse of the narration shows a verb inside the spoken label
+    ("database returns a chunk", "meaning lines" in "the meaning lines up"). False without spaCy."""
+    from backend.services.key_terms import DOMAIN_NOUNS, parser
+    nlp = parser()
+    if nlp is None:
+        return False
+    words = label.casefold().replace('’', "'").split()
+    doc = nlp(narration.replace('’', "'"))
+    tokens = [t for t in doc if not t.is_punct]
+    for start in range(len(tokens) - len(words) + 1):
+        span = tokens[start:start + len(words)]
+        if all(t.lower_ == w or t.lower_.rstrip('s') == w.rstrip('s') for t, w in zip(span, words)):
+            # A participle modifying a noun ("annual paid time off") is part of the phrase, not a verb.
+            return any(t.pos_ in ('VERB', 'AUX') and t.dep_ not in ('amod', 'compound') and t.lower_ not in DOMAIN_NOUNS for t in span)
+    return False
+
+
 def label_score(scene, visual):
     """How weak the labels a visual would show are, for any kind of visual (lower is better)."""
     from backend.services.choreography import compile_scene
@@ -50,7 +68,7 @@ def label_score(scene, visual):
     options = [o for part in sentences(scene['narration']) for o in concept_options(part)]
     missed = [o for o in dict.fromkeys(options) if strong_option(o) and o.casefold() not in used
               and not any(o.casefold() in u or u in o.casefold() for u in used)]
-    bad = sum(weak_label(l) for l in labels)
+    bad = sum(weak_label(l) or verb_inside(l, scene['narration']) for l in labels)
     # One weak label is already visible on screen, so each counts in full, not as a share.
     value = (min(3, bad) * .5 if labels else 1.0) + min(2, len(missed)) * .25
     return round(value, 3)

@@ -147,6 +147,8 @@ class HeadlineTests(unittest.TestCase):
             'Imagine you have 100,000 documents.': 'Imagine you have 100,000 documents',
             'Printed books work without batteries and can be shared in person.': 'Printed books work without batteries',
             'Think of it like finding a book in a library.': 'Finding a book in a library',
+            'This is exactly what a vector database is built for.': 'What a vector database is built for',
+            'This is a vector database.': 'This is a vector database',
             'So vector databases use a smarter trick called Approximate Nearest Neighbor search, or ANN.': 'Vector databases use a smarter trick',
         }
         for sentence, expected in cases.items():

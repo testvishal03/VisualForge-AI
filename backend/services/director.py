@@ -24,7 +24,9 @@ def short(text, limit=70):
 
 # Openers that add nothing to a headline: discourse fillers and step words.
 HEADLINE_LEAD_IN = re.compile(r"^(?:(?:so|but|and|now|then|also|of course|in simple terms|in other words|think of (?:it|this|that) (?:like|as)|think of|first|second|third|next|"
-                              r"finally|lastly|here's the (?:secret|idea|key)|remember that)\b[,:]?\s*)+", re.I)
+                              r"finally|lastly|here's the (?:secret|idea|key)|remember that|"
+                              # "This is exactly what a vector database is built for" -> "What a vector database is built for".
+                              r"(?:this|that|it)(?:'s| is) (?:exactly |precisely |just )?(?=(?:what|why|how|where|when)\b))\b[,:]?\s*)+", re.I)
 # A headline never ends on these: articles, prepositions, conjunctions, auxiliaries and loose modifiers.
 DANGLING_END = set("""a an the and or but nor so yet of to in on at by for from with into onto over under about as than
 that this these those which who whom whose what when where why how if is are was were be been being am do does did has have

@@ -1,6 +1,7 @@
 import json
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -27,9 +28,13 @@ class WeakLabelTests(unittest.TestCase):
         drawn = row('Now a user asks a question. The question is converted into an embedding. The vector database searches '
                     'for the closest chunks. Those chunks are retrieved and given to the language model, which writes the answer.')
         document = {'scenes': [fine, weak, title, drawn]}
-        self.assertGreater(score(weak), score(fine))
-        self.assertEqual(score(title), 0)
-        chosen = weak_scenes(document, 5)
+        # The rule labels each scene would show, fixed so this tests the ranking, not the parser.
+        shown = {weak['narration']: ['vector databases', 'smarter trick', 'tiny bit'], fine['narration']: ['vector database', 'similar vectors']}
+        objects = lambda scene, visual: {'objects': [{'label': l} for l in shown.get(scene['narration'], ['lesson'])]}
+        with patch('backend.services.choreography.compile_scene', objects):
+            self.assertGreater(score(weak), score(fine))
+            self.assertEqual(score(title), 0)
+            chosen = weak_scenes(document, 5)
         self.assertEqual(chosen[0], 2)
         self.assertNotIn(3, chosen)
         self.assertNotIn(4, chosen, 'a scene drawn by an explainer keeps its explainer')
@@ -37,6 +42,11 @@ class WeakLabelTests(unittest.TestCase):
 
 
 class LimitedPlanningTests(unittest.TestCase):
+    def setUp(self):
+        # Load the grammar parser outside the timed budgets below.
+        from backend.services.key_terms import parser
+        parser()
+
     def video(self, count):
         scenes = [Scene(id=n, headline=f'Topic {n}', body='Short body.', narration=f'The search index groups similar vectors for topic {n}. '
                         f'Each cluster center summarises nearby vectors in group {n}.') for n in range(1, count + 1)]
@@ -106,8 +116,9 @@ class LongVideoMergeTests(unittest.TestCase):
         from backend.services.editor_store import EditorStore, document_from_video
         from backend.services.director import build_direction, script_to_video
         paragraphs = [f'Topic {n} explains how a search index groups vectors so lookups stay fast for every query in group {n}.' for n in range(18)]
-        paragraphs[5] = ('So vector databases use a smarter trick called Approximate Nearest Neighbor search, or ANN. Instead of checking '
-                         'everything, ANN checks only the most promising areas. It trades a tiny bit of accuracy for massive speed.')
+        # A paragraph whose rule labels are weak under either label extractor ("recap", vague "ones").
+        paragraphs[5] = ("Let's recap what we built. The simplest ones work, the bigger ones scale, and the tiny ones stay cheap "
+                         'whenever you choose between them for a new project.')
         video = script_to_video('Indexes', '\n\n'.join(paragraphs))
         with tempfile.TemporaryDirectory() as d:
             store = EditorStore(Path(d) / 'projects')
@@ -120,7 +131,7 @@ class LongVideoMergeTests(unittest.TestCase):
                 weak = weak_scenes(project['document'], 7)
                 def stage(script, args, **kwargs):
                     output = Path(args[1])
-                    scenes = [dict(s['visual'], id=n, icon='rocket', planned=True) for n, s in enumerate(before, 1)]
+                    scenes = [dict(s['visual'], id=n, icon='battery', planned=True) for n, s in enumerate(before, 1)]
                     # The model planned every selected scene except the last, which failed.
                     output.write_text(json.dumps({'scenes': scenes, 'warnings': [], 'model_planned': weak[:-1]}), encoding='utf-8')
                 with patch('backend.services.editor_jobs.python_stage', side_effect=stage):
@@ -132,9 +143,9 @@ class LongVideoMergeTests(unittest.TestCase):
         for n, (old, new) in enumerate(zip(before, after), 1):
             self.assertTrue(new['visual']['planned'])
             if n in weak[:-1]:
-                self.assertEqual(new['visual']['icon'], 'rocket')
+                self.assertEqual(new['visual']['icon'], 'battery')
             else:
-                self.assertNotEqual(new['visual'].get('icon'), 'rocket')
+                self.assertNotEqual(new['visual'].get('icon'), 'battery')
                 self.assertEqual({k: v for k, v in new['visual'].items() if k != 'planned'}, {k: v for k, v in old['visual'].items() if k != 'planned'})
 
 

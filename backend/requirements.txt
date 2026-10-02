@@ -7,6 +7,9 @@ transformers==4.57.6
 huggingface-hub==0.36.2
 hf-xet==1.6.0
 pydantic==2.12.5
+# Grammar for scene labels (MIT): real noun phrases instead of word-shape guesses.
+spacy==3.8.16
+en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
 # CPU wheel only. This extra index is the official PyTorch wheel repository.
 --extra-index-url https://download.pytorch.org/whl/cpu
 torch==2.9.1+cpu
