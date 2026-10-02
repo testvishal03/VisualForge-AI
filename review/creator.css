@@ -46,3 +46,5 @@ body:not(.simple-mode) #creator-progress,body:not(.simple-mode) #creator-player-
 
 .convert-row{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:10px}.convert-row .helper{flex:1;min-width:220px;font-size:12px;line-height:1.5;margin:0}
 .script-check{margin-top:14px;border:1px solid #d6e8df;border-radius:12px;padding:14px 16px;background:#f7fbf9;font-size:13px;line-height:1.5}.script-check h3{font-size:13px;margin:0 0 8px;color:var(--ink)}.script-check ul{list-style:none;padding:0;margin:0}.script-check li{padding:7px 0 7px 12px;border-left:3px solid #9fc9b6;margin:6px 0}.script-check li.error{border-color:#c4473a;background:#fff3f0}.script-check li.warning{border-color:#c59338}.script-check li q{display:block;color:var(--muted);font-size:12px;margin-top:2px;overflow-wrap:anywhere}.script-check .check-scene{font-weight:700;margin-right:6px}.script-check .check-good{color:#297b55;margin:0}.script-check .check-highlights{margin-top:10px;color:var(--muted)}
+.script-check .check-fix{margin:8px 8px 0 0;padding:5px 10px;font-size:12px;border-radius:8px}
+.script-check .check-estimate{margin:0 0 8px;color:var(--muted)}

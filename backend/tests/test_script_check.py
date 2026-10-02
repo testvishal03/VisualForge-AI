@@ -36,6 +36,22 @@ class ScriptCheckTests(unittest.TestCase):
                          'Slashes', '"#1"', '"$5"'):
             self.assertIn(expected, found)
 
+    def test_mechanical_problems_carry_a_fix_and_judgement_calls_do_not(self):
+        script = CLEAN + '\n\n' + 'Chroma vs. Pinecone costs $5 for 10M vectors, see https://example.com for details. It is a 50/50 call.'
+        fixes = {i['excerpt']: i.get('fix') for i in check(script)['issues'] if i['level'] == 'warning'}
+        self.assertEqual(fixes['vs.']['replace'], 'versus')
+        self.assertEqual(fixes['$5']['replace'], '5 dollars')
+        self.assertEqual(fixes['10M']['replace'], '10 million')
+        self.assertIn('vs.', fixes['vs.']['sentence'])
+        self.assertIsNone(fixes['https://example.com'])
+        self.assertIsNone(fixes['50/50'])
+
+    def test_no_fixes_are_offered_for_converted_notes(self):
+        notes = '# Stores\n\n- Chroma vs. Pinecone is a common choice for teams building search.\n- Both store embeddings and metadata for fast similarity search.\n- Pick the one that fits your hosting and scaling needs today.'
+        report = check(notes)
+        self.assertTrue(report['converted'])
+        self.assertFalse(any('fix' in i for i in report['issues']))
+
     def test_symbols_the_voice_reads_correctly_are_not_flagged(self):
         script = CLEAN + '\n\n' + 'Accuracy rose by 42% in 2026. Find the user where id = 42 & the score is 3.14 for C++ code.'
         self.assertEqual(messages(check(script), 'warning'), [])
@@ -64,7 +80,7 @@ class ScriptCheckTests(unittest.TestCase):
                       for n in range(MODEL_PLANNING_LIMIT + 4)]
         report = check('\n\n'.join(paragraphs))
         if report['scenes'] > MODEL_PLANNING_LIMIT:
-            self.assertTrue(any('rule-based visuals' in m for m in messages(report, 'info')))
+            self.assertTrue(any('weakest' in m for m in messages(report, 'info')))
 
     def test_markdown_is_checked_after_conversion(self):
         report = check('# Embeddings\n\n- Embeddings turn meaning into numbers.\n- Similar ideas sit close together in space.\n'

@@ -101,7 +101,7 @@ def make_server(port=8765, root=ROOT, directory=None):
                 return self.json_response({'error': 'Local origin required'}, 403)
             path = urlsplit(self.path).path
             try:
-                if path in {'/', '/app.js', '/storyboard.js', '/style.css', '/creator.js', '/creator.css', '/progress.js', '/episode-review.js'}:
+                if path in {'/', '/app.js', '/storyboard.js', '/style.css', '/creator.js', '/creator.css', '/progress.js', '/script-fixes.js', '/episode-review.js'}:
                     return self.file_response(root/'review' / ('index.html' if path=='/' else path[1:]))
                 if path == '/api/config':
                     from backend.llm.gguf_llm import model_status
