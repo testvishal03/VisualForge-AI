@@ -177,7 +177,17 @@ def decide(data, scene, index):
         raise
 
 
-def plan_video(video, *, engine, cache: Path, instructions=""):
+def plan_video(video, *, engine, cache: Path, instructions="", only=None, budget_seconds=None):
+    """Model-planned visuals per scene. `only` limits planning to those 1-based scene numbers, planned
+    in the order given; `budget_seconds` stops starting new scenes or retries once spent (a started
+    attempt still finishes). Every other scene keeps its narration-based direction, exactly as an
+    unplanned long video would. `model_planned` lists the scenes the model actually planned.
+    """
+    import time
+    deadline = time.monotonic() + budget_seconds if budget_seconds else None
+    # A budgeted run spreads its time over more scenes: a scene rejected twice rarely passes a third time
+    # (scene 9 of a real 25-scene script failed all three, using half of a five-minute budget).
+    attempts = 2 if only is not None else 3
     # Constrain element count during decoding, not just after the response.
     # Small local models otherwise often emit one node for a multi-node diagram.
     base = VisualDecision.model_json_schema()
@@ -194,25 +204,15 @@ def plan_video(video, *, engine, cache: Path, instructions=""):
             'concepts':{'type':'array','items':{'$ref':'#/$defs/Concept'},'minItems':0,'maxItems':MAX_CONCEPTS if kind in CONCEPT_KINDS else 0}},
          'required':['kind','elements','icon','layout','treatment','concepts'],'additionalProperties':False}
         for kind,(lo,hi) in limits.items()]}
-    rows, warnings = [], []
-    for index, scene in enumerate(video.scenes):
-        extracted = direct_scene(scene, index, len(video.scenes))
-        from backend.services.topic_visuals import topic_visual
-        if extracted['kind'] == 'chart' or topic_visual(scene):
-            # Numeric data comes only from the existing literal percentage parser.
-            rows.append(improve_visual(scene, {'id': scene.id, **extracted, 'planned': True}, rows))
-            continue
-        from backend.services.explainers import plan as plan_explainer
-        if plan_explainer({'narration': scene.narration, 'visual': {'kind': extracted['kind']}}):
-            # An explainer animation draws this scene, so a model plan would be discarded:
-            # keep the narration-based direction and skip about a minute of CPU inference.
-            row = improve_visual(scene, {'id': scene.id, **extracted, 'planned': True}, rows)
-            from backend.services.choreography import compile_scene
-            demonstration = compile_scene(scene.model_dump(), row)
-            if demonstration:row['choreography']=demonstration
-            rows.append(row)
-            print(f"Visual scene {scene.id}: explainer animation; model planning skipped", flush=True)
-            continue
+    def rule_row(index, scene, extracted, rows):
+        row = improve_visual(scene, {'id': scene.id, **extracted, 'planned': True}, rows)
+        from backend.services.choreography import compile_scene
+        demonstration = compile_scene(scene.model_dump(), row)
+        if demonstration:row['choreography']=demonstration
+        return row
+
+    def model_row(index, scene, rows):
+        """The model's plan for one scene given the scenes before it, or None if every attempt failed."""
         parts = sentences(scene.narration)
         # Let the model select source phrases rather than generate paraphrases
         # and repeatedly fail exact-grounding checks on a small CPU model.
@@ -254,8 +254,10 @@ For explanation and example scenes, also list concepts: the 2-5 things a learner
                 pass
         retry = prompt
         if row is None:
-            for attempt in range(3):
-                print(f'Visual scene {scene.id}/{len(video.scenes)}: attempt {attempt+1}/3', flush=True)
+            for attempt in range(attempts):
+                if attempt and deadline is not None and time.monotonic() >= deadline:
+                    break
+                print(f'Visual scene {scene.id}/{len(video.scenes)}: attempt {attempt+1}/{attempts}', flush=True)
                 raw = engine.generate_json(retry, schema=schema, max_new_tokens=650) if hasattr(engine, 'generate_json') else engine.generate(retry, max_new_tokens=650)
                 cache.mkdir(parents=True, exist_ok=True)
                 (cache/f'{key}-attempt-{attempt+1}.txt').write_text(raw, encoding='utf-8')
@@ -268,14 +270,64 @@ For explanation and example scenes, also list concepts: the 2-5 things a learner
                     print(f'Visual decision rejected: {str(exc)[:350]}', flush=True)
                     retry = prompt + '\nCorrect this invalid decision: ' + raw[:2000] + '\nValidation error: ' + str(exc)[:500]
         if row is None:
-            row = {'id': scene.id, **direct_scene(scene, index, len(video.scenes)), 'planned': True}
             warnings.append({'scene': scene.id, 'message': 'AI visual plan failed validation; used narration-based fallback.'})
             print(f'Visual scene {scene.id}: AI plan failed validation; using narration-based fallback.', flush=True)
+            return None
         row = improve_visual(scene, row, rows)
         from backend.services.choreography import compile_scene
         demonstration = compile_scene(scene.model_dump(), row)
         if demonstration:row['choreography']=demonstration
-        rows.append(row)
         print(f"Visual scene {scene.id}: {row['kind']} — {', '.join(row['items'])}", flush=True)
-    return {'scenes': rows, 'warnings': warnings,
+        return row
+
+    rows, warnings, by_model, drawn = [], [], [], set()
+    for index, scene in enumerate(video.scenes):
+        extracted = direct_scene(scene, index, len(video.scenes))
+        from backend.services.topic_visuals import topic_visual
+        if extracted['kind'] == 'chart' or topic_visual(scene):
+            # Numeric data comes only from the existing literal percentage parser.
+            rows.append(improve_visual(scene, {'id': scene.id, **extracted, 'planned': True}, rows))
+            drawn.add(index)
+            continue
+        from backend.services.explainers import plan as plan_explainer
+        if plan_explainer({'narration': scene.narration, 'visual': {'kind': extracted['kind']}}):
+            # An explainer animation draws this scene, so a model plan would be discarded:
+            # keep the narration-based direction and skip about a minute of CPU inference.
+            row = improve_visual(scene, {'id': scene.id, **extracted, 'planned': True}, rows)
+            from backend.services.choreography import compile_scene
+            demonstration = compile_scene(scene.model_dump(), row)
+            if demonstration:row['choreography']=demonstration
+            rows.append(row)
+            drawn.add(index)
+            print(f"Visual scene {scene.id}: explainer animation; model planning skipped", flush=True)
+            continue
+        if only is not None or deadline is not None and time.monotonic() >= deadline:
+            rows.append(rule_row(index, scene, extracted, rows))
+            if only is None:
+                print(f"Visual scene {scene.id}: planning time used up; narration-based direction kept", flush=True)
+            continue
+        planned = model_row(index, scene, rows)
+        rows.append(planned or rule_row(index, scene, direct_scene(scene, index, len(video.scenes)), rows))
+        if planned:
+            by_model.append(index + 1)
+    if only is not None:
+        # Selected scenes are planned in the order given (worst first), so a budget that runs out
+        # leaves the least important ones on their rule-based visuals; each sees the scenes before it.
+        for number in only:
+            index = number - 1
+            if not 0 <= index < len(rows) or index in drawn:
+                continue
+            if deadline is not None and time.monotonic() >= deadline:
+                print(f"Visual planning time used up before scene {number}; narration-based direction kept", flush=True)
+                break
+            planned = model_row(index, video.scenes[index], rows[:index])
+            # The AI's plan replaces the rule-based one only when its labels are measurably clearer.
+            from backend.services.visual_quality import label_score
+            scene = video.scenes[index].model_dump()
+            if planned and label_score(scene, planned) < label_score(scene, rows[index]):
+                rows[index] = planned
+                by_model.append(number)
+            elif planned:
+                print(f"Visual scene {number}: AI plan was not clearer; rule-based visual kept", flush=True)
+    return {'scenes': rows, 'warnings': warnings, 'model_planned': sorted(by_model),
             'notice': 'AI-selected diagrams use labels copied from narration. Review meaning and factual accuracy before publishing.'}

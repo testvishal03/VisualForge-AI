@@ -146,28 +146,46 @@ class EditorJobs:
             if action == 'draft':
                 return
         if action == 'generate':
-            # Both prompt-generated and pasted scripts pass through the semantic visual planner.
-            # Long scripts (>16 scenes) use extractive evidence-based direction to avoid 50+ min CPU delays.
-            from backend.services.script_check import MODEL_PLANNING_LIMIT
-            if len(project['document']['scenes']) > MODEL_PLANNING_LIMIT:
+            # Both prompt-generated and pasted scripts pass through the semantic visual planner. Long
+            # scripts would need ~40 s per scene, so only their weakest rule-directed scenes are
+            # planned, within a fixed time budget; the rest keep their narration-based visuals.
+            from backend.services.script_check import LONG_VIDEO_PLANNING_SECONDS, MODEL_PLANNING_LIMIT, SECONDS_PER_PLANNED_SCENE
+            scenes = project['document']['scenes']
+            if not all(s['visual'].get('planned') for s in scenes):
+                long = len(scenes) > MODEL_PLANNING_LIMIT
+                only = None
+                if long:
+                    from backend.services.visual_quality import weak_scenes
+                    only = weak_scenes(project['document'], LONG_VIDEO_PLANNING_SECONDS // SECONDS_PER_PLANNED_SCENE)
+                plan = None
+                if not long or only:
+                    video = validate_document(project['document'])
+                    source = folder/'visual-source.json'
+                    output = folder/'visual-plan.json'
+                    write_json_atomic(source, video.model_dump())
+                    args = [source, output, *(['--only', ','.join(map(str, only)), '--budget', str(LONG_VIDEO_PLANNING_SECONDS)] if long else [])]
+                    if long:
+                        self.state['message'] = f'AI planning the {len(only)} weakest of {len(scenes)} scenes (about {LONG_VIDEO_PLANNING_SECONDS // 60} minutes)'
+                    try:
+                        py('visual-direction', 'plan_visuals.py', args)
+                        plan = json.loads(output.read_text(encoding='utf-8'))
+                    except (RuntimeError, OSError, ValueError) as exc:
+                        if not long:
+                            raise
+                        # A long video never depended on the model; it keeps its rule-based visuals.
+                        self.state['message'] = f'AI planning was skipped ({str(exc)[:160]}); narration-based visuals are used.'
                 revised = copy.deepcopy(project['document'])
-                for s in revised['scenes']:
-                    s['visual']['planned'] = True
-                if revised != project['document']:
-                    project = self.store.save(project['id'], project['revision'], revised)
-            elif not all(s['visual'].get('planned') for s in project['document']['scenes']):
-                video = validate_document(project['document'])
-                source = folder/'visual-source.json'
-                output = folder/'visual-plan.json'
-                write_json_atomic(source, video.model_dump())
-                py('visual-direction', 'plan_visuals.py', [source, output])
-                plan = json.loads(output.read_text(encoding='utf-8'))
-                revised = copy.deepcopy(project['document'])
-                for row, visual in zip(revised['scenes'], plan['scenes']):
+                for number, row in enumerate(revised['scenes'], 1):
+                    # Long videos take only the scenes the model actually planned; a scene it failed on keeps its visual.
+                    visual = plan['scenes'][number-1] if plan and (only is None or number in plan.get('model_planned', [])) else None
+                    if visual is None:
+                        row['visual']['planned'] = True
+                        continue
                     authored={key:row['visual'][key] for key in ('demo','worked') if key in row['visual']}
                     row['visual'] = {k:v for k,v in visual.items() if k != 'id'}
                     row['visual'].update(authored)
-                project = self.store.save(project['id'], project['revision'], revised)
+                if revised != project['document']:
+                    project = self.store.save(project['id'], project['revision'], revised)
             if project.get('source',{}).get('review_first'):
                 self.state['result_kind'] = 'storyboard'
                 self.state['message'] = 'Storyboard ready for review. Inspect scenes and animations, then approve before exporting.'
