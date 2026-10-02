@@ -33,6 +33,6 @@ export function objectState(c:Choreography,index:number,t:number){
   const remove=c.steps.find(s=>s.action==='remove'&&s.targets.includes(index)&&s.start<=t);
   const focus=c.steps.filter(s=>s.action==='focus'&&s.start<=t).at(-1);
   const at=c.objects[index]?.at??reveal?.start??0;
-  return {visible:!!reveal&&t>=at, entrance:reveal?cueProgress(t,at,reveal.end):0,
+  return {start:at, visible:!!reveal&&t>=at, entrance:reveal?cueProgress(t,at,reveal.end):0,
     removed:remove?cueProgress(t,remove.start,remove.end):0,active:!!focus?.targets.includes(index)};
 }
