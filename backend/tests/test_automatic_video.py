@@ -53,7 +53,12 @@ class AutomaticJobTests(unittest.TestCase):
         self.store.update_artifact(p['id'],'draft_render',{'key':self.jobs.output_key(planned,profile='draft'),'file':'draft.mp4','sha256':file_hash(output),'profile':'draft','styled':True})
         with patch('backend.services.editor_jobs.python_stage') as stage:
             self.jobs._perform(self.store.load(p['id']),'generate',None,'',folder)
-            stage.assert_not_called()
+            # Long scripts plan only their weakest scenes, within a time budget. This stage writes
+            # no plan, so the video keeps its rule-based visuals and still reuses its export.
+            self.assertEqual(stage.call_count, 1)
+            args = stage.call_args[0][1]
+            self.assertIn('--only', args)
+            self.assertIn('--budget', args)
         saved=self.store.load(p['id'])
         self.assertTrue(all(s['visual'].get('planned') for s in saved['document']['scenes']))
         self.assertTrue(self.jobs.artifact_ready(saved,saved['draft_render']))

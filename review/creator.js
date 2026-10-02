@@ -32,6 +32,10 @@ function renderScriptCheck(r){
   const counts=['error','warning'].map(l=>r.issues.filter(i=>i.level===l).length);
   const minutes=r.minutes>=1?`about ${r.minutes} min`:`about ${Math.round(r.minutes*60)} s`;
   box.append(element('h3',`Script check · ${r.scenes||0} scene${r.scenes===1?'':'s'} · ${minutes} of narration`));
+  if(r.estimate){
+    const e=r.estimate,m=Math.max(1,Math.round(e.seconds/60)),p=e.parts,mins=s=>s<90?`${Math.round(s)} s`:`${Math.round(s/60)} min`;
+    box.append(element('p',`Generating takes about ${m} min on this computer (visual planning ${mins(p.planning)}, voice ${mins(p.voice)}, rendering ${mins(p.render)}). Edits later re-render only the scenes that change.`,'check-estimate'));
+  }
   if(!r.issues.length)box.append(element('p','No problems found. Every word will be narrated as written.','check-good'));
   const list=element('ul');
   for(const issue of r.issues){
@@ -39,11 +43,29 @@ function renderScriptCheck(r){
     if(issue.scene)li.append(element('span',`Scene ${issue.scene}`,'check-scene'));
     li.append(document.createTextNode(issue.message));
     if(issue.excerpt)li.append(element('q',issue.excerpt));
+    if(issue.fix){
+      const button=element('button',issue.fix.replace?`Apply: “${issue.fix.replace}”`:'Remove it','secondary check-fix');
+      button.type='button';button.onclick=()=>applyScriptFixes([issue.fix]);
+      li.append(button);
+    }
     list.append(li);
   }
   if(r.issues.length)box.append(list);
+  const fixes=r.issues.filter(i=>i.fix).map(i=>i.fix);
+  if(fixes.length>1){
+    const all=element('button',`Apply all ${fixes.length} fixes`,'secondary check-fix');
+    all.type='button';all.onclick=()=>applyScriptFixes(fixes);
+    box.append(all);
+  }
   if(r.highlights?.length)box.append(element('p','Animations: '+r.highlights.map(h=>`scene ${h.scene} ${h.label.toLowerCase()} (${h.note})`).join(' · '),'check-highlights'));
   if(counts[0])box.append(element('p',`Fix the ${counts[0]===1?'error':'errors'} above before preparing.`,'helper'));
+}
+/** Apply checker fixes to the script box, then check again. */
+function applyScriptFixes(fixes){
+  const box=$('studio-script'),result=applyFixes(box.value,fixes);
+  if(!result.applied)message('The script changed since it was checked. The check will refresh.');
+  else box.value=result.text;
+  updateCreatorInput();
 }
 function newCreator(){
   if(state.busy||state.pending)return;
