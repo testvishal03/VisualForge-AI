@@ -32,12 +32,14 @@ def review(result):
         style=chapter.get('review_style',{});first=(plans[0].get('choreography') or {}).get('layout') if plans else None
         last=(plans[-1].get('choreography') or {}).get('layout') if plans else None
         if style.get('showIntro') and first!='intro':offset+=3
+        recent_forms=[]
         for i,s in enumerate(doc.get('scenes',[])):
             plan=plans[i] if i<len(plans) else {};choreo=plan.get('choreography');audio=chapter.get('audio',{}).get(s['uid'])
             duration=audio['duration'] if audio else len(s['narration'].split())/135*60
             frames=math.ceil((duration+.5)*30)
             from backend.services.visual_actions import plan as planned_actions
-            actions=planned_actions(s)
+            actions=planned_actions(s,recent_forms)
+            if actions:recent_forms.append(actions['form'])
             form=(actions or {}).get('form') or (choreo or {}).get('layout') or plan.get('kind') or s['visual']['kind']
             run=run+1 if form==previous else 1;previous=form
             warnings=[q['message'] for q in chapter.get('quality',{}).get('issues',[]) if q.get('scene')==i+1]

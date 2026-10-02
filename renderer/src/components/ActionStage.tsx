@@ -48,6 +48,9 @@ export function ActionStage({scene,previous,time,shotIndex,exit=0,keep=new Set<s
     {form==='mapping'&&<g><rect x="170" y="92" width="520" height="318" rx="25" fill="#ecf4f8"/><rect x="910" y="92" width="520" height="318" rx="25" fill="#f0eefa"/><path d="M705 245H885" stroke={coral} strokeWidth="6" strokeDasharray="13 10" strokeLinecap="round"/></g>}
     {form==='compare'&&<g><rect x="65" y="45" width="715" height="385" rx="28" fill="#e9f4f0"/><rect x="820" y="45" width="715" height="385" rx="28" fill="#fff0e7"/><path d="M800 65V420" stroke="#c5d7d5" strokeWidth="4" strokeDasharray="12 10"/></g>}
     {form==='window'&&<g><rect x="65" y="48" width="1470" height="385" rx="28" fill="#ecf7f3" stroke={teal} strokeWidth="4"/><rect x="66" y="48" width="1468" height="72" rx="28" fill="#d2eae3"/><text x="105" y="95" fontSize="25" fill={teal} fontWeight="700">INFORMATION AVAILABLE IN THIS REQUEST</text><rect x="130" y="380" width="1340" height="17" rx="8" fill="#d0e1dc"/><rect x="130" y="380" width={1340*visible.filter(Boolean).length/Math.max(1,n)} height="17" rx="8" fill={teal}/></g>}
+    {form==='grid'&&<g><rect x="200" y="30" width="1200" height="410" rx="36" fill="#f2f7fb"/>{[0,1].map(c=><rect key={c} x={c?820:240} y="48" width="540" height="374" rx="28" fill="none" stroke="#d6e5ee" strokeWidth="3" strokeDasharray="10 9"/>)}</g>}
+    {form==='stack'&&<g>{choreography.objects.map((_,i)=>{const [,y]=position(i);return <rect key={i} x="470" y={y-62} width="660" height="128" rx="22" fill={i%2?'#f4f1fb':'#eef7f4'}/>;})}<path d={`M420 ${position(0)[1]}V${position(n-1)[1]}`} stroke={teal} strokeWidth="5" strokeLinecap="round" strokeDasharray="2 14"/></g>}
+    {form==='focus'&&<g><circle cx="450" cy="245" r="185" fill="#eef7f4"/><circle cx="450" cy="245" r="185" fill="none" stroke="#bfe0d8" strokeWidth="3" strokeDasharray="12 10"/>{choreography.objects.slice(1).map((_,k)=>{const [x,y]=position(k+1);return <path key={k} d={`M560 245C780 245 820 ${y} ${x-110} ${y}`} fill="none" stroke="#b7d8d1" strokeWidth="4" opacity={visible[k+1]?1:.25}/>;})}</g>}
     {form==='network'&&<g>{choreography.objects.map((_,i)=>{const [x,y]=position(i);return <path key={i} d={`M800 245L${x} ${y}`} stroke="#b7d8d1" strokeWidth="4"/>;})}<circle cx="800" cy="245" r="53" fill="#d9efea" stroke={teal} strokeWidth="4"/></g>}
     </g>
     <g opacity={1-exit}>
@@ -71,7 +74,7 @@ export function ActionStage({scene,previous,time,shotIndex,exit=0,keep=new Set<s
       const focused=shot?.mode!=='wide'&&shot?.focus===i;
       const dimmed=shot?.mode==='detail'&&shot.focus!==null&&!focused;
       const opacity=arrived*(1-state.removed)*(dimmed?.75:1)*(1-leaving);
-      const size=(form==='split'?165:form==='window'?190:form==='mapping'?220:form==='compare'?180:205)*objectScale(n);
+      const size=(form==='split'?165:form==='window'?190:form==='mapping'?220:form==='compare'?180:form==='focus'&&i===0?300:form==='stack'?260:205)*objectScale(n);
       const fit=fitLabel(object.label,size-30,form==='flow'?27:24,16);
       // A matching icon sits above the label and draws itself in when the concept is spoken.
       const icon=conceptIcon(object.label),twoLines=fit.lines.length>1,textTop=icon?(twoLines?16:42):(twoLines?14:24);

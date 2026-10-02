@@ -34,4 +34,33 @@ class VisualActionTests(unittest.TestCase):
         self.assertEqual(result['beats'][-1]['verb'],'evict')
 
 
+class LayoutVarietyTests(unittest.TestCase):
+    def scene(self, narration, kind='explanation'):
+        return {'narration': narration, 'headline': 'Search', 'body': narration.split('.')[0] + '.', 'visual': {'kind': kind, 'items': []}}
+
+    def test_layouts_follow_meaning(self):
+        from backend.services.visual_actions import form_for
+        cases = {
+            'Every tool is described with three parts: a name, a description, and parameters. The name identifies the tool.': 'split',
+            'A model can use tools such as a calculator, a search engine, and a calendar. The model picks the right tool.': 'grid',
+        }
+        three = {'layout': 'sequence', 'objects': [{'label': x, 'sentence': 0} for x in ('a', 'b', 'c')]}
+        for narration, expected in cases.items():
+            self.assertEqual(form_for(self.scene(narration), three), expected, narration)
+        # "such as" without a list is not a list of examples.
+        self.assertNotEqual(form_for(self.scene('Start with input text, such as a question. A tokenizer converts it.'), three), 'grid')
+
+    def test_neighbouring_scenes_do_not_repeat_a_neutral_layout(self):
+        from collections import Counter
+        narrations = [f'The {w} database stores records for the {w} team. The {w} index finds results for every {w} query.'
+                      for w in ('first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth')]
+        recent = []
+        for narration in narrations:
+            result = plan(self.scene(narration), recent)
+            recent.append(result['form'])
+        self.assertTrue(all(a != b for a, b in zip(recent, recent[1:])), recent)
+        self.assertGreaterEqual(len(set(recent)), 4, recent)
+        self.assertLessEqual(max(Counter(recent).values()), 3, recent)
+
+
 if __name__=='__main__':unittest.main()
