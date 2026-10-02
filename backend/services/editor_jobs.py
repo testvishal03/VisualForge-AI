@@ -302,6 +302,7 @@ class EditorJobs:
             return
         from backend.services.visual_storytelling import plan_document as visual_plan, timed_plan as timed_visual_plan
         directions = visual_plan(document)['scenes']
+        recent_forms = []  # diagram layouts already used, so neighbouring scenes look different
         for scene in data['scenes']:
             if scene.get('beats'):
                 scene['visualPlan'] = timed_visual_plan(directions[scene['id']-1], scene['beats'])
@@ -314,8 +315,10 @@ class EditorJobs:
                     shots=timed_shots(authored,scene['beats'])
                     if shots:scene['shots']=shots
                     from backend.services.visual_actions import timed as timed_actions
-                    actions=timed_actions(authored,scene['beats'])
-                    if actions:scene['actions']=actions
+                    actions=timed_actions(authored,scene['beats'],recent_forms)
+                    if actions:
+                        scene['actions']=actions
+                        recent_forms.append(actions['form'])
                 scene['teaching'] = timed_plan({**scene,'visual':authored['visual'],'topic':document['topic']}, scene['beats'])
                 from backend.services.code_examples import timed_example
                 demonstration = timed_example({**authored,'topic':document['topic']},scene['beats'])
