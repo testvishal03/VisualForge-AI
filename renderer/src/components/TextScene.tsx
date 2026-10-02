@@ -18,7 +18,7 @@ export const TextScene = ({headline, body}: TextSceneProps) => {
   return (
     <AbsoluteFill style={{
       background: '#0b1120', color: '#f4f7fc',
-      fontFamily: 'Segoe UI, Arial, sans-serif',
+      fontFamily: "'Segoe UI', Selawik, Arial, sans-serif",
       alignItems: 'center', justifyContent: 'center', padding: '120px 180px',
     }}>
       <div style={{width: '100%', maxWidth: 1480, textAlign: 'center'}}>

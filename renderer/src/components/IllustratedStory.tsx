@@ -62,7 +62,7 @@ export function IllustratedStory({scene,style,previous,next,first,guide}:{scene:
   const camera=cameraAt(scene,t),drift=sceneDrift(t,scene.duration);
   const currentShot=scene.shots?.[camera.index];
   const size=objectScale(n),labelWidth=n<=2?340:n===3?300:n===4?250:210;
-  return <AbsoluteFill style={{color:ink,fontFamily:'Segoe UI, Arial, sans-serif',overflow:'hidden'}}>
+  return <AbsoluteFill style={{color:ink,fontFamily:"'Segoe UI', Selawik, Arial, sans-serif",overflow:'hidden'}}>
     <AbsoluteFill style={{background:paper,opacity:background}}/>
     <div style={{position:'absolute',top:0,left:0,right:0,height:16,background:teal,opacity:background}}/>
     <div style={{position:'absolute',top:52,left:95,right:95,display:'flex',justifyContent:'space-between',fontSize:18,letterSpacing:3,fontWeight:700,color:teal,opacity:background}}><span>{style?.brand??'VISUALFORGE AI'}</span>{!guide&&<span>EXPLAINED VISUALLY</span>}</div>

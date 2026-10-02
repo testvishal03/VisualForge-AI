@@ -6,7 +6,7 @@ import {fitLabel} from '../labels';
 import {Glyph} from './IllustratedStory';
 import {Icon} from './VisualScene';
 
-const font = 'Segoe UI, Arial, sans-serif';
+const font = "'Segoe UI', Selawik, Arial, sans-serif";
 const coral = '#e7805e';
 
 /**

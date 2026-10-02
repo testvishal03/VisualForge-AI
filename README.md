@@ -13,6 +13,20 @@ Open **http://127.0.0.1:8765/**, click **New video**, then either describe an id
 
 First-time setup (Python 3.12 environment, model downloads, `npm install`) is described under *Windows setup* below.
 
+## Make videos on a server or a free GPU
+
+The whole pipeline also runs headless on Linux, so a server can make the videos instead of your laptop. One command turns a script into `video.mp4`, `thumbnail.png`, `description.txt` and a `report.json`:
+
+```
+backend/.venv/bin/python backend/scripts/make_video.py --script lesson.txt --out output/ [--music] [--voice af_heart] [--quality final]
+```
+
+- **Free Kaggle GPU (recommended):** open `server/kaggle_visualforge.ipynb` on [kaggle.com](https://www.kaggle.com/code) (New Notebook, then File, Import Notebook), set *Accelerator* to **GPU T4 x2** and *Internet* on, paste your script and choose *Run All*. The language model runs on the GPU, so every scene gets AI-planned visuals. Free accounts get about 30 GPU hours a week. If the CUDA build cannot start on the GPU, the notebook falls back to the CPU build.
+- **Any Linux x64 machine:** `bash server/install_linux.sh` (add `--cuda` for an NVIDIA GPU) installs the system libraries, Node.js, Python 3.12 packages, the renderer and the models.
+- **Docker:** `docker build -f server/Dockerfile -t visualforge .`, then `docker run --rm -v "$PWD/output:/app/output" -v "$PWD/lesson.txt:/app/lesson.txt:ro" visualforge --script lesson.txt --out output/`.
+
+Settings for a GPU server: `VISUALFORGE_GPU_LAYERS=99` puts the language model on the GPU, and `VISUALFORGE_PLANNING_LIMIT=999` lets the AI plan every scene of long scripts (the laptop default plans only the weakest scenes of scripts over 16 scenes). Text renders with Segoe UI on Windows and with the bundled, metric-compatible [Selawik](https://github.com/microsoft/Selawik) font (SIL OFL) on Linux, so layouts are the same on both. Rendering speed depends on CPU cores, not the GPU.
+
 ## Word-synced narration, transitions and publishing
 
 - **Word-level sync.** Kokoro's own phoneme durations give every spoken word a start and end time; no extra model is used. Captions highlight the spoken word, and diagram objects, arrows and motion start on the word that names them (0.15 s early). Sentences whose words cannot be matched exactly are marked `estimated` rather than guessed.

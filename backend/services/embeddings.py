@@ -53,6 +53,7 @@ class EmbeddingModel:
             return json.load(response)
 
     def _load(self):
+        from backend.llm.gguf_llm import runtime_env
         if self.process is not None and self.process.poll() is None:
             return
         if not self.server.is_file() or not installed():
@@ -68,7 +69,8 @@ class EmbeddingModel:
             str(self.server), '-m', str(MODEL_PATH), '--host', '127.0.0.1', '--port', str(port),
             '--embeddings', '--pooling', 'cls', '-c', '512', '-t', str(self.threads), '-ngl', '0',
             '--api-key', self.key, '--no-webui',
-        ], stdout=self.log, stderr=subprocess.STDOUT, creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
+        ], stdout=self.log, stderr=subprocess.STDOUT, env=runtime_env(self.server),
+            creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
         started = time.perf_counter()
         while time.perf_counter() - started < 60:
             if self.process.poll() is not None:

@@ -60,7 +60,7 @@ export function MotionScene({scene,style,globalFrame,first,previous,next,guide=f
   // Only the content transitions; the background stays solid so the previous scene's text never shows through.
   const exit=exitProgress(t,sceneSeconds(scene,fps));
   const content={...transition,opacity:(transition.opacity??1)*(1-exit)};
-  return <AbsoluteFill style={{color:'#f4f3e9',fontFamily:'Segoe UI, Arial, sans-serif',overflow:'hidden'}}>
+  return <AbsoluteFill style={{color:'#f4f3e9',fontFamily:"'Segoe UI', Selawik, Arial, sans-serif",overflow:'hidden'}}>
     <AbsoluteFill style={{background:base,opacity:backgroundProgress(t,first)}}/>
     <AbsoluteFill style={content}>
     <AbsoluteFill style={{background:`radial-gradient(ellipse at ${68}% 38%, ${accent}19, transparent 65%)`}}/>

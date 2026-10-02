@@ -6,6 +6,7 @@ the narration voice's own phonemizer: each listed hazard was confirmed by phonem
 acronyms are checked inside their sentence, since the voice spells "ANN" mid-sentence but reads
 "or ANN." at the end of a sentence as the word "an".
 """
+import os
 import re
 
 from backend.schemas.video_schema import words
@@ -13,7 +14,7 @@ from backend.services.director import sentences
 
 WORDS_PER_MINUTE = 140  # measured: 701 narrated words made 5:05 of video, including pauses
 # Videos with more scenes than this use rule-based visuals; model planning would take ~40 s per scene.
-MODEL_PLANNING_LIMIT = 16
+MODEL_PLANNING_LIMIT = int(os.environ.get('VISUALFORGE_PLANNING_LIMIT', '16'))  # a GPU server can plan every scene
 # Longer videos get AI planning only for their weakest scenes, within this budget.
 LONG_VIDEO_PLANNING_SECONDS = 300
 SECONDS_PER_PLANNED_SCENE = 40  # measured: ~37 s per scene on a 4-core laptop

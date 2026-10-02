@@ -14,7 +14,7 @@ function look(scene:Scene|undefined, theme?:string, light=false):Look {
 }
 
 const MAX_TOPICS = 5;
-const font = 'Segoe UI, Arial, sans-serif';
+const font = "'Segoe UI', Selawik, Arial, sans-serif";
 
 /** A list of lesson topics, each entering in turn. `mark` draws a number or a check. */
 function TopicList({titles, t, start, step, colors, mark}:{titles:string[];t:number;start:number;step:number;colors:Look;mark:'number'|'check'}) {

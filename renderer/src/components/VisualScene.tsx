@@ -47,7 +47,7 @@ export const VisualScene = ({scene, total, title, style}: {scene: Scene; total: 
   const rich = ['cycle','timeline','components','water_cycle','process','relationship','chart'].includes(kind) && scene.visual!.variant!==undefined;
   const isDiagram = rich || kind === 'process' || kind === 'comparison' || kind === 'relationship';
   const beat = scene.beats?.find(b => frame/fps >= b.start && frame/fps < b.end);
-  return <AbsoluteFill style={{background, color: ink, fontFamily: 'Segoe UI, Arial, sans-serif', padding: '62px 100px'}}>
+  return <AbsoluteFill style={{background, color: ink, fontFamily: "'Segoe UI', Selawik, Arial, sans-serif", padding: '62px 100px'}}>
     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: muted, fontSize: 22, letterSpacing: 2}}>
       <span style={{color: accent, fontWeight: 700}}>{style?.brand??'VISUALFORGE / LEARN'}</span>
       <span style={{maxWidth: 1100, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis'}}>{title}</span>

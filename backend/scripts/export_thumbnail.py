@@ -32,7 +32,7 @@ def main():
     thumbnail_path = project_folder / 'thumbnail.jpg'
 
     ffmpeg_paths_to_try = [
-        ROOT / 'renderer' / 'node_modules' / '@remotion' / 'compositor-win32-x64-msvc' / 'ffmpeg.exe',
+        __import__('backend.services.media_tools', fromlist=['ffmpeg']).ffmpeg(),
         'ffmpeg'
     ]
 

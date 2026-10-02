@@ -151,7 +151,8 @@ Return id={index + 1}, headline (under 8 words), body (8–12 word on-screen cap
 
 
 def join(manifest_path):
-    from backend.scripts.validate_render import validate, BIN
+    from backend.scripts.validate_render import validate
+    from backend.services.media_tools import ffmpeg
     request = json.loads(manifest_path.read_text(encoding='utf-8'))
     output = Path(request['output'])
     folder = output.parent
@@ -192,7 +193,7 @@ def join(manifest_path):
             scheduled = math.ceil((scene['duration'] + .5) * 30) * 800
             writer.writeframes(b'\0\0' * (scheduled - samples))
         if closing:writer.writeframes(b'\0\0'*(5*24000))
-    subprocess.run([str(BIN / 'ffmpeg.exe'), '-y', '-v', 'error', '-f', 'concat', '-safe', '0', '-i', str(listing),
+    subprocess.run([str(ffmpeg()), '-y', '-v', 'error', '-f', 'concat', '-safe', '0', '-i', str(listing),
                     '-i', str(wav), '-map', '0:v:0', '-map', '1:a:0', '-c:v', 'copy', '-c:a', 'libmp3lame',
                     '-b:a', '192k', '-ar', '48000', '-movflags', '+faststart', str(output)], check=True)
     report = validate(output, combined, profile)
