@@ -7,10 +7,30 @@ from backend.services.scene_grouping import group_paragraphs
 from backend.services.script_generator import write_json_atomic
 
 
-def create(store, title, text, source):
+def attach_canvases(document, specs):
+    """Validated scene visuals onto their scenes; a scene with its own visual skips AI planning."""
+    from backend.services.canvas import CanvasError, validate
+    from backend.services.director import sentences
+    for number, (scene, spec) in enumerate(zip(document['scenes'], specs), 1):
+        if spec is None:
+            continue
+        try:
+            scene['visual']['canvas'] = validate(spec, sentences(scene['narration']))
+        except CanvasError as exc:
+            raise ValueError(f'Scene {number} visual: {exc}') from exc
+        scene['visual']['planned'] = True
+    return document
+
+
+def create(store, title, text, source, specs=None):
     paragraphs = [re.sub(r'\s+', ' ', p).strip() for p in re.split(r'\n\s*\n', text) if p.strip()]
     chunks = group_paragraphs(paragraphs)
     source = {**source, 'minutes':len(words(text))/135, 'minimum_seconds':0}
+    if specs:
+        if len(specs) != len(paragraphs):
+            raise ValueError('Each visual block must follow a narration paragraph.')
+        video = script_to_video(title, text, keep_paragraphs=True)
+        return store.create(video.topic, attach_canvases(document_from_video(video, build_direction(video)), specs), source=source)
     if len(chunks) <= 100:
         video = script_to_video(title, text)
         return store.create(video.topic, document_from_video(video, build_direction(video)), source=source)

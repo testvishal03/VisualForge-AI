@@ -1,0 +1,196 @@
+Tool calling lets an AI model use outside tools, like a calculator, a database, or a weather service. Without tools, a model can only write text. With tools, a model can fetch live data and take real actions.
+
+```visual
+{"elements": [
+ {"type": "text", "x": 960, "y": 250, "text": "TOOL CALLING", "size": "title", "at": 0},
+ {"type": "text", "x": 960, "y": 360, "text": "How AI models use outside tools", "size": "h2", "color": "yellow", "at": 0, "delay": 0.3},
+ {"id": "model", "type": "box", "x": 960, "y": 620, "w": 360, "h": 150, "text": "AI MODEL", "color": "yellow", "at": 1},
+ {"id": "calc", "type": "box", "x": 360, "y": 820, "w": 330, "text": "Calculator", "icon": "calculator", "color": "cyan", "at": 2},
+ {"id": "db", "type": "box", "x": 960, "y": 860, "w": 330, "text": "Database", "icon": "database", "color": "cyan", "at": 2, "delay": 0.2},
+ {"id": "wx", "type": "box", "x": 1560, "y": 820, "w": 330, "text": "Weather", "icon": "weather", "color": "cyan", "at": 2, "delay": 0.4},
+ {"type": "arrow", "from": "model", "to": "calc", "color": "cyan", "at": 2, "delay": 0.1},
+ {"type": "arrow", "from": "model", "to": "wx", "color": "cyan", "at": 2, "delay": 0.5}
+]}
+```
+
+A language model only knows its training data. Ask "What is the weather in Tokyo right now?" and the model cannot know. A correct answer depends on live data the model does not have.
+
+```visual
+{"elements": [
+ {"id": "model", "type": "box", "x": 960, "y": 330, "w": 380, "h": 150, "text": "AI MODEL", "sub": "Training data only", "color": "yellow", "at": 0},
+ {"type": "bubble", "x": 170, "y": 520, "w": 760, "text": "\"What is the weather in Tokyo right now?\"", "color": "cyan", "at": 1},
+ {"type": "arrow", "from": [940, 580], "to": "model", "color": "cyan", "at": 1, "delay": 0.4},
+ {"type": "stamp", "x": 1450, "y": 560, "text": "UNKNOWN", "color": "red", "at": 1, "delay": 0.9},
+ {"type": "pill", "x": 960, "y": 820, "text": "Needs live data", "color": "pink", "at": 2}
+]}
+```
+
+Think of the model as a smart manager and the tools as a team of specialists. The manager does not do every job alone. Instead, the manager decides which specialist to call and what to ask them.
+
+```visual
+{"elements": [
+ {"id": "boss", "type": "box", "x": 960, "y": 300, "w": 420, "h": 160, "text": "Manager", "sub": "the AI model", "icon": "manager", "color": "yellow", "at": 0},
+ {"id": "a", "type": "box", "x": 420, "y": 720, "w": 340, "text": "Math specialist", "icon": "calculator", "color": "line", "at": 0, "delay": 0.4},
+ {"id": "b", "type": "box", "x": 960, "y": 720, "w": 340, "text": "Search specialist", "icon": "search", "color": "line", "at": 0, "delay": 0.6},
+ {"id": "c", "type": "box", "x": 1500, "y": 720, "w": 340, "text": "Calendar specialist", "icon": "calendar", "color": "line", "at": 0, "delay": 0.8},
+ {"type": "cross", "x": 1270, "y": 300, "at": 1, "delay": 0.3},
+ {"type": "text", "x": 1430, "y": 300, "text": "not every job", "size": "small", "color": "muted", "at": 1, "delay": 0.4},
+ {"type": "arrow", "from": "boss", "to": "b", "color": "yellow", "label": "which one?", "at": 2},
+ {"type": "box", "x": 960, "y": 720, "w": 340, "text": "Search specialist", "icon": "search", "color": "cyan", "fill": "tint", "at": 2, "delay": 0.5}
+]}
+```
+
+Every tool is described to the model with three parts: a name, a description, and parameters. For example, a tool named "get weather" has the description "Returns the current weather for a city". Its only parameter is "city".
+
+```visual
+{"elements": [
+ {"type": "headline", "text": "A tool description", "at": 0},
+ {"type": "box", "x": 960, "y": 450, "w": 1280, "h": 110, "text": "name: get weather", "color": "cyan", "fill": "tint", "at": 1},
+ {"type": "box", "x": 960, "y": 590, "w": 1280, "h": 110, "text": "description: Returns the current weather for a city", "color": "yellow", "fill": "tint", "at": 1, "delay": 0.8},
+ {"type": "box", "x": 960, "y": 730, "w": 1280, "h": 110, "text": "parameters: city", "color": "pink", "fill": "tint", "at": 2},
+ {"type": "pill", "x": 400, "y": 320, "text": "1  Name", "color": "cyan", "at": 0, "delay": 0.4},
+ {"type": "pill", "x": 960, "y": 320, "text": "2  Description", "color": "yellow", "at": 0, "delay": 0.6},
+ {"type": "pill", "x": 1520, "y": 320, "text": "3  Parameters", "color": "pink", "at": 0, "delay": 0.8}
+]}
+```
+
+The model never runs the tool itself. However, the model writes a structured request that names the tool and its inputs. Your application reads that request and runs the real code.
+
+```visual
+{"elements": [
+ {"id": "model", "type": "box", "x": 330, "y": 420, "w": 360, "h": 150, "text": "AI Model", "color": "yellow", "at": 0},
+ {"type": "cross", "x": 330, "y": 560, "at": 0, "delay": 0.5},
+ {"type": "text", "x": 330, "y": 630, "text": "never runs tools", "size": "small", "color": "muted", "at": 0, "delay": 0.6},
+ {"id": "req", "type": "bubble", "x": 620, "y": 340, "w": 680, "mono": true, "text": "{\"tool\": \"get_weather\", \"city\": \"Tokyo\"}", "color": "yellow", "at": 1},
+ {"type": "arrow", "from": "model", "to": [610, 400], "color": "yellow", "at": 1},
+ {"id": "app", "type": "box", "x": 1590, "y": 420, "w": 380, "h": 150, "text": "Your application", "icon": "application", "color": "cyan", "at": 2},
+ {"type": "arrow", "from": [1310, 400], "to": "app", "color": "cyan", "at": 2, "delay": 0.2},
+ {"type": "box", "x": 1590, "y": 720, "w": 380, "h": 130, "text": "Runs the code", "icon": "code", "color": "green", "at": 2, "delay": 0.7},
+ {"type": "arrow", "from": [1590, 500], "to": [1590, 650], "color": "green", "at": 2, "delay": 0.6}
+]}
+```
+
+Here is how a tool call works. First, the application sends the question and the list of tools to the model. Next, the model replies with a tool call, like "get weather" with the city "Tokyo". Finally, the application runs the tool and sends the result back to the model.
+
+```visual
+{"elements": [
+ {"type": "headline", "text": "One tool call, step by step", "at": 0},
+ {"id": "app", "type": "box", "x": 340, "y": 560, "w": 360, "h": 170, "text": "Application", "icon": "application", "color": "cyan", "at": 1},
+ {"id": "model", "type": "box", "x": 960, "y": 560, "w": 360, "h": 170, "text": "AI Model", "icon": "model", "color": "yellow", "at": 1, "delay": 0.2},
+ {"id": "tool", "type": "box", "x": 1580, "y": 560, "w": 360, "h": 170, "text": "Weather tool", "icon": "weather", "color": "green", "at": 3},
+ {"type": "arrow", "from": "app", "to": "model", "color": "cyan", "curve": -90, "at": 1, "delay": 0.4},
+ {"type": "mover", "from": "app", "to": "model", "text": "question + tools", "color": "cyan", "at": 1, "delay": 0.6, "dur": 1.4, "out": {"at": 2}},
+ {"type": "arrow", "from": "model", "to": "app", "color": "yellow", "curve": -90, "at": 2},
+ {"type": "mover", "from": "model", "to": "app", "text": "get weather: Tokyo", "color": "yellow", "at": 2, "delay": 0.3, "dur": 1.4, "out": {"at": 3}},
+ {"type": "arrow", "from": "app", "to": "tool", "color": "green", "curve": 360, "at": 3, "delay": 0.3},
+ {"type": "mover", "from": "tool", "to": "model", "text": "22 degrees, sunny", "color": "green", "at": 3, "delay": 1.2, "dur": 1.4},
+ {"type": "pill", "x": 340, "y": 330, "text": "1", "color": "cyan", "at": 1},
+ {"type": "pill", "x": 960, "y": 330, "text": "2", "color": "yellow", "at": 2},
+ {"type": "pill", "x": 1580, "y": 330, "text": "3", "color": "green", "at": 3}
+]}
+```
+
+The model then reads the tool result, for example "22 degrees and sunny". It turns that raw result into a friendly reply. The user sees "It is 22 degrees and sunny in Tokyo right now."
+
+```visual
+{"elements": [
+ {"type": "bubble", "x": 170, "y": 300, "w": 620, "mono": true, "text": "{\"temp\": 22, \"sky\": \"sunny\"}", "color": "green", "at": 0},
+ {"type": "text", "x": 480, "y": 260, "text": "raw tool result", "size": "small", "color": "muted", "at": 0},
+ {"id": "model", "type": "box", "x": 960, "y": 560, "w": 340, "h": 140, "text": "AI Model", "color": "yellow", "at": 1},
+ {"type": "arrow", "from": [480, 420], "to": "model", "color": "green", "at": 1},
+ {"type": "bubble", "x": 1090, "y": 700, "w": 680, "text": "\"It is 22 degrees and sunny in Tokyo right now.\"", "color": "cyan", "at": 2},
+ {"type": "arrow", "from": "model", "to": [1300, 690], "color": "cyan", "at": 2},
+ {"type": "icon", "x": 1700, "y": 560, "name": "weather", "size": 120, "color": "yellow", "at": 2, "delay": 0.6}
+]}
+```
+
+A model can have many tools available, such as a calculator, a search engine, and a calendar. The model picks a tool based on the question. For example, "What is 18% of 2500?" leads to a calculator call.
+
+```visual
+{"elements": [
+ {"id": "model", "type": "box", "x": 960, "y": 300, "w": 340, "h": 140, "text": "AI Model", "color": "yellow", "at": 0},
+ {"id": "calc", "type": "box", "x": 440, "y": 560, "w": 340, "text": "Calculator", "icon": "calculator", "color": "line", "at": 0, "delay": 0.4},
+ {"id": "search", "type": "box", "x": 960, "y": 600, "w": 340, "text": "Search engine", "icon": "search", "color": "line", "at": 0, "delay": 0.6},
+ {"id": "cal", "type": "box", "x": 1480, "y": 560, "w": 340, "text": "Calendar", "icon": "calendar", "color": "line", "at": 0, "delay": 0.8},
+ {"type": "bubble", "x": 1180, "y": 210, "w": 560, "text": "\"What is 18% of 2500?\"", "color": "cyan", "at": 2},
+ {"type": "arrow", "from": "model", "to": "calc", "color": "green", "at": 2, "delay": 0.6},
+ {"type": "box", "x": 440, "y": 560, "w": 340, "text": "Calculator", "icon": "calculator", "color": "green", "fill": "tint", "at": 2, "delay": 0.9},
+ {"type": "pill", "x": 440, "y": 790, "text": "= 450", "color": "green", "at": 2, "delay": 1.4}
+]}
+```
+
+Good tool choices depend on clear tool descriptions. In contrast, a vague description like "handles data" leads to wrong or missed tool calls. Clear names and parameter descriptions help the model choose correctly.
+
+```visual
+{"elements": [
+ {"type": "box", "x": 500, "y": 420, "w": 640, "h": 200, "text": "get weather", "sub": "Returns the current weather for a city", "color": "green", "at": 0},
+ {"type": "text", "x": 960, "y": 420, "text": "versus", "size": "body", "color": "muted", "at": 1},
+ {"type": "box", "x": 1420, "y": 420, "w": 640, "h": 200, "text": "tool 1", "sub": "handles data", "color": "red", "at": 1, "delay": 0.2},
+ {"type": "check", "x": 500, "y": 600, "at": 2},
+ {"type": "cross", "x": 1420, "y": 600, "at": 1, "delay": 0.8},
+ {"type": "pill", "x": 1420, "y": 720, "text": "Wrong or missed calls", "color": "red", "at": 1, "delay": 1.0},
+ {"type": "pill", "x": 500, "y": 720, "text": "Right tool, every time", "color": "green", "at": 2, "delay": 0.3}
+]}
+```
+
+Some questions need more than one tool call. For example, "Book a meeting with Sara tomorrow" might need a calendar lookup and then a booking call. Each tool result guides the model's next step.
+
+```visual
+{"elements": [
+ {"type": "bubble", "x": 560, "y": 220, "w": 800, "text": "\"Book a meeting with Sara tomorrow\"", "color": "cyan", "at": 1},
+ {"id": "look", "type": "box", "x": 520, "y": 590, "w": 420, "h": 150, "text": "Calendar lookup", "icon": "calendar", "color": "cyan", "at": 1, "delay": 0.8},
+ {"id": "book", "type": "box", "x": 1400, "y": 590, "w": 420, "h": 150, "text": "Booking call", "icon": "meeting", "color": "pink", "at": 1, "delay": 1.4},
+ {"type": "arrow", "from": "look", "to": "book", "color": "muted", "label": "free at 3 pm", "at": 2},
+ {"type": "pill", "x": 520, "y": 420, "text": "Call 1", "color": "cyan", "at": 1, "delay": 0.8},
+ {"type": "pill", "x": 1400, "y": 420, "text": "Call 2", "color": "pink", "at": 1, "delay": 1.4},
+ {"type": "check", "x": 1650, "y": 590, "at": 2, "delay": 0.8}
+]}
+```
+
+Tools can take real actions, like sending an email or deleting a file. Risky actions should depend on user approval before they run. Careful tool design leads to safer and more trustworthy AI applications.
+
+```visual
+{"elements": [
+ {"id": "agent", "type": "box", "x": 960, "y": 240, "w": 340, "h": 130, "text": "AI Model", "color": "yellow", "at": 0},
+ {"id": "mail", "type": "box", "x": 560, "y": 720, "w": 380, "text": "Send email", "icon": "email", "color": "red", "at": 0, "delay": 0.4},
+ {"id": "del", "type": "box", "x": 1360, "y": 720, "w": 380, "text": "Delete file", "icon": "file", "color": "red", "at": 0, "delay": 0.7},
+ {"id": "gate", "type": "box", "x": 960, "y": 480, "w": 640, "h": 110, "text": "User approval required", "icon": "approval", "color": "yellow", "fill": "tint", "at": 1},
+ {"type": "arrow", "from": "agent", "to": "gate", "color": "yellow", "at": 1, "delay": 0.3},
+ {"type": "arrow", "from": "gate", "to": "mail", "color": "yellow", "at": 1, "delay": 0.6},
+ {"type": "arrow", "from": "gate", "to": "del", "color": "yellow", "at": 1, "delay": 0.6},
+ {"type": "pill", "x": 960, "y": 880, "text": "Safer, more trustworthy apps", "color": "green", "at": 2}
+]}
+```
+
+Tool calling is the foundation of AI agents. An agent repeats tool calls in a loop until the task is finished. That loop turns a simple chatbot into an assistant that gets real work done.
+
+```visual
+{"elements": [
+ {"type": "headline", "text": "From tool calls to agents", "at": 0},
+ {"id": "think", "type": "box", "x": 960, "y": 380, "w": 300, "h": 120, "text": "Think", "color": "yellow", "at": 1},
+ {"id": "call", "type": "box", "x": 1320, "y": 680, "w": 300, "h": 120, "text": "Call tool", "color": "cyan", "at": 1, "delay": 0.3},
+ {"id": "read", "type": "box", "x": 600, "y": 680, "w": 300, "h": 120, "text": "Read result", "color": "green", "at": 1, "delay": 0.6},
+ {"type": "arrow", "from": "think", "to": "call", "color": "muted", "curve": -40, "at": 1, "delay": 0.4},
+ {"type": "arrow", "from": "call", "to": "read", "color": "muted", "curve": -40, "at": 1, "delay": 0.7},
+ {"type": "arrow", "from": "read", "to": "think", "color": "muted", "curve": -40, "at": 1, "delay": 1.0},
+ {"type": "pill", "x": 1640, "y": 380, "text": "Task done", "color": "green", "at": 2},
+ {"type": "text", "x": 300, "y": 380, "text": "chatbot", "size": "small", "color": "muted", "at": 2},
+ {"type": "arrow", "from": [300, 420], "to": [300, 560], "color": "muted", "at": 2, "delay": 0.2},
+ {"type": "text", "x": 300, "y": 600, "text": "assistant", "size": "body", "color": "yellow", "at": 2, "delay": 0.5}
+]}
+```
+
+Tool calling lets a model request outside tools while your application runs them. Clear tool descriptions lead to correct tool choices. Tool results lead to accurate, up-to-date answers.
+
+```visual
+{"elements": [
+ {"type": "headline", "text": "Recap", "y": 200, "at": 0},
+ {"type": "box", "x": 400, "y": 520, "w": 480, "h": 170, "text": "Model requests, app runs", "color": "green", "at": 0, "delay": 0.4},
+ {"type": "check", "x": 400, "y": 410, "r": 30, "at": 0, "delay": 0.4},
+ {"type": "box", "x": 960, "y": 520, "w": 480, "h": 170, "text": "Clear descriptions", "color": "green", "at": 1},
+ {"type": "check", "x": 960, "y": 410, "r": 30, "at": 1},
+ {"type": "box", "x": 1520, "y": 520, "w": 480, "h": 170, "text": "Up-to-date answers", "color": "green", "at": 2},
+ {"type": "check", "x": 1520, "y": 410, "r": 30, "at": 2},
+ {"type": "pill", "x": 960, "y": 780, "text": "AI that gets real work done", "color": "yellow", "at": 2, "delay": 0.6}
+]}
+```
