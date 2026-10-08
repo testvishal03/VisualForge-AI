@@ -13,6 +13,21 @@ Open **http://127.0.0.1:8765/**, click **New video**, then either describe an id
 
 First-time setup (Python 3.12 environment, model downloads, `npm install`) is described under *Windows setup* below.
 
+## Hand-designed scene visuals (best quality)
+
+For videos where every scene has its own picture, ask Claude for the script **and** a visual for each scene. Copy the prompt in `data/examples/claude-visual-prompt.md` into Claude, then paste its whole answer into **Paste a script**. After each narration paragraph, Claude adds a block like:
+
+```visual
+{"elements": [
+ {"id": "model", "type": "box", "x": 960, "y": 300, "text": "AI MODEL", "color": "yellow", "at": 0},
+ {"id": "risk", "type": "box", "x": 480, "y": 620, "text": "Made-up facts", "color": "red", "at": 1},
+ {"type": "arrow", "from": "model", "to": "risk", "color": "red", "at": 1, "delay": 0.2},
+ {"type": "stamp", "x": 1400, "y": 620, "text": "BLOCKED", "at": 2}
+]}
+```
+
+The block is never read aloud. Its elements (boxes, arrows, moving messages, chat bubbles, pills, stamps, ticks and crosses, brackets, rings, bars, icons, headlines) are drawn on a dark 1920x1080 stage and each appears when its sentence (`at`, counted from 0) or a named `word` is spoken. Each paragraph with a block becomes its own scene and skips AI planning, so these videos also generate faster. The script check reports any invalid block with its scene number before you prepare. A complete example is `data/examples/tool-calling-visual.txt`.
+
 ## Make videos on a server or a free GPU
 
 The whole pipeline also runs headless on Linux, so a server can make the videos instead of your laptop. One command turns a script into `video.mp4`, `thumbnail.png`, `description.txt` and a `report.json`:

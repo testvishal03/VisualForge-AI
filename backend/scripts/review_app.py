@@ -337,14 +337,18 @@ def make_server(port=8765, root=ROOT, directory=None):
                             if mode == 'script':
                                 title = normalize_topic(body['title']) if body.get('title') else None
                                 from backend.services.page_script import looks_like_markdown, page_to_script
-                                if looks_like_markdown(text):
+                                from backend.services.canvas import extract
+                                text, specs, problems = extract(text)
+                                if problems:
+                                    raise ValueError(f'Scene {problems[0][0]} visual: {problems[0][1]}')
+                                if not specs and looks_like_markdown(text):
                                     # A pasted page or production script is converted to its spoken words; the
                                     # narration is still reviewed before anything renders.
                                     converted = page_to_script(text)
                                     text = converted['script']
                                     title = title or (normalize_topic(converted['title']) if converted['title'] else None)
                                 from backend.services.script_projects import create as create_script
-                                project = create_script(store, title, text, {'mode':mode,'text':text,'profile':profile,
+                                project = create_script(store, title, text, specs=specs or None, source={'mode':mode,'text':text,'profile':profile,
                                     'review_first':reviewed or not bool(body.get('render_now') or automatic),
                                     'automatic':automatic,'approval_required':reviewed})
                                 if 'long_video' in project and not automatic:

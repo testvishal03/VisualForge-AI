@@ -154,23 +154,28 @@ class EditorJobs:
             if not all(s['visual'].get('planned') for s in scenes):
                 long = len(scenes) > MODEL_PLANNING_LIMIT
                 only = None
+                drawn = {n for n, s in enumerate(scenes, 1) if s['visual'].get('canvas')}
                 if long:
                     from backend.services.visual_quality import weak_scenes
-                    only = weak_scenes(project['document'], LONG_VIDEO_PLANNING_SECONDS // SECONDS_PER_PLANNED_SCENE)
+                    only = [n for n in weak_scenes(project['document'], LONG_VIDEO_PLANNING_SECONDS // SECONDS_PER_PLANNED_SCENE) if n not in drawn]
+                elif drawn:
+                    # Scenes with their own hand-designed visual are never re-planned.
+                    only = [n for n in range(1, len(scenes) + 1) if n not in drawn]
                 plan = None
-                if not long or only:
+                if (not long and only is None) or only:
                     video = validate_document(project['document'])
                     source = folder/'visual-source.json'
                     output = folder/'visual-plan.json'
                     write_json_atomic(source, video.model_dump())
-                    args = [source, output, *(['--only', ','.join(map(str, only)), '--budget', str(LONG_VIDEO_PLANNING_SECONDS)] if long else [])]
+                    args = [source, output, *(['--only', ','.join(map(str, only))] if only is not None else []),
+                            *(['--budget', str(LONG_VIDEO_PLANNING_SECONDS)] if long else [])]
                     if long:
                         self.state['message'] = f'AI planning the {len(only)} weakest of {len(scenes)} scenes (about {LONG_VIDEO_PLANNING_SECONDS // 60} minutes)'
                     try:
                         py('visual-direction', 'plan_visuals.py', args)
                         plan = json.loads(output.read_text(encoding='utf-8'))
                     except (RuntimeError, OSError, ValueError) as exc:
-                        if not long:
+                        if not long and not drawn:
                             raise
                         # A long video never depended on the model; it keeps its rule-based visuals.
                         self.state['message'] = f'AI planning was skipped ({str(exc)[:160]}); narration-based visuals are used.'
@@ -178,7 +183,7 @@ class EditorJobs:
                 for number, row in enumerate(revised['scenes'], 1):
                     # Long videos take only the scenes the model actually planned; a scene it failed on keeps its visual.
                     visual = plan['scenes'][number-1] if plan and (only is None or number in plan.get('model_planned', [])) else None
-                    if visual is None:
+                    if visual is None or row['visual'].get('canvas'):
                         row['visual']['planned'] = True
                         continue
                     authored={key:row['visual'][key] for key in ('demo','worked') if key in row['visual']}
@@ -326,7 +331,7 @@ class EditorJobs:
                 # Narration that explains next-token prediction, noise-to-image, judge-vs-create
                 # or limitations gets its dedicated explainer animation.
                 from backend.services.explainers import plan as plan_explainer, timed as timed_explainer
-                explainer = None if demonstration or authored['visual'].get('worked') else plan_explainer(authored)
+                explainer = None if demonstration or authored['visual'].get('worked') or authored['visual'].get('canvas') else plan_explainer(authored)
                 if explainer and explainer['kind']=='next_token' and explainer['prompt'] in next_tokens:
                     # Measured odds from the installed model replace the illustrative example.
                     from backend.services.next_token import shown
@@ -344,7 +349,12 @@ class EditorJobs:
                         explainer=dict(explainer,points=[dict(p,xy=xy) for p,xy in zip(explainer['points'],found['xy'])],
                                        links=nearest_links(found['similarity']),measured=True,model=MODEL_NAME)
                 if explainer:scene['explainer']=timed_explainer(explainer,scene['beats'])
-            scene['visual'] = timed_visual(document['scenes'][scene['id']-1]['visual'], scene['narration'], scene.get('beats', []))
+                canvas = authored['visual'].get('canvas')
+                if canvas:
+                    # A hand-designed scene visual, timed to the measured narration.
+                    from backend.services.canvas import timed as timed_canvas
+                    scene['canvas'] = timed_canvas(canvas, scene['beats'])
+            scene['visual'] = timed_visual({k: v for k, v in document['scenes'][scene['id']-1]['visual'].items() if k != 'canvas'}, scene['narration'], scene.get('beats', []))
             if scene.get('demonstration'):
                 scene['visual'] = {'kind':'example','items':[],'directed':True,'revealAt':[],'transition':'fade'}
             if scene['visual'].get('worked'):
@@ -402,7 +412,7 @@ class EditorJobs:
         """
         from backend.services.explainers import plan as plan_explainer
         from backend.services import embeddings, next_token
-        plans=[e for row in rows if not row['visual'].get('worked') and (e:=plan_explainer(row))]
+        plans=[e for row in rows if not row['visual'].get('worked') and not row['visual'].get('canvas') and (e:=plan_explainer(row))]
         prompts=list(dict.fromkeys(e['prompt'] for e in plans if e['kind']=='next_token'))
         texts=list(dict.fromkeys(e['text'] for e in plans if e['kind']=='tokens'))
         maps=list(dict.fromkeys(tuple(p['label'] for p in e['points']) for e in plans if e['kind']=='embedding_map'))

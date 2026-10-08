@@ -28,7 +28,7 @@ def validate_document(document):
         if set(scene) != {'uid', 'headline', 'body', 'narration', 'visual'}:
             raise ValueError('Unexpected or missing scene fields')
         visual = scene['visual']
-        if not isinstance(visual, dict) or not {'kind', 'items'} <= set(visual) or set(visual)-{'kind','items','directed','planned','motion','layout','icon','cues','icons','variant','transition','values','statValues','codeLines','worked','demo','treatment','choreography','shotOverrides','concepts'} or visual['kind'] not in KINDS:
+        if not isinstance(visual, dict) or not {'kind', 'items'} <= set(visual) or set(visual)-{'kind','items','directed','planned','motion','layout','icon','cues','icons','variant','transition','values','statValues','codeLines','worked','demo','treatment','choreography','shotOverrides','concepts','canvas'} or visual['kind'] not in KINDS:
             raise ValueError('Unknown visual layout')
         if not isinstance(visual['items'],list): raise ValueError('Visual items must be a list')
         count = 3 if visual['kind'] == 'process' else 2 if visual['kind'] == 'comparison' else 4 if visual['kind']=='water_cycle' else len(visual['items']) if visual['kind'] in {'relationship','cycle','timeline','components','chart','neural_net','stat_card'} else 0

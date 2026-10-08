@@ -10,6 +10,7 @@ import {fitLabel,objectScale,textWidth} from '../src/labels.ts';
 import {along,chipKind} from '../src/flow.ts';
 import {after,chipRows,inside,mapLayout,measuredLayout,noise} from '../src/explainer.ts';
 import {iconFor} from '../src/icon-match.ts';
+import {bounds,boxSize,edgePoint} from '../src/canvas.ts';
 import {animationTiming,activeConcept,sharedConcept} from '../src/animation.ts';
 import {isContextWindow,contextCues} from '../src/context-window.ts';
 import {validateTeaching,teachingStage,type TeachingPlan} from '../src/teaching-plan.ts';
@@ -507,4 +508,17 @@ test('concept icons: specific concepts get a fitting icon, vague or unknown word
     'smarter trick':null,'tiny bit':null,'built':null,'brute force':null,'single':null,'meaning lines':null,'HNSW':null,'Chroma':null};
   for(const [label,icon] of Object.entries(expected))assert.equal(iconFor(label,nodes),icon,label);
   for(const icon of Object.values(expected))if(icon)assert.ok(nodes[icon],`${icon} exists in this Lucide version`);
+});
+
+test('scene canvases: arrows meet box edges, boxes fit their text, bad canvases are rejected',()=>{
+  const box={type:'box' as const,id:'a',x:500,y:400,w:300,h:120,text:'Model',t:0};
+  const [x,y]=edgePoint(bounds(box),[1500,400]);
+  assert.ok(Math.abs(x-(650+12))<1e-6&&y===400,'a horizontal arrow leaves from the right edge');
+  const tall=boxSize({type:'box',x:500,y:400,w:300,h:100,text:'Your application with a long title',icon:'app',t:0});
+  assert.ok(tall.h>100,'a given height grows to fit the text and icon');
+  const base={...scene(1,8),narration:'One sentence here.'};
+  const canvas={elements:[box,{type:'arrow' as const,from:'a',to:[1500,400] as [number,number],t:1}]};
+  validateVideoData({title:'C',scenes:[{...base,canvas}]});
+  for(const bad of [{elements:[{...box,x:5000}]},{elements:[{...box,color:'gold'}]},{elements:[{type:'arrow' as const,from:'nowhere',to:'a',t:0}]},{elements:[{...box,t:99}]}])
+    assert.throws(()=>validateVideoData({title:'C',scenes:[{...base,canvas:bad as typeof canvas}]}),/canvas/);
 });

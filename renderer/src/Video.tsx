@@ -9,6 +9,7 @@ import type {Scene, VideoProps} from './types';
 import {TopicGuide} from './components/TopicGuide';
 import {isIllustrated, lightCard, lightVideo} from './transitions';
 import {IntroScene, OutroScene} from './components/Bookends';
+import {CanvasScene} from './components/CanvasScene';
 
 /** The topic guide follows each scene's stage: light for illustrated boards, themed dark otherwise. */
 function guideColors(scene: Scene, theme?: string, light = false) {
@@ -37,8 +38,9 @@ export const Video = ({videoData}: VideoProps) => {
       )}
       {timeline.scenes.map(({scene, from, durationInFrames}, index) => (
         <Sequence key={scene.id} name={scene.headline} from={from} durationInFrames={durationInFrames+Math.ceil(fps*TRANSITION_SECONDS)}>
-          {scene.visual ? <MotionScene scene={scene} style={videoData.style} globalFrame={globalFrame} first={from===0} previous={timeline.scenes[index-1]?.scene} next={timeline.scenes[index+1]?.scene} guide={guide} light={light}/> : <TextScene headline={scene.headline} body={scene.body} />}
-          {guide && scene.visual && <TopicGuide scenes={videoData.scenes} index={index} colors={guideColors(scene, videoData.style?.theme, light)}/>}
+          {scene.canvas ? <CanvasScene scene={scene} data={videoData} index={index} total={timeline.scenes.length} first={from===0}/>
+            : scene.visual ? <MotionScene scene={scene} style={videoData.style} globalFrame={globalFrame} first={from===0} previous={timeline.scenes[index-1]?.scene} next={timeline.scenes[index+1]?.scene} guide={guide} light={light}/> : <TextScene headline={scene.headline} body={scene.body} />}
+          {guide && scene.visual && !scene.canvas && <TopicGuide scenes={videoData.scenes} index={index} colors={guideColors(scene, videoData.style?.theme, light)}/>}
           <SceneAudio src={scene.audio} />
         </Sequence>
       ))}

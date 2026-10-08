@@ -102,7 +102,7 @@ def headline_sentence(narration):
     return next((part for part in parts if readable(part)), parts[0])
 
 
-def script_to_video(title, script, max_words=None, max_scenes=120):
+def script_to_video(title, script, max_words=None, max_scenes=120, keep_paragraphs=False):
     if not isinstance(script, str) or not script.strip():
         raise ValueError('Paste a narration script.')
     # If script is passed as a file path, load from file automatically
@@ -120,8 +120,9 @@ def script_to_video(title, script, max_words=None, max_scenes=120):
     if count < 1 or max_words is not None and count > max_words:
         raise ValueError(f'Use 30–{max_words} spoken words. Separate teaching points with blank lines.')
     from backend.services.scene_grouping import group_paragraphs
-    chunks = group_paragraphs(paragraphs)
-    if len(chunks) == 1:
+    # With hand-designed scene visuals each paragraph is its own scene, so visuals stay with their words.
+    chunks = paragraphs if keep_paragraphs else group_paragraphs(paragraphs)
+    if len(chunks) == 1 and not keep_paragraphs:
         parts = sentences(chunks[0])
         for cut in range(1, len(parts)):
             a, b = ' '.join(parts[:cut]), ' '.join(parts[cut:])

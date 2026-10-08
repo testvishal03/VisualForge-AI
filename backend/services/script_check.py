@@ -136,9 +136,13 @@ def check(text, title=None):
     """Findings for a pasted script: counts, issues (error / warning / info) and planned animations."""
     from backend.services.page_script import looks_like_markdown, page_to_script
     issues, converted = [], False
+    from backend.services.canvas import CanvasError, extract, validate as validate_canvas
+    text, specs, problems = extract(text) if isinstance(text, str) else (text, [], [])
+    for number, message in problems:
+        issues.append(_issue('error', message, number))
     if not isinstance(text, str) or not text.strip():
         return {'words': 0, 'scenes': 0, 'minutes': 0, 'issues': [_issue('error', 'Paste the words you want narrated.')], 'highlights': []}
-    if looks_like_markdown(text):
+    if not specs and looks_like_markdown(text):
         result = page_to_script(text)
         text, title, converted = result['script'], title or result['title'], True
         issues.append(_issue('info', 'Formatted notes detected. Prepare converts them to narration: headings become scenes and labels are not read aloud.'))
@@ -154,11 +158,20 @@ def check(text, title=None):
     # splitter) keeps the checker from ever reading local files.
     safe = text if '\n' in text.strip() else text.strip().replace(' ', '\n', 1)
     try:
-        video = script_to_video(title, safe)
+        video = script_to_video(title, safe, keep_paragraphs=bool(specs))
     except ValueError as exc:
         issues.insert(0, _issue('error', str(exc)))
         return report
     document = document_from_video(video, build_direction(video))
+    drawn = set()
+    for number, (scene, spec) in enumerate(zip(video.scenes, specs), 1):
+        if spec is None:
+            continue
+        try:
+            validate_canvas(spec, sentences(scene.narration))
+            drawn.add(number)
+        except CanvasError as exc:
+            issues.append(_issue('error', f'Visual block: {exc}.', number))
     report.update(scenes=len(video.scenes), title=video.title)
 
     seen = {}
@@ -198,7 +211,11 @@ def check(text, title=None):
     if len(video.scenes) > MODEL_PLANNING_LIMIT:
         issues.append(_issue('info', f'{len(video.scenes)} scenes: over {MODEL_PLANNING_LIMIT} scenes, the AI plans visuals only for the weakest '
                                      f'scenes (up to {LONG_VIDEO_PLANNING_SECONDS // 60} minutes); the rest use rule-based visuals.'))
+    for number in sorted(drawn):
+        report['highlights'].append({'scene': number, 'kind': 'canvas', 'label': 'Hand-designed visual', 'note': 'from your script'})
     for number, row in enumerate(document['scenes'], 1):
+        if number in drawn:
+            continue
         spec = None if row['visual'].get('worked') else plan_explainer(row)
         if spec:
             report['highlights'].append({'scene': number, 'kind': spec['kind'], 'label': EXPLAINER_LABELS.get(spec['kind'], spec['kind']),
@@ -208,7 +225,7 @@ def check(text, title=None):
         from backend.services.visual_quality import weak_scenes
         planned = len(weak_scenes(document, LONG_VIDEO_PLANNING_SECONDS // SECONDS_PER_PLANNED_SCENE))
     else:
-        planned = len(video.scenes) - len(report['highlights'])
+        planned = len(video.scenes) - len(report['highlights'])  # hand-designed and explainer scenes skip planning
     measured = any(h['kind'] in ('next_token', 'tokens', 'embedding_map') for h in report['highlights'])
     report['estimate'] = generation_estimate(count, planned, measured)
     order = {'error': 0, 'warning': 1, 'info': 2}
