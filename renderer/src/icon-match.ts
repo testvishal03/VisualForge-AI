@@ -41,6 +41,10 @@ const VOCABULARY: Record<string, string> = {
   request: 'send', requests: 'send', calculator: 'calculator', calendar: 'calendar', meeting: 'calendar-clock', email: 'mail', emails: 'mail',
   weather: 'cloud-sun', temperature: 'thermometer-sun', action: 'zap', actions: 'zap', approval: 'shield-check', parameter: 'braces', parameters: 'braces',
   name: 'tag', description: 'file-text', descriptions: 'file-text', engine: 'search',
+  face: 'scan-face', faces: 'scan-face', cart: 'shopping-cart', shopping: 'shopping-cart', game: 'gamepad-2', games: 'gamepad-2', gamepad: 'gamepad-2',
+  phone: 'smartphone', smartphone: 'smartphone', reward: 'trophy', rewards: 'trophy', win: 'trophy', wins: 'trophy', house: 'house', home: 'house',
+  car: 'car', health: 'heart-pulse', doctor: 'stethoscope', medicine: 'pill', dice: 'dice-5', shop: 'store', product: 'package',
+  products: 'package', movie: 'clapperboard', movies: 'clapperboard', music: 'music', experiment: 'flask-conical', student: 'graduation-cap', students: 'graduation-cap',
 };
 const VAGUE = new Set(('trick bit bits one ones way ways thing things lot lots kind part parts stuff point points area areas option options need needs side top ' +
   'example examples case cases level levels question idea set type types system systems problem problems step steps').split(' '));

@@ -67,6 +67,29 @@ class CanvasError(ValueError):
     pass
 
 
+BARE = re.compile(r'^[ \t]*visual[ \t]*\n(?=[ \t]*\{)', re.I | re.M)
+
+
+def fence_bare_blocks(text):
+    """Copying from a chat window drops the ``` lines and leaves the word "visual" above the JSON;
+    such blocks are fenced again so both forms work."""
+    out, position = [], 0
+    decoder = json.JSONDecoder()
+    for match in BARE.finditer(text):
+        if match.start() < position:
+            continue
+        start = match.end() + (len(text[match.end():]) - len(text[match.end():].lstrip(' \t')))
+        try:
+            _, end = decoder.raw_decode(text, start)
+        except ValueError:
+            # Unreadable JSON: fence it up to the closing brace line, so the error names the scene.
+            closing = re.compile(r'^\}\s*$', re.M).search(text, start)
+            end = closing.end() if closing else len(text)
+        out.append(text[position:match.start()] + '```visual\n' + text[start:end].strip() + '\n```')
+        position = end
+    return ''.join(out) + text[position:]
+
+
 def extract(text):
     """Split a script into narration and per-paragraph canvas blocks.
 
@@ -74,7 +97,7 @@ def extract(text):
     block for narration paragraph i (or None), and `errors` lists unparseable blocks as
     (paragraph number, message). Text without blocks returns specs == [].
     """
-    text = text.replace('\r\n', '\n')
+    text = fence_bare_blocks(text.replace('\r\n', '\n'))
     if not FENCE.search(text):
         return text, [], []
     paragraphs, specs, errors = [], [], []
@@ -343,6 +366,109 @@ def validate(spec, sentences):
             if key in row:
                 row[key] = _point(row[key], ids, f'element {index} {key}')
     return {'elements': clean}
+
+
+# ---- Layout check: estimates of what the renderer draws (renderer/src/canvas.ts uses the same sizes) ----
+CHAR = .56                    # average bold character width, as a share of the font size
+TEXT_SIZES = {'title': 140, 'h2': 64, 'body': 34, 'small': 28}
+CAPTION_TOP = 945             # the caption bar starts here
+# Overlays meant to sit on other elements: connectors, data drawn on plots, and small badges.
+OVERLAYS = {'arrow', 'mover', 'line', 'points', 'curve', 'dot', 'segments', 'region'}
+BADGES = {'check', 'cross', 'icon'}
+
+
+def _lines(text, size, width):
+    return max(1, math.ceil(len(text) * size * CHAR / max(1, width)))
+
+
+def bounds(row):
+    """(x0, y0, x1, y1) of a validated element, or None for overlays without a fixed footprint."""
+    t, x, y = row['type'], row.get('x', 960), row.get('y', 540)
+    if t in OVERLAYS:
+        return None
+    if t == 'box':
+        w = row.get('w') or min(760, max(240, len(row.get('text', '')) * 40 * CHAR + 90))
+        lines = _lines(row.get('text', ''), 40, w - 50)
+        subs = _lines(row['sub'], 28, w - 50) if row.get('sub') else 0
+        h = max(row.get('h') or 120, lines * 48 + (subs * 36.4 + 10 if subs else 0) + (70 if row.get('icon') else 0) + 56)
+        return x - w / 2, y - h / 2, x + w / 2, y + h / 2
+    if t in ('pill', 'stamp'):
+        size = 34 if t == 'pill' else 64
+        w, h = len(row['text']) * size * CHAR + (60 if t == 'pill' else 70), (68 if t == 'pill' else 110)
+        return x - w / 2, y - h / 2, x + w / 2, y + h / 2
+    if t == 'bubble':
+        w = row.get('w', 900)
+        h = _lines(row['text'], 34, w - 70) * 34 * 1.35 + 60
+        return x, y, x + w, y + h
+    if t in ('text', 'headline', 'counter'):
+        size = TEXT_SIZES['h2' if t == 'headline' else row.get('size', 'h2' if t == 'counter' else 'body')]
+        text = row.get('text') or f"{row.get('prefix', '')}{row.get('value', '')}{row.get('suffix', '')}"
+        if t == 'headline':
+            x, y = 960, row.get('y', 210)
+        # Text that would leave the frame is drawn smaller to fit (renderer fitText), as is its estimate here.
+        room = {'left': 1880 - x, 'right': x - 40}.get(row.get('align'), 2 * min(x - 40, 1880 - x))
+        size = max(16, min(size, room / max(1, len(text) * CHAR)))
+        w = len(text) * size * CHAR
+        left = {'left': x, 'right': x - w}.get(row.get('align'), x - w / 2)
+        return left, y - size / 2, left + w, y + size / 2
+    if t in ('check', 'cross', 'ring'):
+        r = row.get('r', 36 if t != 'ring' else 100)
+        return x - r, y - r, x + r, y + r
+    if t == 'icon':
+        r = row.get('size', 96) / 2
+        return x - r, y - r, x + r, y + r
+    if t == 'bar':
+        return x, y, x + row['w'], y + row['h']
+    if t == 'bracket':
+        return row['x1'], row['y'] - 50, row['x2'], row['y'] + (115 if row.get('label') else 0)
+    if t == 'table':
+        columns = max(len(r) for r in row['rows'])
+        return x, y, x + columns * row.get('colWidth', 220), y + len(row['rows']) * row.get('rowHeight', 72)
+    if t in ('plot', 'network'):
+        w, h = row['w'], row['h']
+        return x - w / 2, y - h / 2, x + w / 2, y + h / 2
+    return None
+
+
+def _name(row):
+    return f'{row["type"]} "{row["text"]}"' if row.get('text') else row['type'] + (f' "{row["id"]}"' if row.get('id') else '')
+
+
+def layout_issues(spec):
+    """Warnings about elements that collide, leave the frame or sit under the caption bar."""
+    rows = spec['elements']
+    shown = []
+    for row in rows:
+        box = bounds(row)
+        if box is None:
+            continue
+        start = (row['at'], row.get('delay', 0))
+        end = (row['out']['at'], row['out'].get('delay', 0)) if 'out' in row else (10**6, 0)
+        shown.append((row, box, start, end))
+    issues = []
+    for row, (x0, y0, x1, y1), _, _ in shown:
+        if x0 < 0 or x1 > 1920 or y0 < 100:
+            issues.append(f'{_name(row)} reaches past the edge of the frame')
+        elif y1 > CAPTION_TOP + 10:
+            issues.append(f'{_name(row)} reaches under the caption bar (keep it above y {CAPTION_TOP})')
+    for i, (a, ba, sa, ea) in enumerate(shown):
+        for b, bb, sb, eb in shown[i + 1:]:
+            if ea <= sb or eb <= sa:
+                continue  # never on screen together
+            # One fading out as the other fades in, within the same sentence, is a hand-over, not a clash.
+            if ea[0] == sb[0] and 0 <= ea[1] - sb[1] < .6 or eb[0] == sa[0] and 0 <= eb[1] - sa[1] < .6:
+                continue
+            if {a['type'], b['type']} & BADGES or 'plot' in {a['type'], b['type']} and {a['type'], b['type']} & {'text', 'counter', 'pill', 'stamp', 'bubble'}:
+                continue  # badges and labels placed on a plot sit on other elements by design
+            if ba == bb:
+                continue  # the same footprint redrawn, e.g. to recolour a box
+            overlap_w, overlap_h = min(ba[2], bb[2]) - max(ba[0], bb[0]), min(ba[3], bb[3]) - max(ba[1], bb[1])
+            if overlap_w > 12 and overlap_h > 12:
+                inside = lambda p, q: p[0] >= q[0] and p[1] >= q[1] and p[2] <= q[2] and p[3] <= q[3]
+                if a['type'] == 'ring' and inside(bb, ba) or b['type'] == 'ring' and inside(ba, bb):
+                    continue  # a label inside a ring
+                issues.append(f'{_name(a)} overlaps {_name(b)}')
+    return issues
 
 
 def timed(spec, beats):

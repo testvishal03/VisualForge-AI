@@ -149,3 +149,9 @@ export function along(points: [number, number][], m: number): [number, number] {
   }
   return points[points.length - 1];
 }
+
+/** Font size that keeps a line of text inside the frame (40 px margins), never larger than wanted. */
+export function fitText(text: string, wanted: number, x: number, align?: string) {
+  const room = align === 'left' ? 1880 - x : align === 'right' ? x - 40 : 2*Math.min(x - 40, 1880 - x);
+  return Math.max(16, Math.min(wanted, room/Math.max(1, textWidth(text, 1))));
+}

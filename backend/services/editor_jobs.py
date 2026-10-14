@@ -457,8 +457,10 @@ class EditorJobs:
             command = [command[0], str(bundle), *[a for a in command[1:] if not str(a).startswith('--public-dir=')]]
         for attempt in range(2):
             try:
+                # Remotion reports progress every few frames, so three silent minutes means a hung browser:
+                # stop it and retry rather than waiting for the hour-long stage limit.
                 return execute([node_executable(), self.root/'renderer/node_modules/@remotion/cli/remotion-cli.js', *command],
-                               cwd=self.root/'renderer', log=folder/'logs'/f'{name}.log', cancel_event=self.cancel)
+                               cwd=self.root/'renderer', log=folder/'logs'/f'{name}.log', cancel_event=self.cancel, stall=180)
             except RuntimeError:
                 if attempt:
                     raise

@@ -1,0 +1,263 @@
+This playlist teaches machine learning from zero, one visual idea at a time. What is machine learning? It is a way to teach computers by showing them examples instead of writing every rule by hand. It powers spam filters, maps, and movie recommendations.
+
+visual
+{"elements": [
+{"type": "pill", "x": 960, "y": 220, "text": "Machine Learning Visualized", "color": "cyan", "at": 0},
+{"type": "text", "x": 960, "y": 370, "text": "What is Machine Learning?", "size": "title", "color": "white", "at": 1},
+{"type": "box", "id": "ex", "x": 480, "y": 620, "w": 380, "h": 160, "text": "Examples", "icon": "database", "color": "cyan", "fill": "panel", "at": 2},
+{"type": "box", "id": "model", "x": 1440, "y": 620, "w": 380, "h": 160, "text": "Model", "sub": "finds the rules", "color": "yellow", "fill": "panel", "at": 2, "delay": 0.8},
+{"type": "arrow", "from": "ex", "to": "model", "color": "line", "at": 2, "delay": 1.0},
+{"type": "mover", "from": "ex", "to": "model", "text": "data", "color": "cyan", "dur": 1.2, "at": 2, "delay": 1.3},
+{"type": "pill", "x": 480, "y": 850, "text": "Spam filters", "color": "pink", "at": 3},
+{"type": "pill", "x": 960, "y": 850, "text": "Maps", "color": "pink", "at": 3, "delay": 0.4},
+{"type": "pill", "x": 1440, "y": 850, "text": "Movie picks", "color": "pink", "at": 3, "delay": 0.8}
+]}
+
+Traditional programming starts with rules written by a programmer. For example, “If the email says lottery, mark it as spam.” The computer follows those rules exactly and never improves.
+
+visual
+{"elements": [
+{"type": "box", "id": "rules", "x": 320, "y": 420, "w": 320, "h": 130, "text": "Rules", "sub": "written by hand", "color": "yellow", "at": 0},
+{"type": "box", "id": "data", "x": 320, "y": 720, "w": 320, "h": 130, "text": "Data", "color": "cyan", "at": 0, "delay": 0.4},
+{"type": "box", "id": "prog", "x": 960, "y": 570, "w": 340, "h": 150, "text": "Program", "color": "muted", "at": 0, "delay": 0.8},
+{"type": "arrow", "from": "rules", "to": "prog", "color": "yellow", "at": 0, "delay": 1.0},
+{"type": "arrow", "from": "data", "to": "prog", "color": "cyan", "at": 0, "delay": 1.2},
+{"type": "box", "id": "ans", "x": 1600, "y": 570, "w": 320, "h": 130, "text": "Answers", "color": "pink", "at": 0, "delay": 1.4},
+{"type": "arrow", "from": "prog", "to": "ans", "color": "pink", "at": 0, "delay": 1.6},
+{"type": "bubble", "x": 600, "y": 170, "w": 720, "text": "if \"lottery\" in email: mark_spam()", "color": "yellow", "mono": true, "at": 1},
+{"type": "stamp", "x": 1600, "y": 830, "text": "NO LEARNING", "color": "red", "at": 2}
+]}
+
+Machine learning flips that recipe around. Traditional programming turns rules and data into answers. In contrast, machine learning turns data and answers into rules. The computer discovers the pattern itself.
+
+visual
+{"elements": [
+{"type": "headline", "text": "Flip the recipe", "color": "white", "at": 0},
+{"type": "line", "points": [[960, 260], [960, 900]], "color": "line", "dashed": true, "at": 0, "delay": 0.4},
+{"type": "text", "x": 480, "y": 300, "text": "Traditional", "size": "h2", "color": "muted", "at": 1},
+{"type": "box", "id": "l1", "x": 300, "y": 470, "w": 260, "h": 110, "text": "Rules", "color": "yellow", "at": 1, "delay": 0.3},
+{"type": "box", "id": "l2", "x": 660, "y": 470, "w": 260, "h": 110, "text": "Data", "color": "cyan", "at": 1, "delay": 0.5},
+{"type": "box", "id": "l3", "x": 480, "y": 770, "w": 300, "h": 110, "text": "Answers", "color": "pink", "at": 1, "delay": 0.9},
+{"type": "arrow", "from": "l1", "to": "l3", "color": "line", "at": 1, "delay": 1.1},
+{"type": "arrow", "from": "l2", "to": "l3", "color": "line", "at": 1, "delay": 1.1},
+{"type": "text", "x": 1440, "y": 300, "text": "Machine learning", "size": "h2", "color": "yellow", "at": 2},
+{"type": "box", "id": "r1", "x": 1260, "y": 470, "w": 260, "h": 110, "text": "Data", "color": "cyan", "at": 2, "delay": 0.3},
+{"type": "box", "id": "r2", "x": 1620, "y": 470, "w": 260, "h": 110, "text": "Answers", "color": "pink", "at": 2, "delay": 0.5},
+{"type": "box", "id": "r3", "x": 1440, "y": 770, "w": 300, "h": 110, "text": "Rules", "color": "yellow", "fill": "tint", "at": 2, "delay": 0.9, "pulse": 3},
+{"type": "arrow", "from": "r1", "to": "r3", "color": "line", "at": 2, "delay": 1.1},
+{"type": "arrow", "from": "r2", "to": "r3", "color": "line", "at": 2, "delay": 1.1}
+]}
+
+Think about teaching a child to spot a “Cat”. You never hand them a rulebook about whiskers, ears, and tails. You just show many pictures and say “Cat” or “Not cat” until it clicks.
+
+visual
+{"elements": [
+{"type": "bubble", "x": 180, "y": 180, "w": 560, "text": "Is this a cat?", "color": "cyan", "at": 0},
+{"type": "box", "x": 1420, "y": 280, "w": 460, "h": 150, "text": "Rulebook", "sub": "whiskers, ears, tails", "color": "red", "fill": "tint", "at": 1},
+{"type": "cross", "x": 1690, "y": 220, "r": 36, "at": 1, "delay": 0.7},
+{"type": "box", "x": 380, "y": 630, "w": 300, "h": 200, "icon": "cat", "text": "Photo", "color": "muted", "at": 2},
+{"type": "box", "x": 760, "y": 630, "w": 300, "h": 200, "icon": "dog", "text": "Photo", "color": "muted", "at": 2, "delay": 0.5},
+{"type": "box", "x": 1140, "y": 630, "w": 300, "h": 200, "icon": "cat", "text": "Photo", "color": "muted", "at": 2, "delay": 1.0},
+{"type": "box", "x": 1520, "y": 630, "w": 300, "h": 200, "icon": "bird", "text": "Photo", "color": "muted", "at": 2, "delay": 1.5},
+{"type": "pill", "x": 380, "y": 830, "text": "Cat", "color": "green", "at": 2, "delay": 0.3},
+{"type": "pill", "x": 760, "y": 830, "text": "Not cat", "color": "red", "at": 2, "delay": 0.8},
+{"type": "pill", "x": 1140, "y": 830, "text": "Cat", "color": "green", "at": 2, "delay": 1.3},
+{"type": "pill", "x": 1520, "y": 830, "text": "Not cat", "color": "red", "at": 2, "delay": 1.8}
+]}
+
+Each example in machine learning is one row of data. Take a house listing with its size, location, and number of bedrooms. These details are features, and the price is the label.
+
+visual
+{"elements": [
+{"type": "headline", "text": "One example, one row", "color": "white", "at": 0},
+{"type": "table", "x": 360, "y": 280, "rows": [["Size (sq ft)", "Location", "Bedrooms", "Price"], ["1,200", "City", "2", "235k"], ["2,000", "Suburb", "3", "355k"], ["900", "Town", "1", "190k"]], "header": true, "colWidth": 300, "rowHeight": 90, "at": 1},
+{"type": "bracket", "x1": 370, "x2": 1250, "y": 680, "label": "Features", "color": "cyan", "at": 2},
+{"type": "bracket", "x1": 1270, "x2": 1550, "y": 680, "label": "Label", "color": "pink", "at": 2, "delay": 0.8},
+{"type": "pill", "x": 810, "y": 840, "text": "What we know", "color": "cyan", "at": 2, "delay": 0.4},
+{"type": "pill", "x": 1410, "y": 840, "text": "What we predict", "color": "pink", "at": 2, "delay": 1.2}
+]}
+
+The program that learns from these rows is called a model. A model is a math function that turns features into a prediction. For example, it takes a 1,500 square foot house and predicts 280 thousand dollars.
+
+visual
+{"elements": [
+{"type": "box", "id": "m", "x": 960, "y": 540, "w": 400, "h": 210, "text": "Model", "sub": "a math function", "color": "yellow", "fill": "tint", "at": 0},
+{"type": "box", "id": "f", "x": 330, "y": 540, "w": 380, "h": 170, "text": "Features", "sub": "size, location, rooms", "color": "cyan", "at": 1},
+{"type": "box", "id": "p", "x": 1590, "y": 540, "w": 380, "h": 170, "text": "Prediction", "sub": "price", "color": "pink", "at": 1, "delay": 0.6},
+{"type": "arrow", "from": "f", "to": "m", "color": "cyan", "at": 1, "delay": 0.3},
+{"type": "arrow", "from": "m", "to": "p", "color": "pink", "at": 1, "delay": 0.9},
+{"type": "mover", "from": "f", "to": "m", "text": "1,500 sq ft", "color": "cyan", "dur": 1.2, "at": 2},
+{"type": "mover", "from": "m", "to": "p", "text": "280k", "color": "pink", "dur": 1.2, "at": 2, "delay": 1.4},
+{"type": "text", "x": 1590, "y": 760, "text": "280k", "size": "h2", "color": "pink", "at": 2, "delay": 2.7}
+]}
+
+Training means adjusting the model until its predictions match real answers. Picture house sizes on one axis and prices on the other. The model starts as a random line, then slowly rotates into the best fit.
+
+visual
+{"elements": [
+{"type": "plot", "id": "pl", "x": 960, "y": 540, "w": 1300, "h": 680, "xRange": [500, 2500], "yRange": [0, 500], "xLabel": "Size (square feet)", "yLabel": "Price (thousands)", "grid": true, "at": 1},
+{"type": "points", "plot": "pl", "data": [[600, 150], [800, 170], [900, 190], [1100, 210], [1200, 235], [1400, 260], [1500, 285], [1700, 300], [1800, 330], [2000, 355], [2200, 380], [2400, 410]], "classes": ["cyan"], "r": 12, "stagger": 0.08, "at": 1, "delay": 0.5},
+{"type": "curve", "plot": "pl", "data": [[500, 130], [2500, 430]], "start": [[500, 420], [2500, 60]], "dur": 2.5, "color": "yellow", "at": 2},
+{"type": "pill", "x": 1480, "y": 260, "text": "Best fit", "color": "yellow", "at": 2, "delay": 2.6}
+]}
+
+Here is the training loop. First, the model makes a guess for every house. Next, each guess is compared with the real price to measure the error. Finally, the model nudges itself to shrink that error.
+
+visual
+{"elements": [
+{"type": "headline", "text": "The training loop", "color": "white", "at": 0},
+{"type": "box", "id": "g", "x": 960, "y": 320, "w": 400, "h": 140, "text": "Guess", "sub": "predict every house", "color": "pink", "at": 1},
+{"type": "box", "id": "c", "x": 1460, "y": 720, "w": 400, "h": 140, "text": "Compare", "sub": "measure the error", "color": "red", "at": 2},
+{"type": "box", "id": "n", "x": 460, "y": 720, "w": 400, "h": 140, "text": "Adjust", "sub": "shrink the error", "color": "yellow", "at": 3},
+{"type": "arrow", "from": "g", "to": "c", "curve": 80, "color": "line", "at": 2, "delay": 0.4},
+{"type": "arrow", "from": "c", "to": "n", "curve": 80, "color": "line", "at": 3, "delay": 0.4},
+{"type": "arrow", "from": "n", "to": "g", "curve": 80, "color": "line", "at": 3, "delay": 1.0},
+{"type": "ring", "x": 960, "y": 620, "r": 110, "text": "Repeat", "color": "muted", "at": 3, "delay": 1.6}
+]}
+
+The error is the distance between each guess and the real price. Every round leads to a slightly smaller error. After thousands of rounds, the average error drops from 120 thousand to just 15 thousand dollars.
+
+visual
+{"elements": [
+{"type": "plot", "id": "pe", "x": 620, "y": 560, "w": 900, "h": 640, "xRange": [500, 2500], "yRange": [0, 500], "xLabel": "Size", "yLabel": "Price", "grid": false, "at": 0},
+{"type": "points", "plot": "pe", "data": [[800, 170], [1200, 235], [1500, 285], [1800, 330], [2200, 380]], "classes": ["cyan"], "r": 12, "stagger": 0.1, "at": 0, "delay": 0.3},
+{"type": "curve", "id": "mid", "plot": "pe", "data": [[500, 200], [2500, 360]], "color": "yellow", "dur": 1.0, "at": 0, "delay": 0.8, "out": {"at": 1}},
+{"type": "segments", "plot": "pe", "segments": [[800, 170, 800, 224], [1200, 235, 1200, 256], [1500, 285, 1500, 280], [1800, 330, 1800, 304], [2200, 380, 2200, 336]], "color": "red", "at": 0, "delay": 1.6, "out": {"at": 1}},
+{"type": "curve", "plot": "pe", "start": [[500, 200], [2500, 360]], "data": [[500, 130], [2500, 430]], "color": "yellow", "dur": 2.0, "at": 1},
+{"type": "segments", "plot": "pe", "segments": [[800, 170, 800, 175], [1200, 235, 1200, 235], [1500, 285, 1500, 280], [1800, 330, 1800, 325], [2200, 380, 2200, 385]], "color": "green", "at": 1, "delay": 2.1},
+{"type": "text", "x": 1500, "y": 330, "text": "Average error", "size": "h2", "color": "muted", "at": 2},
+{"type": "counter", "x": 1500, "y": 500, "value": 15, "begin": 120, "suffix": "k", "size": "title", "color": "green", "at": 2, "delay": 0.4},
+{"type": "pill", "x": 1500, "y": 680, "text": "8 times smaller", "color": "green", "at": 2, "delay": 1.8}
+]}
+
+Model quality depends on data quality. Messy or biased data leads to a weak model. Clean, varied examples lead to a model that works in the real world.
+
+visual
+{"elements": [
+{"type": "headline", "text": "Garbage in, garbage out", "color": "white", "at": 0},
+{"type": "box", "id": "d1", "x": 340, "y": 420, "w": 340, "h": 140, "text": "Messy data", "color": "red", "fill": "tint", "at": 1},
+{"type": "box", "id": "m1", "x": 960, "y": 420, "w": 300, "h": 140, "text": "Model", "color": "yellow", "at": 1, "delay": 0.4},
+{"type": "box", "id": "o1", "x": 1560, "y": 420, "w": 340, "h": 140, "text": "Bad predictions", "color": "red", "at": 1, "delay": 0.8},
+{"type": "arrow", "from": "d1", "to": "m1", "color": "red", "at": 1, "delay": 0.5},
+{"type": "arrow", "from": "m1", "to": "o1", "color": "red", "at": 1, "delay": 0.9},
+{"type": "cross", "x": 1790, "y": 420, "r": 34, "at": 1, "delay": 1.2},
+{"type": "box", "id": "d2", "x": 340, "y": 740, "w": 340, "h": 140, "text": "Clean data", "color": "green", "fill": "tint", "at": 2},
+{"type": "box", "id": "m2", "x": 960, "y": 740, "w": 300, "h": 140, "text": "Model", "color": "yellow", "at": 2, "delay": 0.4},
+{"type": "box", "id": "o2", "x": 1560, "y": 740, "w": 340, "h": 140, "text": "Good predictions", "color": "green", "at": 2, "delay": 0.8},
+{"type": "arrow", "from": "d2", "to": "m2", "color": "green", "at": 2, "delay": 0.5},
+{"type": "arrow", "from": "m2", "to": "o2", "color": "green", "at": 2, "delay": 0.9},
+{"type": "check", "x": 1790, "y": 740, "r": 34, "at": 2, "delay": 1.2}
+]}
+
+Machine learning comes in three main types. Supervised learning learns from labeled examples. Unsupervised learning finds groups in data with no labels. Reinforcement learning learns by trial and error, chasing rewards.
+
+visual
+{"elements": [
+{"type": "box", "id": "ml", "x": 960, "y": 260, "w": 460, "h": 140, "text": "Machine learning", "color": "yellow", "fill": "tint", "at": 0},
+{"type": "box", "id": "s", "x": 380, "y": 700, "w": 440, "h": 200, "text": "Supervised", "sub": "labeled examples", "color": "cyan", "at": 1},
+{"type": "arrow", "from": "ml", "to": "s", "color": "cyan", "at": 1, "delay": 0.2},
+{"type": "box", "id": "u", "x": 960, "y": 700, "w": 440, "h": 200, "text": "Unsupervised", "sub": "finds groups", "color": "purple", "at": 2},
+{"type": "arrow", "from": "ml", "to": "u", "color": "purple", "at": 2, "delay": 0.2},
+{"type": "box", "id": "r", "x": 1540, "y": 700, "w": 440, "h": 200, "text": "Reinforcement", "sub": "trial, error, rewards", "color": "orange", "at": 3},
+{"type": "arrow", "from": "ml", "to": "r", "color": "orange", "at": 3, "delay": 0.2}
+]}
+
+Supervised learning sees the answers, like emails marked “Spam” or “Not spam”. In contrast, unsupervised learning gets no labels at all. It might sort shoppers into groups just by their habits.
+
+visual
+{"elements": [
+{"type": "text", "x": 520, "y": 200, "text": "Supervised: has labels", "size": "h2", "color": "cyan", "at": 0},
+{"type": "plot", "id": "ps", "x": 520, "y": 580, "w": 700, "h": 560, "xRange": [0, 10], "yRange": [0, 10], "xLabel": "Links in email", "yLabel": "Exclamation marks", "grid": false, "at": 0, "delay": 0.3},
+{"type": "points", "plot": "ps", "data": [[1, 2, 0], [2, 1, 0], [2, 3, 0], [3, 2, 0], [1, 4, 0], [3, 4, 0], [7, 8, 1], [8, 7, 1], [6, 8, 1], [8, 9, 1], [9, 6, 1], [7, 6, 1]], "classes": ["green", "red"], "r": 12, "stagger": 0.06, "at": 0, "delay": 0.6},
+{"type": "region", "plot": "ps", "polygon": [[10, 0], [10, 10], [0, 10]], "color": "red", "at": 0, "delay": 1.8},
+{"type": "text", "x": 1400, "y": 200, "text": "Unsupervised: no labels", "size": "h2", "color": "purple", "at": 1},
+{"type": "plot", "id": "pu", "x": 1400, "y": 580, "w": 700, "h": 560, "xRange": [0, 10], "yRange": [0, 10], "xLabel": "Visits per month", "yLabel": "Spend per visit", "grid": false, "at": 1, "delay": 0.3},
+{"type": "points", "plot": "pu", "data": [[2, 2], [2.5, 3], [3, 2.2], [1.8, 2.8], [7, 3], [8, 2.5], [7.5, 3.6], [8.4, 3.2], [4.5, 8], [5.2, 7.4], [5.8, 8.3], [4.8, 8.8]], "classes": ["muted"], "r": 12, "stagger": 0.05, "at": 1, "delay": 0.6},
+{"type": "region", "plot": "pu", "polygon": [[1.2, 1.4], [3.6, 1.4], [3.6, 3.6], [1.2, 3.6]], "color": "cyan", "at": 2},
+{"type": "region", "plot": "pu", "polygon": [[6.4, 1.9], [9, 1.9], [9, 4.2], [6.4, 4.2]], "color": "pink", "at": 2, "delay": 0.4},
+{"type": "region", "plot": "pu", "polygon": [[4, 6.8], [6.4, 6.8], [6.4, 9.4], [4, 9.4]], "color": "purple", "at": 2, "delay": 0.8}
+]}
+
+Reinforcement learning is how AI masters games. It tries a move, and a good move earns a reward. Over thousands of games, chasing rewards leads to winning strategies.
+
+visual
+{"elements": [
+{"type": "box", "id": "ag", "x": 450, "y": 420, "w": 380, "h": 170, "text": "Agent", "sub": "the model", "color": "yellow", "fill": "tint", "at": 0},
+{"type": "box", "id": "gm", "x": 1470, "y": 420, "w": 380, "h": 170, "text": "Game", "icon": "gamepad", "color": "cyan", "at": 0, "delay": 0.5},
+{"type": "arrow", "from": "ag", "to": "gm", "curve": -120, "color": "line", "dashed": true, "at": 1},
+{"type": "arrow", "from": "gm", "to": "ag", "curve": -120, "color": "line", "dashed": true, "at": 1, "delay": 0.2},
+{"type": "mover", "from": "ag", "to": "gm", "text": "Move", "color": "pink", "dur": 1.0, "at": 1, "delay": 0.3},
+{"type": "mover", "from": "gm", "to": "ag", "text": "Reward", "color": "green", "dur": 1.0, "at": 1, "delay": 1.5},
+{"type": "text", "x": 960, "y": 610, "text": "Score over time", "size": "small", "color": "muted", "at": 2},
+{"type": "bar", "x": 700, "y": 820, "w": 120, "h": 80, "color": "green", "at": 2, "delay": 0.2},
+{"type": "bar", "x": 860, "y": 760, "w": 120, "h": 140, "color": "green", "at": 2, "delay": 0.6},
+{"type": "bar", "x": 1020, "y": 700, "w": 120, "h": 200, "color": "green", "at": 2, "delay": 1.0},
+{"type": "bar", "x": 1180, "y": 650, "w": 120, "h": 250, "color": "green", "text": "Wins", "at": 2, "delay": 1.4}
+]}
+
+After training, the model takes a test on data it has never seen. It works like a surprise exam, not a practice quiz. If it labels 90 of 100 new emails correctly, its accuracy is 90 percent.
+
+visual
+{"elements": [
+{"type": "bar", "x": 200, "y": 240, "w": 1100, "h": 120, "color": "cyan", "text": "Training data", "at": 0},
+{"type": "bar", "x": 1340, "y": 240, "w": 380, "h": 120, "color": "purple", "text": "Test data", "at": 0, "delay": 0.6},
+{"type": "box", "id": "exam", "x": 640, "y": 640, "w": 480, "h": 190, "text": "Surprise exam", "sub": "never seen before", "color": "purple", "at": 1},
+{"type": "arrow", "from": [1530, 370], "to": "exam", "curve": 60, "color": "purple", "dashed": true, "at": 1, "delay": 0.3},
+{"type": "counter", "x": 1450, "y": 620, "value": 90, "begin": 0, "suffix": "%", "size": "title", "color": "green", "at": 2},
+{"type": "text", "x": 1450, "y": 770, "text": "Accuracy on new emails", "size": "body", "color": "muted", "at": 2, "delay": 0.6}
+]}
+
+Sometimes a model memorizes instead of learning. It aces the training data but fails on anything new. This problem is called overfitting, and fresh test data exposes it.
+
+visual
+{"elements": [
+{"type": "plot", "id": "po", "x": 960, "y": 560, "w": 1300, "h": 640, "xRange": [0, 10], "yRange": [0, 10], "xLabel": "Input", "yLabel": "Output", "grid": false, "at": 0},
+{"type": "points", "plot": "po", "data": [[1, 2], [2, 4.5], [3, 3], [4, 5.5], [5, 4.5], [6, 7], [7, 5.8], [8, 8], [9, 7.2]], "classes": ["cyan"], "r": 12, "stagger": 0.06, "at": 0, "delay": 0.3},
+{"type": "curve", "plot": "po", "data": [[0.5, 1], [1, 2], [2, 4.5], [3, 3], [4, 5.5], [5, 4.5], [6, 7], [7, 5.8], [8, 8], [9, 7.2], [9.5, 9]], "color": "red", "dur": 2.0, "at": 0, "delay": 1.0},
+{"type": "pill", "x": 560, "y": 220, "text": "Perfect on training", "color": "red", "at": 1},
+{"type": "points", "plot": "po", "data": [[2.2, 3.2], [4.1, 4.6], [6.1, 6.0], [8.1, 7.4]], "classes": ["pink"], "r": 14, "stagger": 0.2, "at": 1, "delay": 0.8},
+{"type": "stamp", "x": 1420, "y": 240, "text": "OVERFITTING", "color": "red", "at": 2}
+]}
+
+Machine learning already runs your day. Your phone unlocks with your face, and maps predict traffic jams. Shopping apps suggest items under “Customers also bought”.
+
+visual
+{"elements": [
+{"type": "headline", "text": "Machine learning everywhere", "color": "white", "at": 0},
+{"type": "box", "x": 400, "y": 520, "w": 440, "h": 280, "icon": "face", "text": "Face unlock", "color": "cyan", "at": 1},
+{"type": "box", "x": 960, "y": 520, "w": 440, "h": 280, "icon": "map", "text": "Traffic prediction", "color": "cyan", "at": 1, "delay": 0.7},
+{"type": "box", "x": 1520, "y": 520, "w": 440, "h": 280, "icon": "cart", "text": "Recommendations", "color": "cyan", "at": 2},
+{"type": "bubble", "x": 1300, "y": 720, "w": 460, "text": "Customers also bought", "color": "pink", "at": 2, "delay": 0.6}
+]}
+
+Even chatbots like ChatGPT are machine learning models. They learn from huge amounts of text to predict the next word. For example, after “the cat sat on the”, the model predicts “mat”.
+
+visual
+{"elements": [
+{"type": "box", "id": "llm", "x": 1100, "y": 270, "w": 480, "h": 150, "text": "Language model", "color": "yellow", "fill": "tint", "at": 0},
+{"type": "icon", "x": 380, "y": 270, "name": "book", "size": 120, "color": "cyan", "at": 1},
+{"type": "arrow", "from": [480, 270], "to": "llm", "color": "cyan", "label": "huge text", "at": 1, "delay": 0.3},
+{"type": "bubble", "x": 180, "y": 520, "w": 640, "text": "\"the cat sat on the ...\"", "color": "cyan", "at": 2},
+{"type": "arrow", "from": [840, 580], "to": [1080, 580], "color": "pink", "at": 2, "delay": 0.6},
+{"type": "bar", "x": 1120, "y": 500, "w": 520, "h": 70, "color": "pink", "text": "mat", "at": 2, "delay": 0.9},
+{"type": "bar", "x": 1120, "y": 600, "w": 220, "h": 70, "color": "muted", "text": "floor", "at": 2, "delay": 1.1},
+{"type": "bar", "x": 1120, "y": 700, "w": 130, "h": 70, "color": "muted", "text": "sofa", "at": 2, "delay": 1.3},
+{"type": "check", "x": 1700, "y": 535, "r": 30, "at": 2, "delay": 1.7}
+]}
+
+Machine learning teaches computers with examples instead of hand-written rules. Models learn from features and labels by shrinking their error. Good data leads to good models, and test data keeps them honest. The next episode shows how AI, machine learning, and deep learning fit together.
+
+visual
+{"elements": [
+{"type": "headline", "text": "Recap", "color": "white", "at": 0},
+{"type": "check", "x": 400, "y": 300, "r": 30, "at": 0, "delay": 0.5},
+{"type": "box", "x": 400, "y": 430, "w": 440, "h": 150, "text": "Learn from examples", "color": "green", "at": 0, "delay": 0.2},
+{"type": "check", "x": 960, "y": 300, "r": 30, "at": 1, "delay": 0.5},
+{"type": "box", "x": 960, "y": 430, "w": 440, "h": 150, "text": "Shrink the error", "color": "green", "at": 1, "delay": 0.2},
+{"type": "check", "x": 1520, "y": 300, "r": 30, "at": 2, "delay": 0.5},
+{"type": "box", "x": 1520, "y": 430, "w": 440, "h": 150, "text": "Test on new data", "color": "green", "at": 2, "delay": 0.2},
+{"type": "text", "x": 960, "y": 680, "text": "Next episode", "size": "small", "color": "muted", "at": 3},
+{"type": "pill", "x": 640, "y": 790, "text": "AI", "color": "purple", "at": 3, "delay": 0.3},
+{"type": "pill", "x": 960, "y": 790, "text": "Machine learning", "color": "yellow", "at": 3, "delay": 0.7},
+{"type": "pill", "x": 1300, "y": 790, "text": "Deep learning", "color": "cyan", "at": 3, "delay": 1.1}
+]}
