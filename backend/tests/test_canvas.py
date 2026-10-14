@@ -83,5 +83,51 @@ class ExampleTests(unittest.TestCase):
             validate(spec, sentences(scene.narration))
 
 
+
+class MachineLearningVisualTests(unittest.TestCase):
+    plot = {'id': 'p', 'type': 'plot', 'x': 960, 'y': 500, 'w': 1000, 'h': 500, 'xRange': [0, 10], 'yRange': [-50, 100]}
+
+    def test_formula_curves_become_points_across_the_plot(self):
+        spec = {'elements': [self.plot, {'type': 'curve', 'plot': 'p', 'shape': {'type': 'line', 'slope': 2, 'intercept': 1}},
+                             {'type': 'curve', 'plot': 'p', 'shape': {'type': 'sigmoid', 'k': 2, 'x0': 5}}]}
+        line, sigmoid = validate(spec, ['One.'])['elements'][1:]
+        self.assertEqual(line['data'][0], [0, 1])
+        self.assertEqual(line['data'][-1], [10, 21])
+        self.assertAlmostEqual(sigmoid['data'][len(sigmoid['data']) // 2][1], .5, delta=.05)
+
+    def test_plotted_elements_use_data_coordinates_and_must_name_a_plot(self):
+        spec = {'elements': [self.plot, {'type': 'dot', 'plot': 'p', 'x': 4, 'y': -30}]}
+        self.assertEqual(validate(spec, ['One.'])['elements'][1]['y'], -30)
+        for bad, message in [({'type': 'points', 'plot': 'q', 'data': [[1, 2], [3, 4]]}, 'plot "q"'),
+                             ({'type': 'curve', 'plot': 'p', 'data': [[1, 2], [3, 4]], 'start': [[0, 0], [1, 1], [2, 2]]}, 'as many points'),
+                             ({'type': 'table', 'x': 10, 'y': 10, 'rows': [['a', 'b']], 'highlight': [[2, 0, 'red']]}, 'outside the table'),
+                             ({'type': 'network', 'x': 960, 'y': 500, 'w': 600, 'h': 300, 'layers': [3, 40]}, 'neuron counts')]:
+            with self.assertRaisesRegex(CanvasError, message):
+                validate({'elements': [self.plot, bad]}, ['One.'])
+
+    def test_the_linear_regression_example_is_valid(self):
+        from backend.services.director import script_to_video, sentences
+        narration, specs, errors = extract((ROOT / 'data/examples/ml-linear-regression-visual.txt').read_text(encoding='utf-8'))
+        self.assertEqual(errors, [])
+        video = script_to_video('Linear Regression', narration, keep_paragraphs=True)
+        for scene, spec in zip(video.scenes, specs):
+            validate(spec, sentences(scene.narration))
+
+
+class EpisodePromptTests(unittest.TestCase):
+    def test_the_prompt_places_the_episode_in_its_playlist(self):
+        from backend.services.claude_prompt import episode_prompt
+        from backend.services.workspaces import MACHINE_LEARNING_TOPICS as topics
+        prompt = episode_prompt('Linear Regression', 4, 'Machine Learning', topics)
+        self.assertIn('about: Linear Regression', prompt.splitlines()[0])
+        self.assertIn('episode 9 of 20', prompt)
+        self.assertIn('The next episode is "Logistic Regression"', prompt)
+        self.assertIn('Overfitting and Underfitting', prompt)
+        self.assertIn('"type": "plot"', prompt.replace('plot: {"id"', '"type": "plot"'))
+        first = episode_prompt('What is Machine Learning?', 4, 'Machine Learning', topics)
+        self.assertIn('first episode', first)
+        self.assertNotIn('SERIES CONTEXT', episode_prompt('Anything', 3))
+
+
 if __name__ == '__main__':
     unittest.main()

@@ -1,0 +1,47 @@
+Linear regression is one of the simplest ideas in machine learning. It finds the straight line that best fits your data. Then it uses that line to make predictions.
+
+```visual
+{"elements": [{"type": "text", "x": 960, "y": 230, "text": "LINEAR REGRESSION", "size": "title", "at": 0}, {"id": "p", "type": "plot", "x": 960, "y": 640, "w": 900, "h": 380, "xRange": [0, 10], "yRange": [20, 100], "grid": false, "at": 1}, {"type": "points", "plot": "p", "data": [[1, 35], [2, 42], [3, 48], [4, 57], [5, 61], [6, 70], [7, 74], [8, 83], [9, 88]], "classes": ["cyan"], "at": 1, "delay": 0.3}, {"type": "curve", "plot": "p", "shape": {"type": "line", "slope": 6.67, "intercept": 28.67}, "color": "yellow", "at": 1, "delay": 1.2}, {"type": "pill", "x": 1620, "y": 520, "text": "Predict", "color": "green", "at": 2}]}
+```
+
+Imagine we track how many hours students study and the score they get. Each student becomes one point on a graph. More hours usually means a higher score.
+
+```visual
+{"elements": [{"type": "table", "x": 180, "y": 220, "rows": [["Hours", "Score"], ["2", "42"], ["5", "61"], ["8", "83"]], "header": true, "colWidth": 200, "at": 0, "out": {"at": 1, "delay": 0.4}}, {"id": "p", "type": "plot", "x": 990, "y": 510, "w": 1180, "h": 540, "xRange": [0, 10], "yRange": [20, 100], "xLabel": "Hours studied", "yLabel": "Exam score", "at": 1, "delay": 0.3}, {"type": "points", "plot": "p", "data": [[1, 35], [2, 42], [3, 48], [4, 57], [5, 61], [6, 70], [7, 74], [8, 83], [9, 88]], "classes": ["cyan"], "at": 1, "delay": 0.6}, {"type": "arrow", "from": [600, 700], "to": [1450, 300], "color": "green", "dashed": true, "label": "trend", "at": 2}]}
+```
+
+Linear regression draws one straight line through these points. The line has a slope and an intercept. The slope says how much the score rises for each extra hour.
+
+```visual
+{"elements": [{"id": "p", "type": "plot", "x": 990, "y": 510, "w": 1180, "h": 540, "xRange": [0, 10], "yRange": [20, 100], "xLabel": "Hours studied", "yLabel": "Exam score", "at": 0}, {"type": "points", "plot": "p", "data": [[1, 35], [2, 42], [3, 48], [4, 57], [5, 61], [6, 70], [7, 74], [8, 83], [9, 88]], "classes": ["cyan"], "at": 0, "delay": 0.1}, {"type": "curve", "plot": "p", "shape": {"type": "line", "slope": 6.67, "intercept": 28.67}, "color": "yellow", "at": 0, "delay": 0.4}, {"type": "pill", "x": 960, "y": 168, "text": "score = 6.67 x hours + 28.67", "color": "yellow", "at": 1}, {"type": "segments", "plot": "p", "segments": [[4, 55.35, 5, 55.35], [5, 55.35, 5, 62.02]], "color": "green", "dashed": false, "at": 2}, {"type": "text", "x": 1010, "y": 370, "text": "+6.67 per hour", "size": "small", "color": "green", "at": 2, "delay": 0.4}]}
+```
+
+But which line is the best one? For every point, we measure the gap between the real score and the line. These gaps are called errors, or residuals.
+
+```visual
+{"elements": [{"id": "p", "type": "plot", "x": 990, "y": 510, "w": 1180, "h": 540, "xRange": [0, 10], "yRange": [20, 100], "xLabel": "Hours studied", "yLabel": "Exam score", "at": 0}, {"type": "points", "plot": "p", "data": [[1, 35], [2, 42], [3, 48], [4, 57], [5, 61], [6, 70], [7, 74], [8, 83], [9, 88]], "classes": ["cyan"], "at": 0, "delay": 0.1}, {"type": "curve", "plot": "p", "data": [[0.0, 52.0], [0.5, 53.0], [1.0, 54.0], [1.5, 55.0], [2.0, 56.0], [2.5, 57.0], [3.0, 58.0], [3.5, 59.0], [4.0, 60.0], [4.5, 61.0], [5.0, 62.0], [5.5, 63.0], [6.0, 64.0], [6.5, 65.0], [7.0, 66.0], [7.5, 67.0], [8.0, 68.0], [8.5, 69.0], [9.0, 70.0], [9.5, 71.0], [10.0, 72.0]], "color": "pink", "at": 0, "delay": 0.5}, {"type": "segments", "plot": "p", "segments": [[1, 35, 1, 54.0], [2, 42, 2, 56.0], [3, 48, 3, 58.0], [4, 57, 4, 60.0], [5, 61, 5, 62.0], [6, 70, 6, 64.0], [7, 74, 7, 66.0], [8, 83, 8, 68.0], [9, 88, 9, 70.0]], "color": "red", "at": 1, "delay": 0.4}, {"type": "pill", "x": 1560, "y": 860, "text": "errors", "color": "red", "at": 2}]}
+```
+
+The model adds up all the squared errors into one number called the loss. A good line has a small loss. A bad line has a big loss.
+
+```visual
+{"elements": [{"id": "bad", "type": "plot", "x": 520, "y": 470, "w": 640, "h": 380, "xRange": [0, 10], "yRange": [20, 100], "grid": false, "at": 0}, {"type": "points", "plot": "bad", "data": [[1, 35], [2, 42], [3, 48], [4, 57], [5, 61], [6, 70], [7, 74], [8, 83], [9, 88]], "classes": ["cyan"], "r": 10, "at": 0}, {"type": "curve", "plot": "bad", "data": [[0.0, 52.0], [0.5, 53.0], [1.0, 54.0], [1.5, 55.0], [2.0, 56.0], [2.5, 57.0], [3.0, 58.0], [3.5, 59.0], [4.0, 60.0], [4.5, 61.0], [5.0, 62.0], [5.5, 63.0], [6.0, 64.0], [6.5, 65.0], [7.0, 66.0], [7.5, 67.0], [8.0, 68.0], [8.5, 69.0], [9.0, 70.0], [9.5, 71.0], [10.0, 72.0]], "color": "pink", "at": 0, "delay": 0.3}, {"type": "segments", "plot": "bad", "segments": [[1, 35, 1, 54.0], [2, 42, 2, 56.0], [3, 48, 3, 58.0], [4, 57, 4, 60.0], [5, 61, 5, 62.0], [6, 70, 6, 64.0], [7, 74, 7, 66.0], [8, 83, 8, 68.0], [9, 88, 9, 70.0]], "color": "red", "at": 0, "delay": 0.6}, {"id": "good", "type": "plot", "x": 1400, "y": 470, "w": 640, "h": 380, "xRange": [0, 10], "yRange": [20, 100], "grid": false, "at": 1}, {"type": "points", "plot": "good", "data": [[1, 35], [2, 42], [3, 48], [4, 57], [5, 61], [6, 70], [7, 74], [8, 83], [9, 88]], "classes": ["cyan"], "r": 10, "at": 1}, {"type": "curve", "plot": "good", "shape": {"type": "line", "slope": 6.67, "intercept": 28.67}, "color": "green", "at": 1, "delay": 0.3}, {"type": "counter", "x": 1400, "y": 790, "value": 1, "begin": 0, "prefix": "loss ", "color": "green", "at": 1, "delay": 0.6}, {"type": "counter", "x": 520, "y": 790, "value": 146, "begin": 0, "prefix": "loss ", "color": "red", "at": 2}]}
+```
+
+To find the best line, the model starts with a random line. Then it adjusts the slope a little at a time to reduce the loss. Step by step, the line rotates into place.
+
+```visual
+{"elements": [{"id": "p", "type": "plot", "x": 640, "y": 500, "w": 900, "h": 520, "xRange": [0, 10], "yRange": [20, 100], "xLabel": "Hours", "yLabel": "Score", "at": 0}, {"type": "points", "plot": "p", "data": [[1, 35], [2, 42], [3, 48], [4, 57], [5, 61], [6, 70], [7, 74], [8, 83], [9, 88]], "classes": ["cyan"], "at": 0}, {"type": "curve", "plot": "p", "data": [[0.0, 28.67], [0.5, 32.005], [1.0, 35.34], [1.5, 38.675], [2.0, 42.010000000000005], [2.5, 45.345], [3.0, 48.68], [3.5, 52.015], [4.0, 55.35], [4.5, 58.685], [5.0, 62.02], [5.5, 65.355], [6.0, 68.69], [6.5, 72.025], [7.0, 75.36], [7.5, 78.695], [8.0, 82.03], [8.5, 85.36500000000001], [9.0, 88.7], [9.5, 92.035], [10.0, 95.37]], "start": [[0.0, 60.0], [0.5, 60.0], [1.0, 60.0], [1.5, 60.0], [2.0, 60.0], [2.5, 60.0], [3.0, 60.0], [3.5, 60.0], [4.0, 60.0], [4.5, 60.0], [5.0, 60.0], [5.5, 60.0], [6.0, 60.0], [6.5, 60.0], [7.0, 60.0], [7.5, 60.0], [8.0, 60.0], [8.5, 60.0], [9.0, 60.0], [9.5, 60.0], [10.0, 60.0]], "color": "yellow", "dur": 4.5, "at": 1}, {"id": "l", "type": "plot", "x": 1500, "y": 470, "w": 520, "h": 400, "xRange": [-3, 3], "yRange": [0, 9], "xLabel": "Slope", "yLabel": "Loss", "grid": false, "at": 1}, {"type": "curve", "plot": "l", "shape": {"type": "poly", "coefficients": [0.5, 0, 0.9]}, "color": "muted", "at": 1}, {"type": "dot", "plot": "l", "path": [[-2.8, 7.556], [-2, 4.1], [-1.2, 1.796], [-0.6, 0.824], [-0.2, 0.536], [0, 0.5]], "color": "red", "label": "loss", "dur": 4.5, "at": 1, "delay": 0.3}, {"type": "pill", "x": 1500, "y": 820, "text": "Gradient descent", "color": "red", "at": 2}]}
+```
+
+Now we can make predictions. A student who studies 7.5 hours is predicted to score about 79. The model never saw this student, but the line gives a good guess.
+
+```visual
+{"elements": [{"id": "p", "type": "plot", "x": 990, "y": 510, "w": 1180, "h": 540, "xRange": [0, 10], "yRange": [20, 100], "xLabel": "Hours studied", "yLabel": "Exam score", "at": 0}, {"type": "points", "plot": "p", "data": [[1, 35], [2, 42], [3, 48], [4, 57], [5, 61], [6, 70], [7, 74], [8, 83], [9, 88]], "classes": ["cyan"], "at": 0, "delay": 0.1}, {"type": "curve", "plot": "p", "shape": {"type": "line", "slope": 6.67, "intercept": 28.67}, "color": "yellow", "at": 0, "delay": 0.3}, {"type": "segments", "plot": "p", "segments": [[7.5, 20, 7.5, 78.695], [7.5, 78.695, 0, 78.695]], "color": "green", "at": 1}, {"type": "dot", "plot": "p", "x": 7.5, "y": 78.695, "color": "green", "label": "new student", "at": 1, "delay": 0.6}, {"type": "counter", "x": 1700, "y": 300, "value": 79, "prefix": "≈ ", "color": "green", "at": 1, "delay": 1.0}, {"type": "check", "x": 1700, "y": 420, "at": 2}]}
+```
+
+Linear regression fits a straight line to data. It measures the errors, reduces the loss, and then predicts new values. Next, we will see how logistic regression handles yes or no questions.
+
+```visual
+{"elements": [{"type": "headline", "text": "Recap", "at": 0}, {"id": "a", "type": "box", "x": 360, "y": 500, "w": 380, "h": 150, "text": "Fit a line", "color": "yellow", "at": 0}, {"id": "b", "type": "box", "x": 960, "y": 500, "w": 380, "h": 150, "text": "Reduce the loss", "color": "red", "at": 1}, {"id": "c", "type": "box", "x": 1560, "y": 500, "w": 380, "h": 150, "text": "Predict", "color": "green", "at": 1, "delay": 0.8}, {"type": "arrow", "from": "a", "to": "b", "color": "muted", "at": 1}, {"type": "arrow", "from": "b", "to": "c", "color": "muted", "at": 1, "delay": 0.6}, {"type": "pill", "x": 960, "y": 780, "text": "Next: Logistic Regression", "color": "cyan", "at": 2}]}
+```

@@ -172,6 +172,15 @@ function renderPlaylistSuggestion(){
   $('playlist-use-next').textContent=w?.active_project?'Continue current video':'Use suggested topic';
 }
 $('studio-workspace').addEventListener('change',renderPlaylistSuggestion);
+/** Copy the Claude prompt for this playlist's next episode; Claude's answer goes into Paste a script. */
+$('playlist-claude-prompt').onclick=()=>guarded(async()=>{
+  const w=state.spaces.find(w=>w.id===$('studio-workspace').value);if(!w)return;
+  const result=await api(`/api/workspaces/${w.id}/claude-prompt`,{});
+  let copied=true;try{await navigator.clipboard.writeText(result.prompt);}catch{copied=false;}
+  creatorMode='script';$('studio-title').value=result.topic;updateCreatorInput();
+  if(!copied){$('studio-script').value=result.prompt;$('studio-script').select();}
+  $('playlist-prompt-note').textContent=copied?`Prompt for episode ${result.episode??''} "${result.topic}" copied. Paste it into Claude, then paste Claude's answer into the script box.`:"Copy blocked by the browser: the prompt is in the script box. Copy it to Claude, then replace it with Claude's answer.";
+});
 $('playlist-use-next').onclick=()=>guarded(async()=>{const w=state.spaces.find(w=>w.id===$('studio-workspace').value);if(w?.active_project){await openProject(w.active_project);return;}if(w?.next_topic){creatorMode='prompt';$('studio-topic').value=w.next_topic;updateCreatorInput();}});
 let scriptReviewKey='';
 function renderScriptReview(p,running){

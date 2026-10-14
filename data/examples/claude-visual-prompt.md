@@ -59,5 +59,19 @@ Element types:
 - icon: {"x","y", "name": a concept word, "size", "color"}
 - line: {"points": [[x,y], ...], "color", "dashed"}
 
+Data and machine-learning visuals (a "plot" gives other elements data coordinates):
+- plot: {"id", "x","y" (centre), "w","h", "xRange": [low, high], "yRange": [low, high], "xLabel", "yLabel", "grid": true|false} — axes that draw themselves
+- points: {"plot": plot id, "data": [[x, y], [x, y, classIndex], ...], "classes": ["cyan", "pink", ...], "r", "stagger": seconds between points} — a scatter plot; classIndex picks the colour
+- curve: {"plot", "shape": {"type": "line", "slope", "intercept"} | {"type": "sigmoid", "k", "x0"} | {"type": "poly", "coefficients": [c0, c1, c2, ...]}, or "data": [[x, y], ...], "start": [[x, y], ...] (same number of points: the curve morphs from start to its final shape, e.g. a line rotating into the best fit), "dur", "color", "dashed"}
+- dot: {"plot" (optional), "x","y" or "path": [[x, y], ...] (it travels along the path, e.g. gradient descent rolling down a loss curve), "label", "color", "dur"}
+- segments: {"plot", "segments": [[x1, y1, x2, y2], ...], "color", "dashed"} — residual errors, distances to neighbours, guide lines
+- region: {"plot", "polygon": [[x, y], ...], "color"} — a shaded area, e.g. one side of a decision boundary
+- table: {"x","y" (top-left), "rows": [["", "Pred yes", "Pred no"], ["Actual yes", "40", "10"], ...], "header": true, "colWidth", "rowHeight", "highlight": [[row, column, "green"], ...]} — datasets, features and labels, confusion matrices; rows appear one by one
+- network: {"x","y","w","h", "layers": [3, 4, 2], "labels": ["Input", "Hidden", "Output"]} — a neural network drawn layer by layer
+- counter: {"x","y", "value": 92, "begin": 0, "prefix", "suffix": "%", "decimals", "size", "color"} — a number that counts up, for accuracy, loss or scores
+
+Use real, consistent numbers: if the narration says the model predicts 79, the plot and counter show 79.
+Prefer these data visuals whenever the idea is about data, fitting, distance, probability or measuring a model.
+
 Output only the script: paragraphs, each followed by its visual block. Valid JSON, double quotes,
 escape quotes inside text as \".

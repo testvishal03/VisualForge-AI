@@ -28,6 +28,10 @@ For videos where every scene has its own picture, ask Claude for the script **an
 
 The block is never read aloud. Its elements (boxes, arrows, moving messages, chat bubbles, pills, stamps, ticks and crosses, brackets, rings, bars, icons, headlines) are drawn on a dark 1920x1080 stage and each appears when its sentence (`at`, counted from 0) or a named `word` is spoken. Each paragraph with a block becomes its own scene and skips AI planning, so these videos also generate faster. The script check reports any invalid block with its scene number before you prepare. A complete example is `data/examples/tool-calling-visual.txt`.
 
+**Machine-learning visuals.** Blocks can also draw data: `plot` (axes with tick values), `points` (a scatter plot coloured by class), `curve` (a line, sigmoid or polynomial that draws itself, or morphs from a start shape into its final fit), `dot` (a point that travels along a path, such as gradient descent rolling down a loss curve), `segments` (residual errors and guide lines), `region` (a shaded decision area), `table` (datasets, features and labels, confusion matrices), `network` (neural network layers) and `counter` (a number that counts up). See `data/examples/ml-linear-regression-visual.txt`.
+
+**Playlists.** Create a series workspace (Workspace settings, *Use Machine Learning preset* fills in a 20-episode Machine Learning playlist). In **New video**, the next-lesson bar offers **Copy Claude prompt**: the prompt for that episode, including what earlier episodes covered, the next episode to set up, and one consistent visual language for the whole series. Paste it into Claude, then paste Claude's answer into **Paste a script**.
+
 ## Make videos on a server or a free GPU
 
 The whole pipeline also runs headless on Linux, so a server can make the videos instead of your laptop. One command turns a script into `video.mp4`, `thumbnail.png`, `description.txt` and a `report.json`:

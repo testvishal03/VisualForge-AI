@@ -271,6 +271,20 @@ def make_server(port=8765, root=ROOT, directory=None):
                 if path == '/api/cancel':
                     jobs.cancel.set()
                     return self.json_response({'status': 'cancelling'})
+                prompt_match = re.fullmatch(r'/api/workspaces/([a-f0-9]{12})/claude-prompt', path)
+                if prompt_match:
+                    # Read-only: the Claude prompt for one playlist episode (default: the next topic).
+                    from backend.services.claude_prompt import episode_prompt
+                    workspace = jobs.workspaces.get(prompt_match[1])
+                    topic = body.get('topic') or workspace.get('next_topic') or (workspace.get('topics') or [None])[0]
+                    minutes = body.get('minutes', 4)
+                    if not isinstance(topic, str) or not topic.strip() or len(topic) > 200:
+                        raise ValueError('Choose a topic for the episode.')
+                    if type(minutes) not in (int, float) or not 1 <= minutes <= 12:
+                        raise ValueError('Choose a length from 1 to 12 minutes.')
+                    topics = workspace.get('topics') or []
+                    return self.json_response({'topic': topic.strip(), 'prompt': episode_prompt(topic, minutes, workspace.get('name') if topics else None, topics, workspace.get('audience', 'beginners')),
+                                               'episode': next((i + 1 for i, t in enumerate(topics) if t.casefold() == topic.strip().casefold()), None), 'total': len(topics)})
                 if path == '/api/check-script':
                     # Read-only: the same conversion and scene rules as Prepare, plus pronunciation checks.
                     from backend.services.script_check import check
