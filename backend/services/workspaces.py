@@ -11,6 +11,10 @@ GENERATIVE_AI_TOPICS = ['What is Generative AI?', 'How Large Language Models Wor
     'Tokens and Context Windows', 'Embeddings', 'Vector Databases', 'RAG',
     'Prompt Engineering', 'Fine-Tuning', 'Tool Calling', 'AI Agents', 'MCP',
     'Multimodal AI', 'Guardrails and AI Safety', 'Build a RAG Application', 'Build an AI Agent']
+MACHINE_LEARNING_TOPICS = ['What is Machine Learning?', 'AI vs ML vs Deep Learning', 'Supervised Learning', 'Unsupervised Learning',
+    'Reinforcement Learning', 'Features and Labels', 'Training vs Testing Data', 'Overfitting and Underfitting', 'Linear Regression',
+    'Logistic Regression', 'Decision Trees', 'Random Forest', 'K-Nearest Neighbors', 'K-Means Clustering', 'Model Evaluation',
+    'Accuracy, Precision, Recall, F1', 'Confusion Matrix', 'Cross Validation', 'Feature Engineering', 'End-to-End ML Project']
 
 
 def next_topic(workspace, project_topics=()):
