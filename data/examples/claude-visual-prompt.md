@@ -4,6 +4,10 @@ Copy everything below the line into Claude, replace `<TOPIC>` and the length, an
 answer into **Paste a script** in VisualForge. The `visual` blocks are drawn and animated in sync with
 the narration; they are never read aloud. See `tool-calling-visual.txt` in this folder for a full example.
 
+Copying Claude's answer: the **Copy** button under the answer keeps the ```` ```visual ```` fences. Selecting
+the text with the mouse drops them and leaves the word `visual` above each JSON block; VisualForge accepts
+that form too, so either way works.
+
 ---
 
 Write a narration script for a YouTube explainer video about: <TOPIC>

@@ -168,8 +168,11 @@ def check(text, title=None):
         if spec is None:
             continue
         try:
-            validate_canvas(spec, sentences(scene.narration))
+            clean = validate_canvas(spec, sentences(scene.narration))
             drawn.add(number)
+            from backend.services.canvas import layout_issues
+            for problem in layout_issues(clean):
+                issues.append(_issue('warning', f'Layout: {problem}. Ask Claude to move it, or adjust x and y in the visual block.', number))
         except CanvasError as exc:
             issues.append(_issue('error', f'Visual block: {exc}.', number))
     report.update(scenes=len(video.scenes), title=video.title)
@@ -208,7 +211,7 @@ def check(text, title=None):
         seconds = len(words(scene.narration)) / WORDS_PER_MINUTE * 60
         if seconds > LONG_SCENE_SECONDS:
             issues.append(_issue('info', f'This scene runs about {round(seconds)} seconds on one visual. A blank line splits it into two scenes.', n, sentences(scene.narration)[0]))
-    if len(video.scenes) > MODEL_PLANNING_LIMIT:
+    if len(video.scenes) > MODEL_PLANNING_LIMIT and len(drawn) < len(video.scenes):
         issues.append(_issue('info', f'{len(video.scenes)} scenes: over {MODEL_PLANNING_LIMIT} scenes, the AI plans visuals only for the weakest '
                                      f'scenes (up to {LONG_VIDEO_PLANNING_SECONDS // 60} minutes); the rest use rule-based visuals.'))
     for number in sorted(drawn):
@@ -223,7 +226,7 @@ def check(text, title=None):
     # The planner skips explainer scenes; long videos plan only their weakest scenes.
     if len(video.scenes) > MODEL_PLANNING_LIMIT:
         from backend.services.visual_quality import weak_scenes
-        planned = len(weak_scenes(document, LONG_VIDEO_PLANNING_SECONDS // SECONDS_PER_PLANNED_SCENE))
+        planned = len([n for n in weak_scenes(document, LONG_VIDEO_PLANNING_SECONDS // SECONDS_PER_PLANNED_SCENE) if n not in drawn])
     else:
         planned = len(video.scenes) - len(report['highlights'])  # hand-designed and explainer scenes skip planning
     measured = any(h['kind'] in ('next_token', 'tokens', 'embedding_map') for h in report['highlights'])

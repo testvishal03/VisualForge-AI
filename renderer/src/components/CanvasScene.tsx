@@ -1,13 +1,14 @@
 import {AbsoluteFill, useCurrentFrame, useVideoConfig} from 'remotion';
 import type {Scene, VideoData} from '../types';
-import {along, arrowEnds, BG, BOX_SUB, BOX_TITLE, boxSize, BUBBLE, bubbleSize, COLORS, PANEL, PILL, plotMapper, reveal, SIZES, tableSize, textWidth, wrap, type CanvasElement} from '../canvas';
+import {along, arrowEnds, BG, BOX_SUB, BOX_TITLE, boxSize, BUBBLE, bubbleSize, COLORS, fitText, PANEL, PILL, plotMapper, reveal, SIZES, tableSize, textWidth, wrap, type CanvasElement} from '../canvas';
 import {Caption} from './Caption';
 import {ConceptIcon, conceptIcon} from './ConceptIcon';
 import {exitProgress, sceneSeconds} from '../transitions';
 
 const FONT = "'Segoe UI', Selawik, Arial, sans-serif", MONO = "Consolas, 'DejaVu Sans Mono', monospace";
 const color = (name?: string, fallback = 'cyan') => COLORS[name ?? fallback] ?? COLORS[fallback];
-const iconName = (name?: string) => name ? (conceptIcon(name) ?? name) : null;
+// A concept word ("cart") or a Lucide name ("shopping-cart"); null when neither exists.
+const iconName = (name?: string) => name ? conceptIcon(name) : null;
 
 /** One element at reveal progress `p` (0 hidden → 1 in place): fades in while rising 30 px. */
 function Element({e, p, t, byId}: {e: CanvasElement; p: number; t: number; byId: Map<string, CanvasElement>}) {
@@ -71,9 +72,10 @@ function Element({e, p, t, byId}: {e: CanvasElement; p: number; t: number; byId:
     </g>;
   }
   if (e.type === 'text' || e.type === 'headline') {
-    const [size, weight] = SIZES[e.type === 'headline' ? 'h2' : String(e.size ?? 'body')] ?? SIZES.body;
-    const anchor = e.align === 'left' ? 'start' : e.align === 'right' ? 'end' : 'middle';
-    return <text x={e.type === 'headline' ? 960 : x} y={(e.type === 'headline' ? e.y ?? 210 : y) + rise} textAnchor={anchor} dominantBaseline="central"
+    const [wanted, weight] = SIZES[e.type === 'headline' ? 'h2' : String(e.size ?? 'body')] ?? SIZES.body;
+    const anchor = e.align === 'left' ? 'start' : e.align === 'right' ? 'end' : 'middle', at = e.type === 'headline' ? 960 : x;
+    const size = fitText(e.text ?? '', wanted, at, e.align);
+    return <text x={at} y={(e.type === 'headline' ? e.y ?? 210 : y) + rise} textAnchor={anchor} dominantBaseline="central"
       fontSize={size} fontWeight={weight} letterSpacing={size > 100 ? -3 : 0} fill={color(e.color, 'white')} opacity={p}>{e.text}</text>;
   }
   if (e.type === 'bracket') {
@@ -216,7 +218,9 @@ function Element({e, p, t, byId}: {e: CanvasElement; p: number; t: number; byId:
 /** A scene drawn from its hand-designed canvas: dark stage, dot grid, timed elements, word captions. */
 export function CanvasScene({scene, data, index, total, first}: {scene: Scene; data: VideoData; index: number; total: number; first: boolean}) {
   const frame = useCurrentFrame(), {fps} = useVideoConfig(), t = frame/fps;
-  const elements = scene.canvas!.elements, byId = new Map(elements.filter(e => e.id).map(e => [e.id!, e]));
+  // An icon that does not exist is dropped before layout, so its box keeps no empty space for it.
+  const elements = scene.canvas!.elements.map(e => e.icon && !iconName(e.icon) ? {...e, icon: undefined} : e);
+  const byId = new Map(elements.filter(e => e.id).map(e => [e.id!, e]));
   const enter = first ? 1 : Math.min(1, t/.3), exit = exitProgress(t, sceneSeconds(scene, fps));
   // The dot grid is one CSS pattern rather than hundreds of SVG circles, which kept rendering slow.
   const grid = `radial-gradient(circle, #1e2846 1.6px, transparent 2px) 10px 10px / 3.125% 5.556%`;

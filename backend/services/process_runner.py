@@ -25,7 +25,9 @@ def stop_process(process):
     process.wait(timeout=15)
 
 
-def execute(command: list, *, cwd: Path, log: Path, timeout: int = 3600, cancel_event=None) -> dict:
+def execute(command: list, *, cwd: Path, log: Path, timeout: int = 3600, cancel_event=None, stall: int | None = None) -> dict:
+    """Run a stage, streaming its log. With `stall`, a stage that prints nothing for that many seconds
+    is treated as hung (a crashed render browser can leave the process waiting forever)."""
     log.parent.mkdir(parents=True, exist_ok=True)
     started = time.monotonic()
     with log.open('a', encoding='utf-8') as output, log.open('r', encoding='utf-8', errors='replace') as reader:
@@ -37,6 +39,7 @@ def execute(command: list, *, cwd: Path, log: Path, timeout: int = 3600, cancel_
         try:
             last_progress = 0
             last_heartbeat = 0
+            last_output = 0
             while process.poll() is None:
                 if cancel_event is not None and cancel_event.is_set():
                     raise InterruptedError('Cancelled; completed outputs remain available.')
@@ -47,7 +50,9 @@ def execute(command: list, *, cwd: Path, log: Path, timeout: int = 3600, cancel_
                     lines = reader.read().strip().splitlines()
                     if lines:
                         console_progress('  '+lines[-1][:250])
-                        last_heartbeat = elapsed
+                        last_heartbeat = last_output = elapsed
+                    elif stall and elapsed - last_output > stall:
+                        raise RuntimeError(f'Stage stalled: no output for {stall}s. See {log}')
                     elif elapsed-last_heartbeat >= 30:
                         console_progress(f'  {log.stem}: still running ({elapsed:.0f}s elapsed).')
                         last_heartbeat = elapsed
