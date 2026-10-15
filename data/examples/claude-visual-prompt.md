@@ -77,5 +77,28 @@ Data and machine-learning visuals (a "plot" gives other elements data coordinate
 Use real, consistent numbers: if the narration says the model predicts 79, the plot and counter show 79.
 Prefer these data visuals whenever the idea is about data, fitting, distance, probability or measuring a model.
 
-Output only the script: paragraphs, each followed by its visual block. Valid JSON, double quotes,
+PUBLISHING (YouTube title, description and tags)
+After the last visual block, add ONE block that the app uses for publishing (it is never narrated):
+
+```publish
+{"titles": ["...", "...", "...", "...", "..."],
+ "description": "...",
+ "tags": ["...", "..."],
+ "hashtags": ["...", "...", "..."]}
+```
+
+- titles: 5 high-click-through options, best first. 45–60 characters each. Put the main search keyword in the
+  first 40 characters. Each uses one proven hook: a clear benefit ("…in 5 Minutes"), curiosity ("How … Really
+  Works"), "Explained Visually", "for Beginners", a number, or a before/after. Title Case, at most one emoji-free
+  bracket like (Visual Guide). Never misleading clickbait, never ALL CAPS, every title must match the video.
+- description: 150–300 words. The first 2 lines (about 150 characters) are the hook and contain the main keyword,
+  because only they show in search. Then "In this video you'll learn:" with 4–6 short bullet lines starting "- ",
+  then one line about the playlist. Use 3–5 related keywords naturally (no keyword stuffing). No timestamps, links,
+  or < > characters: the app adds chapter times measured from the finished video.
+- tags: 15–25 tags, from specific to broad: the exact topic, long-tail search phrases ("what is machine learning
+  for beginners"), related concepts, then broad ones ("machine learning", "artificial intelligence"). Under 500
+  characters in total.
+- hashtags: 3 hashtags without "#", most important first (YouTube shows the first three above the title).
+
+Output only the script: paragraphs, each followed by its visual block, then the publish block. Valid JSON, double quotes,
 escape quotes inside text as \".

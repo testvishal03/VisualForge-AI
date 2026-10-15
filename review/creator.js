@@ -269,8 +269,29 @@ function renderPublishKit(project,show){
   $('publish-thumb-download').href=kit.thumbnail_url;$('publish-thumb-download').download=stem+'-thumbnail.png';
   $('publish-description-download').href=kit.description_url;$('publish-description-download').download=stem+'-description.txt';
   if($('publish-description').value!==kit.description)$('publish-description').value=kit.description;
+  renderSeo(kit);
   $('publish-note').textContent=kit.chapters?`Includes ${kit.chapters} chapter markers timed from the finished video.`:(kit.chapters_note||'');
 }
+/** Title options and tags written with the script: each title copies with one click. */
+function renderSeo(kit){
+  const box=$('publish-seo');box.hidden=!kit.titles?.length;
+  if(box.hidden)return;
+  const list=$('publish-titles');list.replaceChildren();
+  for(const title of kit.titles){
+    const li=element('li');li.append(element('strong',title.text));
+    li.append(element('span',` ${title.chars} characters`+(title.notes.length?` · ${title.notes.join('; ')}`:''),'helper'));
+    const copy=element('button','Copy','secondary');copy.type='button';
+    copy.onclick=()=>copyText(title.text,copy);
+    li.append(copy);list.append(li);
+  }
+  $('publish-tags').value=(kit.tags||[]).join(', ');
+  $('publish-tags-note').textContent=`${(kit.tags||[]).length} tags, ${$('publish-tags').value.length}/500 characters`;
+}
+async function copyText(text,button){
+  try{await navigator.clipboard.writeText(text);const label=button.textContent;button.textContent='Copied';setTimeout(()=>{button.textContent=label;},1500);}
+  catch{message('Copy blocked by the browser; select the text and press Ctrl+C.');}
+}
+$('publish-tags-copy').onclick=()=>copyText($('publish-tags').value,$('publish-tags-copy'));
 $('publish-copy').onclick=async()=>{
   const text=$('publish-description').value;
   try{await navigator.clipboard.writeText(text);$('publish-copied').textContent='Copied';}

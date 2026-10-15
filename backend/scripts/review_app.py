@@ -352,6 +352,10 @@ def make_server(port=8765, root=ROOT, directory=None):
                                 title = normalize_topic(body['title']) if body.get('title') else None
                                 from backend.services.page_script import looks_like_markdown, page_to_script
                                 from backend.services.canvas import extract
+                                from backend.services import seo as seo_block
+                                text, seo, seo_problem = seo_block.extract(text)
+                                if seo_problem:
+                                    raise ValueError(seo_problem)
                                 text, specs, problems = extract(text)
                                 if problems:
                                     raise ValueError(f'Scene {problems[0][0]} visual: {problems[0][1]}')
@@ -364,7 +368,7 @@ def make_server(port=8765, root=ROOT, directory=None):
                                 from backend.services.script_projects import create as create_script
                                 project = create_script(store, title, text, specs=specs or None, source={'mode':mode,'text':text,'profile':profile,
                                     'review_first':reviewed or not bool(body.get('render_now') or automatic),
-                                    'automatic':automatic,'approval_required':reviewed})
+                                    'automatic':automatic,'approval_required':reviewed, **({'seo': seo} if seo else {})})
                                 if 'long_video' in project and not automatic:
                                     project['source']['automatic']=True
                                     from backend.services.script_generator import write_json_atomic
