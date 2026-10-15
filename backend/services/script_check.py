@@ -137,6 +137,12 @@ def check(text, title=None):
     from backend.services.page_script import looks_like_markdown, page_to_script
     issues, converted = [], False
     from backend.services.canvas import CanvasError, extract, validate as validate_canvas
+    seo = None
+    if isinstance(text, str):
+        from backend.services import seo as seo_block
+        text, seo, seo_problem = seo_block.extract(text)
+        if seo_problem:
+            issues.append(_issue('error', seo_problem + '.'))
     text, specs, problems = extract(text) if isinstance(text, str) else (text, [], [])
     for number, message in problems:
         issues.append(_issue('error', message, number))
@@ -231,6 +237,12 @@ def check(text, title=None):
         planned = len(video.scenes) - len(report['highlights'])  # hand-designed and explainer scenes skip planning
     measured = any(h['kind'] in ('next_token', 'tokens', 'embedding_map') for h in report['highlights'])
     report['estimate'] = generation_estimate(count, planned, measured)
+    if seo:
+        from backend.services.seo import title_notes
+        report['seo'] = {'titles': len(seo['titles']), 'tags': len(seo['tags']), 'description': bool(seo['description'])}
+        for title in seo['titles']:
+            for note in title_notes(title):
+                issues.append(_issue('info', f'Title "{title}" {note}.'))
     order = {'error': 0, 'warning': 1, 'info': 2}
     issues.sort(key=lambda row: (order[row['level']], row['scene'] or 0))
     return report

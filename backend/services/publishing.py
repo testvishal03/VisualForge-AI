@@ -72,12 +72,23 @@ def hashtags(topic):
     return ' '.join('#' + t for t in [*dict.fromkeys(tags), 'Explained', 'Learning'])
 
 
-def description(title, topic, scenes, style, parts=None):
-    """Plain-text description; `parts` overrides scene sections (chapter videos)."""
+def description(title, topic, scenes, style, parts=None, seo=None):
+    """Plain-text description; `parts` overrides scene sections (chapter videos). With `seo` (written
+    alongside the script), its description and hashtags lead, followed by the measured chapters."""
     rows, total = sections(parts or [(s['headline'], scene_seconds(s)) for s in scenes], style)
     marks = chapters(rows)
     points = [s for s in scenes if s.get('headline')][:8]
     voice = VOICES.get(style.get('voice', DEFAULT_VOICE), (style.get('voice', 'Kokoro'),))[0]
+    if seo and seo.get('description'):
+        lines = [seo['description']]
+        if marks:
+            lines += ['', 'Chapters:', *[f'{stamp(start)} {name}' for start, name in marks]]
+        if style.get('nextTopic'):
+            lines += ['', f"Next in this series: {style['nextTopic']}"]
+        tags = ' '.join('#' + h for h in seo.get('hashtags') or []) or hashtags(topic)
+        lines += ['', tags, '', f'Narration is AI-generated (Kokoro "{voice}" voice). Please check facts against reliable sources.']
+        return '\n'.join(lines) + '\n', {'seconds': round(total, 3), 'chapters': len(marks) if marks else 0,
+                                        'chapters_note': None if marks else 'YouTube needs 3+ chapters of 10s+; this video is too short for chapter markers.'}
     lines = [title, '', first_sentence(scenes[0]['narration']) if scenes else topic, '', 'In this video:']
     if parts:
         # Chapter videos summarise by chapter; listing every scene would bury the structure.
@@ -106,7 +117,10 @@ def publish(jobs, project, folder: Path, data, render, profile, parts=None):
     pending, thumbnail = out/'thumbnail.pending.png', out/'thumbnail.png'
     render(['still', 'VisualForgeThumbnail', pending, f'--props={props}'], 'thumbnail')
     pending.replace(thumbnail)
-    text, meta = description(data['title'], project.get('topic') or data['title'], data['scenes'], data.get('style', {}), parts)
+    seo = project.get('source', {}).get('seo')
+    text, meta = description(data['title'], project.get('topic') or data['title'], data['scenes'], data.get('style', {}), parts, seo)
+    if seo:
+        meta['seo'] = {'titles': seo['titles'], 'tags': seo['tags']}
     notes = out/'description.txt'
     notes.write_text(text, encoding='utf-8')
     record = {'profile': profile, 'thumbnail': {'file': 'publish/thumbnail.png', 'sha256': file_hash(thumbnail)},
@@ -143,4 +157,8 @@ def present(jobs, project, result):
                          'description_url': f"/media/{project['id']}/description?v={record['description']['sha256'][:12]}",
                          'description': (base/record['description']['file']).read_text(encoding='utf-8'),
                          'chapters': record.get('chapters', 0), 'chapters_note': record.get('chapters_note')}
+    if record.get('seo'):
+        from backend.services.seo import title_notes
+        result['publish']['titles'] = [{'text': t, 'chars': len(t), 'notes': title_notes(t)} for t in record['seo']['titles']]
+        result['publish']['tags'] = record['seo']['tags']
     return result

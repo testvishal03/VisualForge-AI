@@ -261,3 +261,44 @@ visual
 {"type": "pill", "x": 960, "y": 790, "text": "Machine learning", "color": "yellow", "at": 3, "delay": 0.7},
 {"type": "pill", "x": 1300, "y": 790, "text": "Deep learning", "color": "cyan", "at": 3, "delay": 1.1}
 ]}
+
+```publish
+{
+ "titles": [
+  "What Is Machine Learning? Explained Visually for Beginners",
+  "Machine Learning Explained in 5 Minutes (Visual Guide)",
+  "How Machines Learn From Data: Machine Learning Basics",
+  "Machine Learning for Beginners: The Simplest Explanation",
+  "Rules vs Examples: How Machine Learning Really Works"
+ ],
+ "description": "What is machine learning, really? In this beginner-friendly visual guide, you'll see how computers learn from examples instead of hand-written rules, and why that idea powers spam filters, maps, face unlock and ChatGPT.\n\nNo heavy math, just clear animations that build one idea at a time.\n\nIn this video you'll learn:\n- The difference between traditional programming and machine learning\n- What features, labels and a model are, using a simple house price example\n- How training works: guess, measure the error, adjust, repeat\n- The three types of machine learning: supervised, unsupervised and reinforcement learning\n- Why test data matters and what overfitting means\n\nThis is episode 1 of the Machine Learning Visualized playlist, which takes you from zero to building an end-to-end machine learning project. Subscribe to follow the full series.",
+ "tags": [
+  "what is machine learning",
+  "machine learning explained",
+  "machine learning for beginners",
+  "machine learning basics",
+  "machine learning tutorial",
+  "how machine learning works",
+  "machine learning visualized",
+  "supervised learning",
+  "unsupervised learning",
+  "reinforcement learning",
+  "features and labels",
+  "training data",
+  "overfitting",
+  "machine learning vs traditional programming",
+  "ai vs machine learning",
+  "intro to machine learning",
+  "learn machine learning",
+  "machine learning course",
+  "data science",
+  "artificial intelligence",
+  "machine learning"
+ ],
+ "hashtags": [
+  "MachineLearning",
+  "AI",
+  "DataScience"
+ ]
+}
+```
