@@ -46,8 +46,8 @@ def extract(text):
 
 def validate(block):
     """A clean copy of the publish block, or ValueError naming the problem."""
-    if not isinstance(block, dict) or set(block) - {'titles', 'description', 'tags', 'hashtags'}:
-        raise ValueError('expected {"titles": [...], "description": "...", "tags": [...], "hashtags": [...]}')
+    if not isinstance(block, dict) or set(block) - {'titles', 'description', 'tags', 'hashtags', 'thumbnail'}:
+        raise ValueError('expected {"titles": [...], "description": "...", "tags": [...], "hashtags": [...], "thumbnail": {...}}')
     titles = block.get('titles', [])
     if not isinstance(titles, list) or not 1 <= len(titles) <= 8 or any(not isinstance(t, str) or not t.strip() for t in titles):
         raise ValueError('titles must list 1 to 8 titles')
@@ -69,7 +69,31 @@ def validate(block):
     if not isinstance(hashtags, list) or len(hashtags) > 15 or any(not isinstance(h, str) for h in hashtags):
         raise ValueError('hashtags must list up to 15 words')
     hashtags = [re.sub(r'[^\w]', '', h) for h in hashtags if re.sub(r'[^\w]', '', h)][:5]
-    return {'titles': titles, 'description': description.strip(), 'tags': tags, 'hashtags': hashtags}
+    result = {'titles': titles, 'description': description.strip(), 'tags': tags, 'hashtags': hashtags}
+    if 'thumbnail' in block:
+        result['thumbnail'] = thumbnail(block['thumbnail'])
+    return result
+
+
+def thumbnail(spec):
+    """2-4 big cover words (one may be highlighted), the scene to show, and an optional badge."""
+    if not isinstance(spec, dict) or set(spec) - {'text', 'highlight', 'scene', 'badge'} or 'text' not in spec or 'scene' not in spec:
+        raise ValueError('thumbnail is {"text": "2-4 words", "highlight": "one of them", "scene": number, "badge": "EPISODE 1"}')
+    text = spec['text']
+    if not isinstance(text, str) or not 1 <= len(text.split()) <= 4 or len(text) > 28:
+        raise ValueError('thumbnail text must be 1 to 4 words, at most 28 characters')
+    if type(spec['scene']) is not int or spec['scene'] < 1:
+        raise ValueError('thumbnail scene must be a scene number from 1')
+    clean = {'text': text.strip(), 'scene': spec['scene']}
+    if spec.get('highlight'):
+        if not isinstance(spec['highlight'], str) or spec['highlight'].casefold() not in [w.casefold() for w in text.split()]:
+            raise ValueError('thumbnail highlight must be one of the thumbnail words')
+        clean['highlight'] = spec['highlight']
+    if spec.get('badge'):
+        if not isinstance(spec['badge'], str) or len(spec['badge']) > 20:
+            raise ValueError('thumbnail badge must be at most 20 characters')
+        clean['badge'] = spec['badge']
+    return clean
 
 
 def title_notes(title):

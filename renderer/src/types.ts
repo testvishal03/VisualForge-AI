@@ -101,6 +101,8 @@ export type VideoData = {
     agenda?: string[];
   };
   scenes: Scene[];
+  /** A designed cover: 2-4 big words (one highlighted) beside the episode's most striking scene. */
+  thumbnail?: {text: string; highlight?: string; scene: number; badge?: string};
 };
 
 export type VideoProps = { videoData: VideoData };
