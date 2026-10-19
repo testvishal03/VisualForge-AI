@@ -33,6 +33,8 @@ def main(argv=None):
     parser.add_argument('--quality', choices=['draft', 'final'], default='draft', help='draft is 720p; final is 1080p')
     parser.add_argument('--store', type=Path, default=ROOT / 'data/headless', help='Project store kept between runs, so reruns reuse caches')
     args = parser.parse_args(argv)
+    # Stages run from other folders (the renderer runs inside renderer/), so paths must be absolute.
+    args.store, args.out = args.store.resolve(), args.out.resolve()
     text = args.script.read_text(encoding='utf-8')
 
     from backend.scripts.review_app import make_server

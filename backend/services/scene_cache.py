@@ -50,18 +50,58 @@ def assemble_audio(root, data, timeline, output):
         sf.write(output,mix(voice,rate),rate,subtype='PCM_16',format='WAV')
 
 
+def batch_render(jobs, folder, props, parts, cache, profile):
+    """Render every missing clip with one Node process and one browser (about 5 s saved per clip).
+
+    Clips land as complete `<key>.pending.mp4` files and are validated by the caller exactly like
+    single renders. Returns False when no bundle is available; a failure raises, and the caller
+    falls back to rendering clip by clip.
+    """
+    from backend.services.render_assets import with_public_dir
+    bundle = jobs.bundle(folder, with_public_dir(jobs.root, folder, ['render', 'VisualForgeVideo', 'batch', f'--props={props}']))
+    if not bundle:
+        return False
+    for part in parts:  # a pending file from an older, interrupted render may be incomplete
+        (cache/f"{part['key']}.pending.mp4").unlink(missing_ok=True)
+    spec = cache/'batch-render.json'
+    write_json_atomic(spec, {'bundle': str(bundle), 'props': str(props), 'scale': 2/3 if profile == 'draft' else 1,
+                             'concurrency': RENDER_CONCURRENCY,
+                             'clips': [{'from': p['from'], 'to': p['from'] + p['frames'] - 1, 'out': str(cache/f"{p['key']}.pending.mp4")} for p in parts]})
+    # The studio reads render progress ("Rendered done/total") from this phase's log.
+    log = folder/'logs/render.log'
+    jobs.state.update(phase='render', log=str(log), log_offset=log.stat().st_size if log.exists() else 0,
+                      message=f'Rendering {len(parts)} scene clips in one pass')
+    for attempt in range(2):
+        try:
+            # Remotion prints progress constantly; three silent minutes means a hung browser.
+            execute([node_executable(), jobs.root/'renderer/scripts/render-clips.mjs', spec], cwd=jobs.root/'renderer',
+                    log=folder/'logs/render.log', cancel_event=jobs.cancel, stall=180)
+            return True
+        except RuntimeError:
+            if attempt:
+                raise  # a retry resumes: clips finished before the failure are kept
+
+
 def render_cached(jobs, project, data, props, pending, profile, render):
     started=time.monotonic();root=jobs.root;folder=jobs.store.folder(project['id'])
     cache=folder/'scene-cache';cache.mkdir(exist_ok=True)
     timeline=json.loads(subprocess.check_output([node_executable(),'--experimental-strip-types',str(root/'renderer/scripts/timeline.ts'),str(props)],cwd=root))
     plan=segments(data,timeline,jobs.version,profile);built=[];reused=[]
+    missing=[part for part in plan if not intact(cache,part['key'])]
+    if missing:
+        try:
+            batch_render(jobs,folder,props,missing,cache,profile)
+        except (RuntimeError,OSError,ValueError) as exc:
+            # Rendering clip by clip below still works; only the batch speed-up is lost.
+            jobs.state['message']=f'One-pass rendering stopped ({str(exc)[:120]}); continuing clip by clip.'
     for index,part in enumerate(plan):
         if jobs.cancel.is_set():raise InterruptedError('Cancelled; completed scene clips are cached.')
         key=part['key'];clip=cache/f'{key}.mp4'
         jobs.state.update(scene_index=index+1,scene_total=len(plan),message=f"Scene clip {index+1}/{len(plan)}; {len(reused)} reused")
         if intact(cache,key):reused.append(part['id']);continue
         temporary=cache/f'{key}.pending.mp4'
-        render(['render','VisualForgeVideo',temporary,f'--props={props}',f"--frames={part['from']}-{part['from']+part['frames']-1}",'--muted',f'--concurrency={RENDER_CONCURRENCY}',*(['--scale=0.6666666666666666'] if profile=='draft' else [])],'render')
+        if not temporary.is_file():  # not produced by the one-pass render
+          render(['render','VisualForgeVideo',temporary,f'--props={props}',f"--frames={part['from']}-{part['from']+part['frames']-1}",'--muted',f'--concurrency={RENDER_CONCURRENCY}',*(['--scale=0.6666666666666666'] if profile=='draft' else [])],'render')
         from backend.services.media_tools import ffmpeg as ffmpeg_tool, ffprobe
         probe=json.loads(subprocess.check_output([str(ffprobe(root)),'-v','error','-show_streams','-of','json',str(temporary)]))
         video=next(s for s in probe['streams'] if s['codec_type']=='video')
