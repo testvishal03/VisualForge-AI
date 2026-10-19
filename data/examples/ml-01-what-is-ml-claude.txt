@@ -299,6 +299,12 @@ visual
   "MachineLearning",
   "AI",
   "DataScience"
- ]
+ ],
+ "thumbnail": {
+  "text": "How Machines Learn",
+  "highlight": "Learn",
+  "scene": 7,
+  "badge": "Episode 1"
+ }
 }
 ```

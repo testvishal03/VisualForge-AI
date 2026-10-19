@@ -29,6 +29,15 @@ class PublishBlockTests(unittest.TestCase):
         _, _, error = extract('Narration.\n\n```publish\n{"titles": [\n```')
         self.assertIn('Publish block', error)
 
+    def test_thumbnail_words_scene_and_badge_are_checked(self):
+        good = validate({'titles': ['Fine'], 'thumbnail': {'text': 'How Machines Learn', 'highlight': 'Learn', 'scene': 7, 'badge': 'Episode 1'}})
+        self.assertEqual(good['thumbnail']['scene'], 7)
+        for bad, message in [({'text': 'one two three four five', 'scene': 1}, '1 to 4 words'),
+                             ({'text': 'How Machines Learn', 'highlight': 'Data', 'scene': 1}, 'one of the thumbnail words'),
+                             ({'text': 'Learn', 'scene': 0}, 'scene number')]:
+            with self.assertRaisesRegex(ValueError, message):
+                validate({'titles': ['Fine'], 'thumbnail': bad})
+
     def test_title_notes(self):
         self.assertIn('cut off', ' '.join(title_notes('x' * 70)))
         self.assertEqual(title_notes('Machine Learning Explained Visually for Beginners'), [])

@@ -99,6 +99,11 @@ After the last visual block, add ONE block that the app uses for publishing (it 
   for beginners"), related concepts, then broad ones ("machine learning", "artificial intelligence"). Under 500
   characters in total.
 - hashtags: 3 hashtags without "#", most important first (YouTube shows the first three above the title).
+- thumbnail: {"text": "2-4 punchy words", "highlight": "one of those words", "scene": number, "badge": "EPISODE 1"}.
+  The words must COMPLEMENT the best title, not repeat it (title "What Is Machine Learning? Explained Visually",
+  thumbnail "HOW MACHINES LEARN"); at most 28 characters. "scene" is the scene whose finished visual is the
+  most striking and readable when small (a plot, a before/after, a big stamp), shown beside the words.
+  "badge" is optional, e.g. the episode number.
 
 Output only the script: paragraphs, each followed by its visual block, then the publish block. Valid JSON, double quotes,
 escape quotes inside text as \".

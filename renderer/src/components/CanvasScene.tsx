@@ -215,34 +215,41 @@ function Element({e, p, t, byId}: {e: CanvasElement; p: number; t: number; byId:
   return null;
 }
 
+/** Elements usable for drawing: an icon that does not exist is dropped, so its box keeps no gap. */
+export const drawable = (elements: CanvasElement[]) => elements.map(e => e.icon && !iconName(e.icon) ? {...e, icon: undefined} : e);
+
+/** A canvas's elements as they stand at time `t` (seconds into the scene), in 1920x1080 SVG units. */
+export function CanvasArt({elements: given, t}: {elements: CanvasElement[]; t: number}) {
+  const elements = drawable(given), byId = new Map(elements.filter(e => e.id).map(e => [e.id!, e]));
+  return <>
+    <defs>{elements.filter(e => e.type === 'plot' && e.id).map(e => {
+      const w = e.w ?? 800, h = e.h ?? 500;
+      return <clipPath key={e.id} id={`plot-${e.id}`}><rect x={(e.x ?? 960) - w/2 - 20} y={(e.y ?? 540) - h/2 - 20} width={w + 40} height={h + 40}/></clipPath>;
+    })}</defs>
+    {elements.map((e, i) => {
+      const p = reveal(t, e.t, e.type === 'stamp' ? .4 : e.type === 'arrow' || e.type === 'line' ? .6 : .5);
+      const out = e.tOut === undefined ? 1 : 1 - reveal(t, e.tOut, .4);
+      if (p <= 0 || out <= 0) return null;
+      const glow = e.tPulse === undefined ? 0 : Math.max(0, 1 - Math.abs(t - e.tPulse - .4)/.6);
+      return <g key={i} opacity={out} style={glow ? {filter: `drop-shadow(0 0 ${18*glow}px ${color(e.color)})`} : undefined}>
+        <Element e={e} p={p} t={t} byId={byId}/>
+      </g>;
+    })}
+  </>;
+}
+
+/** The stage's dot grid, as one CSS pattern rather than hundreds of SVG circles (which slowed rendering). */
+export const GRID_BACKGROUND = `radial-gradient(circle, #1e2846 1.6px, transparent 2px) 10px 10px / 3.125% 5.556%, ${BG}`;
+
 /** A scene drawn from its hand-designed canvas: dark stage, dot grid, timed elements, word captions. */
 export function CanvasScene({scene, data, index, total, first}: {scene: Scene; data: VideoData; index: number; total: number; first: boolean}) {
   const frame = useCurrentFrame(), {fps} = useVideoConfig(), t = frame/fps;
-  // An icon that does not exist is dropped before layout, so its box keeps no empty space for it.
-  const elements = scene.canvas!.elements.map(e => e.icon && !iconName(e.icon) ? {...e, icon: undefined} : e);
-  const byId = new Map(elements.filter(e => e.id).map(e => [e.id!, e]));
   const enter = first ? 1 : Math.min(1, t/.3), exit = exitProgress(t, sceneSeconds(scene, fps));
-  // The dot grid is one CSS pattern rather than hundreds of SVG circles, which kept rendering slow.
-  const grid = `radial-gradient(circle, #1e2846 1.6px, transparent 2px) 10px 10px / 3.125% 5.556%`;
-  return <AbsoluteFill style={{background: `${grid}, ${BG}`, fontFamily: FONT, opacity: enter}}>
+  return <AbsoluteFill style={{background: GRID_BACKGROUND, fontFamily: FONT, opacity: enter}}>
     <svg viewBox="0 0 1920 1080" style={{position: 'absolute', inset: 0, width: '100%', height: '100%'}}>
       <text x={80} y={64} dominantBaseline="central" fontSize={26} fontWeight={800} letterSpacing={1} fill={COLORS.cyan}>{(data.title ?? '').toUpperCase().slice(0, 60)}</text>
       <text x={1840} y={64} textAnchor="end" dominantBaseline="central" fontSize={26} fontWeight={800} fill={COLORS.muted}>{String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}</text>
-      <defs>{elements.filter(e => e.type === 'plot' && e.id).map(e => {
-        const w = e.w ?? 800, h = e.h ?? 500;
-        return <clipPath key={e.id} id={`plot-${e.id}`}><rect x={(e.x ?? 960) - w/2 - 20} y={(e.y ?? 540) - h/2 - 20} width={w + 40} height={h + 40}/></clipPath>;
-      })}</defs>
-      <g opacity={1 - exit}>
-        {elements.map((e, i) => {
-          const p = reveal(t, e.t, e.type === 'stamp' ? .4 : e.type === 'arrow' || e.type === 'line' ? .6 : .5);
-          const out = e.tOut === undefined ? 1 : 1 - reveal(t, e.tOut, .4);
-          if (p <= 0 || out <= 0) return null;
-          const glow = e.tPulse === undefined ? 0 : Math.max(0, 1 - Math.abs(t - e.tPulse - .4)/.6);
-          return <g key={i} opacity={out} style={glow ? {filter: `drop-shadow(0 0 ${18*glow}px ${color(e.color)})`} : undefined}>
-            <Element e={e} p={p} t={t} byId={byId}/>
-          </g>;
-        })}
-      </g>
+      <g opacity={1 - exit}><CanvasArt elements={scene.canvas!.elements} t={t}/></g>
     </svg>
     <div style={{opacity: 1 - exit}}>
       <Caption scene={scene} t={t} highlight={COLORS.yellow}

@@ -113,11 +113,15 @@ def publish(jobs, project, folder: Path, data, render, profile, parts=None):
     out = folder/'publish'
     out.mkdir(exist_ok=True)
     props = out/'thumbnail-props.json'
-    write_json_atomic(props, {'videoData': data})
+    seo = project.get('source', {}).get('seo') or {}
+    cover = seo.get('thumbnail')
+    # A designed cover needs its chosen scene to have a hand-designed visual; otherwise the classic cover is used.
+    usable = cover and cover['scene'] <= len(data['scenes']) and data['scenes'][cover['scene'] - 1].get('canvas')
+    write_json_atomic(props, {'videoData': {**data, 'thumbnail': cover} if usable else data})
     pending, thumbnail = out/'thumbnail.pending.png', out/'thumbnail.png'
     render(['still', 'VisualForgeThumbnail', pending, f'--props={props}'], 'thumbnail')
     pending.replace(thumbnail)
-    seo = project.get('source', {}).get('seo')
+    seo = project.get('source', {}).get('seo') or None
     text, meta = description(data['title'], project.get('topic') or data['title'], data['scenes'], data.get('style', {}), parts, seo)
     if seo:
         meta['seo'] = {'titles': seo['titles'], 'tags': seo['tags']}

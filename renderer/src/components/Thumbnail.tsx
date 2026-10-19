@@ -5,6 +5,8 @@ import {isIllustrated} from '../transitions';
 import {fitLabel} from '../labels';
 import {Glyph} from './IllustratedStory';
 import {Icon} from './VisualScene';
+import {CanvasArt, GRID_BACKGROUND} from './CanvasScene';
+import {COLORS} from '../canvas';
 
 const font = "'Segoe UI', Selawik, Arial, sans-serif";
 const coral = '#e7805e';
@@ -30,8 +32,35 @@ function minutes(data:VideoData) {
   return seconds < 60 ? `${Math.max(1, Math.round(seconds))} SEC` : `${Math.round(seconds/60)} MIN`;
 }
 
+/**
+ * High-click-through cover for videos with hand-designed scenes: a few huge words (one in yellow)
+ * on the left, and the chosen scene, fully built, in a glowing frame on the right, so the cover
+ * shows exactly what the video shows.
+ */
+function DesignedThumbnail({videoData}:{videoData:VideoData}) {
+  const spec = videoData.thumbnail!, scene = videoData.scenes[spec.scene - 1];
+  const words = spec.text.trim().split(/\s+/), mark = spec.highlight?.toLowerCase();
+  const longest = Math.max(...words.map(w => w.length));
+  const size = Math.max(70, Math.min(150, 560/Math.max(4, longest*.6)));
+  return <AbsoluteFill style={{background:GRID_BACKGROUND, fontFamily:font, overflow:'hidden'}}>
+    <div style={{position:'absolute', right:-60, top:70, width:820, height:462, borderRadius:28, overflow:'hidden', transform:'rotate(-3deg)',
+      border:`6px solid ${COLORS.cyan}`, boxShadow:`0 0 60px ${COLORS.cyan}66, 0 30px 80px #000a`, background:GRID_BACKGROUND}}>
+      <svg viewBox="0 0 1920 1080" style={{width:'100%', height:'100%'}}><CanvasArt elements={scene.canvas!.elements} t={scene.duration + 5}/></svg>
+    </div>
+    <div style={{position:'absolute', left:0, top:0, bottom:0, width:620, background:'linear-gradient(90deg, #0b1020 75%, #0b102000)'}}/>
+    {spec.badge && <div style={{position:'absolute', left:60, top:56, padding:'10px 22px', borderRadius:40, background:COLORS.yellow, color:'#0b1020',
+      fontSize:30, fontWeight:900, letterSpacing:2}}>{spec.badge.toUpperCase()}</div>}
+    <div style={{position:'absolute', left:60, top:0, bottom:0, width:600, display:'flex', flexDirection:'column', justifyContent:'center',
+      fontSize:size, lineHeight:.98, fontWeight:900, letterSpacing:-3, color:'#ffffff', textShadow:'0 6px 24px #000c'}}>
+      {words.map((word, i) => <div key={i} style={{color:word.toLowerCase().replace(/[^\w-]/g, '') === mark?.replace(/[^\w-]/g, '') ? COLORS.yellow : undefined}}>{word.toUpperCase()}</div>)}
+    </div>
+  </AbsoluteFill>;
+}
+
 /** 1280×720 cover: a bold title, the lesson's key concepts as a small diagram, and its scope. */
 export function Thumbnail({videoData}:{videoData:VideoData}) {
+  const designed = videoData.thumbnail, chosen = designed && videoData.scenes[designed.scene - 1];
+  if (designed && chosen?.canvas) return <DesignedThumbnail videoData={videoData}/>;
   const light = videoData.scenes.filter(isIllustrated).length*2 >= videoData.scenes.length;
   const p = palette(videoData.style?.theme);
   const colors = light
