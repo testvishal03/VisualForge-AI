@@ -150,6 +150,35 @@ class LayoutCheckTests(unittest.TestCase):
                          'oversized text is drawn smaller to fit')
 
 
+
+class AnimationActionTests(unittest.TestCase):
+    sentences = ['One.', 'Two.', 'Three.']
+
+    def test_actions_validate_and_time_on_sentences(self):
+        spec = {'elements': [{'id': 'm', 'type': 'box', 'x': 500, 'y': 400, 'text': 'Model', 'at': 0,
+                              'moveTo': {'at': 1, 'x': 900, 'y': 300}, 'dim': {'at': 2}},
+                             {'type': 'bubble', 'x': 100, 'y': 600, 'text': 'typed text', 'typing': True, 'at': 1}],
+                'camera': [{'at': 2, 'x': 900, 'y': 300, 'zoom': 1.5}]}
+        beats = [{'text': t, 'start': i * 2.0, 'end': i * 2.0 + 1.5, 'words': []} for i, t in enumerate(self.sentences)]
+        result = timed(validate(spec, self.sentences), beats)
+        box = result['elements'][0]
+        self.assertEqual(box['move']['t'], 2.0)
+        self.assertEqual((box['move']['x'], box['move']['y'], box['move']['dur']), (900, 300, .9))
+        self.assertEqual(box['tDim'], 4.0)
+        self.assertTrue(result['elements'][1]['typing'])
+        self.assertEqual(result['camera'][0]['t'], 4.0)
+        self.assertEqual(result['camera'][0]['zoom'], 1.5)
+
+    def test_invalid_actions_are_explained(self):
+        for element, message in [({'type': 'box', 'x': 1, 'y': 1, 'moveTo': {'x': 3000, 'y': 1}}, 'moveTo x'),
+                                 ({'type': 'pill', 'x': 1, 'y': 1, 'text': 'a', 'typing': True}, 'bubble and text'),
+                                 ({'type': 'arrow', 'from': [1, 1], 'to': [2, 2], 'moveTo': {'x': 3, 'y': 3}}, 'x and y can move')]:
+            with self.assertRaisesRegex(CanvasError, message):
+                validate({'elements': [element]}, self.sentences)
+        with self.assertRaisesRegex(CanvasError, 'zoom'):
+            validate({'elements': [{'type': 'box', 'x': 1, 'y': 1}], 'camera': [{'zoom': 9}]}, self.sentences)
+
+
 class EpisodePromptTests(unittest.TestCase):
     def test_the_prompt_places_the_episode_in_its_playlist(self):
         from backend.services.claude_prompt import episode_prompt

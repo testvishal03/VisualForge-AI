@@ -19,8 +19,12 @@ export type CanvasElement = {
   data?: number[][]; start?: number[][]; path?: number[][]; segments?: number[][]; polygon?: number[][]; classes?: string[]; stagger?: number;
   rows?: string[][]; colWidth?: number; rowHeight?: number; header?: boolean; highlight?: [number, number, string][];
   layers?: number[]; labels?: string[]; value?: number; begin?: number; prefix?: string; suffix?: string; decimals?: number;
+  /** Later movement, a fade into the background, and typed-out text. */
+  move?: {t: number; x: number; y: number; dur: number}; tDim?: number; typing?: boolean;
 };
-export type Canvas = {elements: CanvasElement[]};
+/** Camera moves: from time t, glide over dur seconds to centre (x, y) at the given zoom (1 = whole stage). */
+export type CameraMove = {t: number; x: number; y: number; zoom: number; dur: number};
+export type Canvas = {elements: CanvasElement[]; camera?: CameraMove[]};
 
 export const COLORS: Record<string, string> = {
   yellow: '#ffd23f', cyan: '#3ddcff', pink: '#ff5c8a', green: '#5be49b', red: '#ff5c5c',
@@ -114,6 +118,42 @@ export function arrowEnds(e: CanvasElement, byId: Map<string, CanvasElement>): [
   const start = typeof e.from === 'string' ? edgePoint(bounds(byId.get(e.from)!), b) : a;
   const end = typeof e.to === 'string' ? edgePoint(bounds(byId.get(e.to)!), a) : b;
   return [start, end];
+}
+
+const smooth = (x: number) => {const p = Math.max(0, Math.min(1, x)); return p < .5 ? 4*p**3 : 1 - (-2*p + 2)**3/2;};
+const mix = (a: number | undefined, b: number | undefined, m: number) => a === undefined || b === undefined ? b : a + (b - a)*m;
+
+/** Where an element moved from the previous scene to at the start of this one (same id and type). */
+export const CARRY_SECONDS = .8;
+
+/**
+ * An element's geometry at time t: gliding in from the previous scene (when carried), then along its
+ * own later move. Elements without x and y (arrows, plotted data) are returned unchanged.
+ */
+export function placed(e: CanvasElement, t: number, before?: CanvasElement): CanvasElement {
+  let {x, y, w, h} = e;
+  if (before) {
+    const m = smooth(t/CARRY_SECONDS);
+    x = mix(before.move?.x ?? before.x, x, m); y = mix(before.move?.y ?? before.y, y, m); w = mix(before.w, w, m); h = mix(before.h, h, m);
+  }
+  if (e.move && x !== undefined && y !== undefined) {
+    const m = smooth((t - e.move.t)/e.move.dur);
+    x = x + (e.move.x - x)*m; y = y + (e.move.y - y)*m;
+  }
+  return {...e, x, y, w, h};
+}
+
+/** The camera at time t: each move glides from wherever the previous one left it. */
+export function canvasCamera(moves: CameraMove[] | undefined, t: number) {
+  let state = {x: 960, y: 540, zoom: 1};
+  for (const m of [...(moves ?? [])].sort((a, b) => a.t - b.t)) {
+    if (t < m.t) break;
+    const k = smooth((t - m.t)/m.dur);
+    state = {x: state.x + (m.x - state.x)*k, y: state.y + (m.y - state.y)*k, zoom: state.zoom + (m.zoom - state.zoom)*k};
+  }
+  // Keep the view inside the stage.
+  const halfW = 960/state.zoom, halfH = 540/state.zoom;
+  return {zoom: state.zoom, x: Math.min(1920 - halfW, Math.max(halfW, state.x)), y: Math.min(1080 - halfH, Math.max(halfH, state.y))};
 }
 
 /** 0→1 cubic ease-out over `seconds` from `start`. */
