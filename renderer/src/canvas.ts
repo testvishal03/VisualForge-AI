@@ -195,3 +195,27 @@ export function fitText(text: string, wanted: number, x: number, align?: string)
   const room = align === 'left' ? 1880 - x : align === 'right' ? x - 40 : 2*Math.min(x - 40, 1880 - x);
   return Math.max(16, Math.min(wanted, room/Math.max(1, textWidth(text, 1))));
 }
+
+/**
+ * The part of the 1920x1080 stage a scene actually uses (padded), so vertical Shorts can zoom in on
+ * it instead of showing the whole stage small. Connectors and plotted data lie inside other elements.
+ */
+export function contentBox(elements: CanvasElement[], pad = 50) {
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const e of elements) {
+    if (['arrow', 'mover', 'line', 'points', 'curve', 'segments', 'region'].includes(e.type) || e.plot) continue;
+    let b = bounds(e);
+    if (e.type === 'text' || e.type === 'headline' || e.type === 'counter') {
+      const size = SIZES[e.type === 'headline' ? 'h2' : String(e.size ?? (e.type === 'counter' ? 'h2' : 'body'))]?.[0] ?? 34;
+      const x = e.type === 'headline' ? 960 : e.x ?? 960, y = e.type === 'headline' ? e.y ?? 210 : e.y ?? 540;
+      const w = Math.min(1840, textWidth(e.text ?? `${e.prefix ?? ''}${e.value ?? ''}${e.suffix ?? ''}`, size));
+      const left = e.align === 'left' ? x : e.align === 'right' ? x - w : x - w/2;
+      b = {x0: left, y0: y - size/2, x1: left + w, y1: y + size/2};
+    }
+    if (e.type === 'plot') b = {x0: b.x0 - 90, y0: b.y0 - 20, x1: b.x1 + 20, y1: b.y1 + 90};  // axis labels
+    x0 = Math.min(x0, b.x0); y0 = Math.min(y0, b.y0); x1 = Math.max(x1, b.x1); y1 = Math.max(y1, b.y1);
+  }
+  if (!Number.isFinite(x0)) return {x: 0, y: 0, w: 1920, h: 1080};
+  x0 = Math.max(0, x0 - pad); y0 = Math.max(0, y0 - pad); x1 = Math.min(1920, x1 + pad); y1 = Math.min(1080, y1 + pad);
+  return {x: x0, y: y0, w: x1 - x0, h: y1 - y0};
+}

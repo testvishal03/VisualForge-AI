@@ -290,8 +290,27 @@ function renderPublishKit(project,show){
   $('publish-description-download').href=kit.description_url;$('publish-description-download').download=stem+'-description.txt';
   if($('publish-description').value!==kit.description)$('publish-description').value=kit.description;
   renderSeo(kit);
+  renderShorts(kit,project);
   $('publish-note').textContent=kit.chapters?`Includes ${kit.chapters} chapter markers timed from the finished video.`:(kit.chapters_note||'');
 }
+/** Vertical Shorts made from the episode's scenes, each playable and downloadable. */
+function renderShorts(kit,project){
+  const box=$('publish-shorts'),list=$('publish-shorts-list'),shorts=kit.shorts||[];
+  box.hidden=!shorts.length;if(box.hidden)return;
+  list.replaceChildren();
+  const stem=(project.topic||'video').replace(/[^a-z0-9]+/gi,'-').toLowerCase().slice(0,40);
+  shorts.forEach((short,i)=>{
+    const item=element('figure');
+    if(short.url){
+      const video=element('video');video.src=short.url;video.controls=true;video.preload='metadata';item.append(video);
+      const caption=element('figcaption');caption.append(element('strong',short.hook));
+      const link=element('a','Download','secondary');link.href=short.url;link.download=`${stem}-short-${i+1}.mp4`;caption.append(link);
+      item.append(caption);
+    }else item.append(element('p',short.note||'Short not available','helper'));
+    list.append(item);
+  });
+}
+
 /** Title options and tags written with the script: each title copies with one click. */
 function renderSeo(kit){
   const box=$('publish-seo');box.hidden=!kit.titles?.length;

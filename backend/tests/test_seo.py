@@ -38,6 +38,16 @@ class PublishBlockTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, message):
                 validate({'titles': ['Fine'], 'thumbnail': bad})
 
+    def test_shorts_use_consecutive_scenes_and_a_hook(self):
+        good = validate({'titles': ['Fine'], 'shorts': [{'scenes': [2, 3], 'hook': 'Why computers need no rules', 'title': 'Flip #Shorts'}]})
+        self.assertEqual(good['shorts'][0]['scenes'], [2, 3])
+        for bad, message in [([{'scenes': [2, 4], 'hook': 'A good hook'}], 'consecutive'),
+                             ([{'scenes': [1, 2, 3, 4], 'hook': 'A good hook'}], 'consecutive'),
+                             ([{'scenes': [1], 'hook': 'x' * 80}], 'hook'),
+                             ([{'scenes': [1], 'hook': 'A good hook'}] * 4, '1 to 3 shorts')]:
+            with self.assertRaisesRegex(ValueError, message):
+                validate({'titles': ['Fine'], 'shorts': bad})
+
     def test_title_notes(self):
         self.assertIn('cut off', ' '.join(title_notes('x' * 70)))
         self.assertEqual(title_notes('Machine Learning Explained Visually for Beginners'), [])

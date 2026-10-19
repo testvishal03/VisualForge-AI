@@ -114,6 +114,10 @@ After the last visual block, add ONE block that the app uses for publishing (it 
   thumbnail "HOW MACHINES LEARN"); at most 28 characters. "scene" is the scene whose finished visual is the
   most striking and readable when small (a plot, a before/after, a big stamp), shown beside the words.
   "badge" is optional, e.g. the episode number.
+- shorts: 2-3 vertical YouTube Shorts cut from this video: [{"scenes": [3, 4], "hook": "...", "title": "..."}].
+  Each uses 1-3 CONSECUTIVE scenes (15-60 seconds of narration) that make sense on their own, start strong and
+  end on a payoff. "hook" is the big line shown at the top: a curiosity question or surprising claim under 50
+  characters ("Why computers don't need rules"). "title" is the Short's YouTube title with #Shorts.
 
 Output only the script: paragraphs, each followed by its visual block, then the publish block. Valid JSON, double quotes,
 escape quotes inside text as \".

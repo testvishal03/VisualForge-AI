@@ -183,6 +183,13 @@ def make_server(port=8765, root=ROOT, directory=None):
                     if not nested.artifact_ready(child,record,chapter_motion[4]):
                         raise FileNotFoundError('Scene preview is not current')
                     return self.file_response(nested.store.folder(child['id'])/record['file'])
+                short_media=re.fullmatch(r'/media/([a-f0-9]{12})/short/([1-3])',path)
+                if short_media:
+                    project=store.load(short_media[1]);jobs.workspaces.require_active(project['id'])
+                    current=jobs.present(project).get('publish') or {}
+                    if not any(s.get('url','').startswith(f"/media/{project['id']}/short/{short_media[2]}") for s in current.get('shorts', [])):
+                        raise FileNotFoundError('Short is not ready')
+                    return self.file_response(store.folder(project['id'])/project['publish']['shorts'][int(short_media[2])-1]['file'])
                 publish_media=re.fullmatch(r'/media/([a-f0-9]{12})/(thumbnail|description)',path)
                 if publish_media:
                     project=store.load(publish_media[1]);jobs.workspaces.require_active(project['id'])

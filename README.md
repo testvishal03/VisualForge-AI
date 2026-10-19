@@ -30,6 +30,12 @@ The block is never read aloud. Its elements (boxes, arrows, moving messages, cha
 
 **Machine-learning visuals.** Blocks can also draw data: `plot` (axes with tick values), `points` (a scatter plot coloured by class), `curve` (a line, sigmoid or polynomial that draws itself, or morphs from a start shape into its final fit), `dot` (a point that travels along a path, such as gradient descent rolling down a loss curve), `segments` (residual errors and guide lines), `region` (a shaded decision area), `table` (datasets, features and labels, confusion matrices), `network` (neural network layers) and `counter` (a number that counts up). See `data/examples/ml-linear-regression-visual.txt`.
 
+**Animation actions.** `moveTo` slides an element later in a scene, `dim` fades it into the background, `typing` types out bubbles and text, a per-scene `camera` zooms into a detail and back, and an element with the same `id` in the next scene glides across the cut instead of disappearing. Example: `data/examples/animation-actions-visual.txt`.
+
+**Scene preview.** In the script check, each hand-designed scene has a Preview button: it renders just that scene, small and muted, with timing estimated from its words (no voice), in about 17 seconds. Edit the visual block and preview again.
+
+**Thumbnails and Shorts.** The publish block can add `"thumbnail": {"text", "highlight", "scene", "badge"}`: a cover with 2-4 big words beside the chosen scene's finished visual. `"shorts": [{"scenes": [2, 3], "hook", "title"}]` makes up to three vertical 1080x1920 Shorts from consecutive scenes, with the hook on top, the scene zoomed to fill the screen, big captions and the same narration. Both appear in the publish kit.
+
 **Playlists.** Create a series workspace (Workspace settings, *Use Machine Learning preset* fills in a 20-episode Machine Learning playlist). In **New video**, the next-lesson bar offers **Copy Claude prompt**: the prompt for that episode, including what earlier episodes covered, the next episode to set up, and one consistent visual language for the whole series. Paste it into Claude, then paste Claude's answer into **Paste a script**.
 
 ## Releases
