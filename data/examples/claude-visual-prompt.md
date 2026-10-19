@@ -74,6 +74,16 @@ Data and machine-learning visuals (a "plot" gives other elements data coordinate
 - network: {"x","y","w","h", "layers": [3, 4, 2], "labels": ["Input", "Hidden", "Output"]} — a neural network drawn layer by layer
 - counter: {"x","y", "value": 92, "begin": 0, "prefix", "suffix": "%", "decimals", "size", "color"} — a number that counts up, for accuracy, loss or scores
 
+Animation actions (any element; build scenes that MOVE, not only appear):
+- "moveTo": {"at": sentence, "delay", "x", "y", "dur"} — slide an element to a new place later in the scene.
+- "dim": {"at": sentence, "delay"} — fade an element into the background when focus moves on.
+- "typing": true — a bubble or text types itself out (good for prompts, code and chat messages).
+- Continuity: give an element the SAME "id" and type in the next scene and it stays on screen across the cut and
+  glides to its new position (keep the main character of the story, e.g. "model", on screen between scenes).
+- Camera (on the block, next to "elements"): "camera": [{"at": sentence, "delay", "x", "y", "zoom": 1.2-2, "dur"}]
+  zooms into a detail (for example one row of a table) and {"zoom": 1} zooms back out. Use it at most once or twice
+  per scene.
+
 Use real, consistent numbers: if the narration says the model predicts 79, the plot and counter show 79.
 Prefer these data visuals whenever the idea is about data, fitting, distance, probability or measuring a model.
 

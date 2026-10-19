@@ -54,7 +54,7 @@ TYPES = {
     'network': ({'x', 'y', 'w', 'h', 'layers'}, {'color', 'labels'}),
     'counter': ({'x', 'y', 'value'}, {'begin', 'prefix', 'suffix', 'decimals', 'size', 'color', 'dur'}),
 }
-COMMON = {'id', 'type', 'at', 'delay', 'word', 'out', 'pulse'}
+COMMON = {'id', 'type', 'at', 'delay', 'word', 'out', 'pulse', 'moveTo', 'dim', 'typing'}
 ML_KEYS = {'xRange', 'yRange', 'xLabel', 'yLabel', 'grid', 'plot', 'data', 'classes', 'stagger', 'shape', 'start', 'path',
            'segments', 'polygon', 'rows', 'colWidth', 'rowHeight', 'header', 'highlight', 'layers', 'labels', 'value', 'begin',
            'prefix', 'suffix', 'decimals'}
@@ -275,8 +275,8 @@ def _resolve_plots(clean):
 
 def validate(spec, sentences):
     """A clean copy of a canvas block, or CanvasError naming the first problem."""
-    if not isinstance(spec, dict) or not isinstance(spec.get('elements'), list) or set(spec) - {'elements'}:
-        raise CanvasError('A visual block is {"elements": [...]}')
+    if not isinstance(spec, dict) or not isinstance(spec.get('elements'), list) or set(spec) - {'elements', 'camera'}:
+        raise CanvasError('A visual block is {"elements": [...], "camera": [...] (optional)}')
     elements = spec['elements']
     if not 1 <= len(elements) <= MAX_ELEMENTS:
         raise CanvasError(f'Use 1 to {MAX_ELEMENTS} elements')
@@ -309,6 +309,24 @@ def validate(spec, sentences):
             row['out'] = {'at': min(out.get('at', 0), len(sentences) - 1), 'delay': _number(out.get('delay', 0), 0, 10, f'{where} out delay')}
         if 'pulse' in element:
             row['pulse'] = min(int(_number(element['pulse'], 0, 50, f'{where} pulse')), len(sentences) - 1)
+        if 'moveTo' in element:
+            move = element['moveTo']
+            if not isinstance(move, dict) or set(move) - {'at', 'delay', 'x', 'y', 'dur'} or not {'x', 'y'} <= set(move) or type(move.get('at', 0)) is not int:
+                raise CanvasError(f'{where}: "moveTo" is {{"at": sentence, "delay": seconds, "x": X, "y": Y, "dur": seconds}}')
+            if 'plot' in element or 'x' not in element or 'y' not in element:
+                raise CanvasError(f'{where}: only elements placed with x and y can move')
+            row['moveTo'] = {'at': min(move.get('at', 0), len(sentences) - 1), 'delay': _number(move.get('delay', 0), 0, 10, f'{where} moveTo delay'),
+                             'x': _number(move['x'], 0, 1920, f'{where} moveTo x'), 'y': _number(move['y'], 0, 1080, f'{where} moveTo y'),
+                             'dur': _number(move.get('dur', .9), .2, 6, f'{where} moveTo dur')}
+        if 'dim' in element:
+            dim = element['dim']
+            if not isinstance(dim, dict) or set(dim) - {'at', 'delay'} or type(dim.get('at', 0)) is not int:
+                raise CanvasError(f'{where}: "dim" is {{"at": sentence, "delay": seconds}}')
+            row['dim'] = {'at': min(dim.get('at', 0), len(sentences) - 1), 'delay': _number(dim.get('delay', 0), 0, 10, f'{where} dim delay')}
+        if 'typing' in element:
+            if type(element['typing']) is not bool or element['type'] not in ('bubble', 'text'):
+                raise CanvasError(f'{where}: "typing": true works on bubble and text elements')
+            row['typing'] = element['typing']
         for key in (required | optional) & set(element):
             value = element[key]
             if key in ML_KEYS:
@@ -365,7 +383,25 @@ def validate(spec, sentences):
         for key in ('from', 'to'):
             if key in row:
                 row[key] = _point(row[key], ids, f'element {index} {key}')
-    return {'elements': clean}
+    result = {'elements': clean}
+    if 'camera' in spec:
+        result['camera'] = _camera(spec['camera'], sentences)
+    return result
+
+
+def _camera(moves, sentences):
+    """Zooms into parts of the stage: [{"at", "delay", "x", "y", "zoom", "dur"}]; zoom 1 shows everything."""
+    if not isinstance(moves, list) or not 1 <= len(moves) <= 8:
+        raise CanvasError('camera lists 1 to 8 moves')
+    clean = []
+    for index, move in enumerate(moves, 1):
+        where = f'camera move {index}'
+        if not isinstance(move, dict) or set(move) - {'at', 'delay', 'x', 'y', 'zoom', 'dur'} or type(move.get('at', 0)) is not int:
+            raise CanvasError(f'{where}: a move is {{"at": sentence, "delay": seconds, "x": X, "y": Y, "zoom": 1-3, "dur": seconds}}')
+        clean.append({'at': min(move.get('at', 0), len(sentences) - 1), 'delay': _number(move.get('delay', 0), 0, 10, f'{where} delay'),
+                      'x': _number(move.get('x', 960), 0, 1920, f'{where} x'), 'y': _number(move.get('y', 540), 0, 1080, f'{where} y'),
+                      'zoom': _number(move.get('zoom', 1), 1, 3, f'{where} zoom'), 'dur': _number(move.get('dur', 1.2), .2, 6, f'{where} dur')})
+    return clean
 
 
 # ---- Layout check: estimates of what the renderer draws (renderer/src/canvas.ts uses the same sizes) ----
@@ -482,11 +518,19 @@ def timed(spec, beats):
         return round(cue_time(beat, spoken) + delay, 3)
     elements = []
     for row in spec['elements']:
-        timed_row = {k: v for k, v in row.items() if k not in ('at', 'delay', 'word', 'out', 'pulse')}
+        timed_row = {k: v for k, v in row.items() if k not in ('at', 'delay', 'word', 'out', 'pulse', 'moveTo', 'dim')}
         timed_row['t'] = moment(row['at'], row['delay'], row.get('word'))
         if 'out' in row:
             timed_row['tOut'] = moment(row['out']['at'], row['out']['delay'])
         if 'pulse' in row:
             timed_row['tPulse'] = moment(row['pulse'], 0)
+        if 'moveTo' in row:
+            move = row['moveTo']
+            timed_row['move'] = {'t': moment(move['at'], move['delay']), 'x': move['x'], 'y': move['y'], 'dur': move['dur']}
+        if 'dim' in row:
+            timed_row['tDim'] = moment(row['dim']['at'], row['dim']['delay'])
         elements.append(timed_row)
-    return {'elements': elements}
+    result = {'elements': elements}
+    if spec.get('camera'):
+        result['camera'] = [{'t': moment(m['at'], m['delay']), 'x': m['x'], 'y': m['y'], 'zoom': m['zoom'], 'dur': m['dur']} for m in spec['camera']]
+    return result

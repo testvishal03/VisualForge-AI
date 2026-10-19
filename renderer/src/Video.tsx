@@ -38,7 +38,7 @@ export const Video = ({videoData}: VideoProps) => {
       )}
       {timeline.scenes.map(({scene, from, durationInFrames}, index) => (
         <Sequence key={scene.id} name={scene.headline} from={from} durationInFrames={durationInFrames+Math.ceil(fps*TRANSITION_SECONDS)}>
-          {scene.canvas ? <CanvasScene scene={scene} data={videoData} index={index} total={timeline.scenes.length} first={from===0}/>
+          {scene.canvas ? <CanvasScene scene={scene} data={videoData} index={index} total={timeline.scenes.length} first={from===0} previous={timeline.scenes[index-1]?.scene}/>
             : scene.visual ? <MotionScene scene={scene} style={videoData.style} globalFrame={globalFrame} first={from===0} previous={timeline.scenes[index-1]?.scene} next={timeline.scenes[index+1]?.scene} guide={guide} light={light}/> : <TextScene headline={scene.headline} body={scene.body} />}
           {guide && scene.visual && !scene.canvas && <TopicGuide scenes={videoData.scenes} index={index} colors={guideColors(scene, videoData.style?.theme, light)}/>}
           <SceneAudio src={scene.audio} />

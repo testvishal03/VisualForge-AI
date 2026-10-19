@@ -1,0 +1,25 @@
+A model learns from labeled examples. Each example pairs its features with the right answer. The model finds the pattern that connects them.
+
+```visual
+{"elements": [
+ {"id": "model", "type": "box", "x": 1180, "y": 520, "w": 380, "h": 160, "text": "Model", "sub": "learning", "color": "yellow", "at": 0},
+ {"id": "data", "type": "box", "x": 480, "y": 520, "w": 380, "h": 160, "text": "Labeled data", "icon": "database", "color": "cyan", "at": 1},
+ {"id": "link", "type": "arrow", "from": "data", "to": "model", "color": "cyan", "at": 1, "delay": 0.4},
+ {"type": "bubble", "x": 760, "y": 690, "w": 660, "text": "size 1,500 sq ft  ->  price 280k", "mono": true, "color": "cyan", "typing": true, "at": 1, "delay": 0.8},
+ {"type": "pill", "x": 1180, "y": 330, "text": "Pattern found", "color": "green", "at": 2, "delay": 0.6}
+],
+ "camera": [{"at": 2, "x": 1180, "y": 480, "zoom": 1.6, "dur": 1.2}]}
+```
+
+Then the model makes predictions on new data. The training examples move out of the way. A new input arrives and the model answers it.
+
+```visual
+{"elements": [
+ {"id": "model", "type": "box", "x": 960, "y": 420, "w": 380, "h": 160, "text": "Model", "sub": "trained", "color": "yellow", "at": 0},
+ {"id": "data", "type": "box", "x": 480, "y": 520, "w": 380, "h": 160, "text": "Labeled data", "icon": "database", "color": "cyan", "at": 0,
+  "moveTo": {"at": 1, "x": 300, "y": 820, "dur": 1.0}, "dim": {"at": 1, "delay": 0.4}},
+ {"id": "input", "type": "box", "x": 360, "y": 280, "w": 360, "h": 140, "text": "New house", "icon": "house", "color": "pink", "at": 2},
+ {"type": "arrow", "from": "input", "to": "model", "color": "pink", "at": 2, "delay": 0.4},
+ {"type": "pill", "x": 1500, "y": 420, "text": "Predicted: 310k", "color": "pink", "at": 2, "delay": 1.0}
+]}
+```

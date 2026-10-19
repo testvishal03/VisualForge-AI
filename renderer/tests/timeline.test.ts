@@ -10,7 +10,7 @@ import {fitLabel,objectScale,textWidth} from '../src/labels.ts';
 import {along,chipKind} from '../src/flow.ts';
 import {after,chipRows,inside,mapLayout,measuredLayout,noise} from '../src/explainer.ts';
 import {iconFor} from '../src/icon-match.ts';
-import {bounds,boxSize,edgePoint} from '../src/canvas.ts';
+import {bounds,boxSize,canvasCamera,edgePoint,placed} from '../src/canvas.ts';
 import {animationTiming,activeConcept,sharedConcept} from '../src/animation.ts';
 import {isContextWindow,contextCues} from '../src/context-window.ts';
 import {validateTeaching,teachingStage,type TeachingPlan} from '../src/teaching-plan.ts';
@@ -521,4 +521,17 @@ test('scene canvases: arrows meet box edges, boxes fit their text, bad canvases 
   validateVideoData({title:'C',scenes:[{...base,canvas}]});
   for(const bad of [{elements:[{...box,x:5000}]},{elements:[{...box,color:'gold'}]},{elements:[{type:'arrow' as const,from:'nowhere',to:'a',t:0}]},{elements:[{...box,t:99}]}])
     assert.throws(()=>validateVideoData({title:'C',scenes:[{...base,canvas:bad as typeof canvas}]}),/canvas/);
+});
+
+test('continuity, moves and camera: elements glide between places and the view stays on the stage',()=>{
+  const before={type:'box' as const,id:'m',x:1180,y:520,t:0,move:{t:3,x:1300,y:600,dur:1}};
+  const now={type:'box' as const,id:'m',x:960,y:420,t:0};
+  assert.deepEqual([placed(now,0,before).x,placed(now,0,before).y],[1300,600],'starts where the previous scene left it');
+  assert.deepEqual([placed(now,5,before).x,placed(now,5,before).y],[960,420],'ends at its own place');
+  const moving={...now,move:{t:2,x:300,y:800,dur:1}};
+  assert.deepEqual([placed(moving,1).x,placed(moving,9).x],[960,300]);
+  const zoomed=canvasCamera([{t:1,x:1800,y:100,zoom:2,dur:1}],5);
+  assert.equal(zoomed.zoom,2);
+  assert.deepEqual([zoomed.x,zoomed.y],[1440,270],'the view is kept inside the 1920x1080 stage');
+  assert.deepEqual(canvasCamera(undefined,3),{zoom:1,x:960,y:540});
 });
