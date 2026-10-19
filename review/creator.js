@@ -57,8 +57,28 @@ function renderScriptCheck(r){
     all.type='button';all.onclick=()=>applyScriptFixes(fixes);
     box.append(all);
   }
-  if(r.highlights?.length)box.append(element('p','Animations: '+r.highlights.map(h=>`scene ${h.scene} ${h.label.toLowerCase()} (${h.note})`).join(' · '),'check-highlights'));
+  const drawn=(r.highlights||[]).filter(h=>h.kind==='canvas'),others=(r.highlights||[]).filter(h=>h.kind!=='canvas');
+  if(others.length)box.append(element('p','Animations: '+others.map(h=>`scene ${h.scene} ${h.label.toLowerCase()} (${h.note})`).join(' · '),'check-highlights'));
+  if(drawn.length){
+    // Hand-designed scenes: preview any one in seconds, edit its block above, preview again.
+    const row=element('div',undefined,'check-previews');row.append(element('span','Preview a scene: ','helper'));
+    for(const h of drawn){const b=element('button',String(h.scene),'secondary check-fix');b.type='button';b.title=`Preview scene ${h.scene}`;b.onclick=()=>previewScene(h.scene,b);row.append(b);}
+    box.append(row);
+    const player=element('div',undefined,'check-player');player.id='scene-preview-player';player.hidden=true;box.append(player);
+  }
   if(counts[0])box.append(element('p',`Fix the ${counts[0]===1?'error':'errors'} above before preparing.`,'helper'));
+}
+/** Render one hand-designed scene quickly (estimated timing, no voice) and play it inline. */
+async function previewScene(number,button){
+  const player=$('scene-preview-player');if(!player)return;
+  const label=button.textContent;button.disabled=true;button.textContent='…';
+  player.hidden=false;player.replaceChildren(element('p',`Rendering a preview of scene ${number}…`,'helper'));
+  try{
+    const result=await api('/api/scene-preview',{text:$('studio-script').value,scene:number,title:$('studio-title').value.trim()||'Preview'});
+    const video=element('video');video.src=result.url;video.controls=true;video.autoplay=true;video.muted=true;
+    player.replaceChildren(element('p',`Scene ${number} preview: timing is estimated from the words; the real video follows the voice.`,'helper'),video);
+  }catch(error){player.replaceChildren(element('p',error.message,'helper'));}
+  finally{button.disabled=false;button.textContent=label;}
 }
 /** Apply checker fixes to the script box, then check again. */
 function applyScriptFixes(fixes){

@@ -49,3 +49,4 @@ body:not(.simple-mode) #creator-progress,body:not(.simple-mode) #creator-player-
 .script-check .check-fix{margin:8px 8px 0 0;padding:5px 10px;font-size:12px;border-radius:8px}
 .script-check .check-estimate{margin:0 0 8px;color:var(--muted)}
 .publish-seo{margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}.publish-seo h3{font-size:16px;margin:0 0 10px}.publish-seo ol{margin:0 0 16px;padding-left:22px}.publish-seo li{margin:8px 0;line-height:1.5}.publish-seo li .helper{margin:0 10px;font-size:12px}.publish-seo li button{padding:4px 10px;font-size:12px}.publish-seo textarea{width:100%;font-size:13px}
+.script-check .check-previews{margin-top:10px;display:flex;flex-wrap:wrap;align-items:center;gap:4px}.script-check .check-player{margin-top:10px}.script-check .check-player video{width:100%;max-width:768px;border-radius:10px;background:#0b1020;display:block}

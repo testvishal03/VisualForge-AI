@@ -197,6 +197,9 @@ def make_server(port=8765, root=ROOT, directory=None):
                     pending=candidate(jobs,project)
                     if not pending:raise FileNotFoundError('Candidate is stale or missing')
                     return self.file_response(store.folder(project['id'])/pending['file'])
+                scene_preview=re.fullmatch(r'/media/scene-preview/([a-f0-9]{16})',path)
+                if scene_preview:
+                    return self.file_response(root/'backend/.cache/scene-preview'/f'{scene_preview[1]}.mp4')
                 story_media=re.fullmatch(r'/media/([a-f0-9]{12})/story',path)
                 if story_media:
                     project=store.load(story_media[1]);jobs.workspaces.require_active(project['id'])
@@ -285,6 +288,16 @@ def make_server(port=8765, root=ROOT, directory=None):
                     topics = workspace.get('topics') or []
                     return self.json_response({'topic': topic.strip(), 'prompt': episode_prompt(topic, minutes, workspace.get('name') if topics else None, topics, workspace.get('audience', 'beginners')),
                                                'episode': next((i + 1 for i, t in enumerate(topics) if t.casefold() == topic.strip().casefold()), None), 'total': len(topics)})
+                if path == '/api/scene-preview':
+                    # A small muted render of one hand-designed scene, with timing estimated from its words.
+                    from backend.services.scene_preview import preview
+                    text, number, title = body.get('text'), body.get('scene'), body.get('title') or 'Preview'
+                    if not isinstance(text, str) or len(text) > 200000 or type(number) is not int or not isinstance(title, str):
+                        raise ValueError('Send the script text and a scene number.')
+                    if jobs.busy():
+                        return self.json_response({'error': 'A video is being generated. Preview again when it finishes.'}, 409)
+                    output = preview(jobs, text, number, title.strip()[:80] or 'Preview')
+                    return self.json_response({'url': f'/media/scene-preview/{output.stem}', 'scene': number})
                 if path == '/api/check-script':
                     # Read-only: the same conversion and scene rules as Prepare, plus pronunciation checks.
                     from backend.services.script_check import check
