@@ -34,7 +34,7 @@ The block is never read aloud. Its elements (boxes, arrows, moving messages, cha
 
 ## Releases
 
-`main` is the stable line, tagged per release (`v1.0` first). New work happens on branches and is merged only after `backend\.venv\Scripts\python.exe backend\scriptselease_check.py` passes: backend tests, renderer type check and tests, studio UI tests, and the script check (no errors or layout warnings) on every example in `data/examples`. To return to a release: `git checkout v1.0`.
+`main` is the stable line, tagged per release (`v1.0` first). New work happens on branches and is merged only after `backend\.venv\Scripts\python.exe backend\scripts\release_check.py` passes: backend tests, renderer type check and tests, studio UI tests, and the script check (no errors or layout warnings) on every example in `data/examples`. To return to a release: `git checkout v1.0`.
 
 ## Make videos on a server or a free GPU
 
