@@ -1,6 +1,7 @@
 import {Composition, staticFile, type CalculateMetadataFunction} from 'remotion';
 import {Video} from './Video';
 import {Thumbnail} from './components/Thumbnail';
+import {Short, shortLength, type ShortProps} from './components/Short';
 import {videoData} from './data/demo';
 import {buildTimeline, FPS} from './timeline';
 import type {VideoProps} from './types';
@@ -16,6 +17,8 @@ const calculateMetadata: CalculateMetadataFunction<VideoProps> = async ({props, 
   return {durationInFrames: timeline.durationInFrames};
 };
 
+const shortMetadata: CalculateMetadataFunction<ShortProps> = async ({props}) => ({durationInFrames: shortLength(props.videoData.scenes, FPS)});
+
 export const RemotionRoot = () => (
   <>
     <Composition
@@ -30,5 +33,8 @@ export const RemotionRoot = () => (
     />
     {/* YouTube's recommended thumbnail size; rendered as a single still after export. */}
     <Composition id="VisualForgeThumbnail" component={Thumbnail} fps={FPS} width={1280} height={720} durationInFrames={1} defaultProps={{videoData}}/>
+    {/* Vertical Shorts made from hand-designed scenes of an episode. */}
+    <Composition id="VisualForgeShort" component={Short} fps={FPS} width={1080} height={1920} durationInFrames={FPS}
+      defaultProps={{videoData, short: {hook: 'Preview'}}} calculateMetadata={shortMetadata}/>
   </>
 );

@@ -129,8 +129,36 @@ def publish(jobs, project, folder: Path, data, render, profile, parts=None):
     notes.write_text(text, encoding='utf-8')
     record = {'profile': profile, 'thumbnail': {'file': 'publish/thumbnail.png', 'sha256': file_hash(thumbnail)},
               'description': {'file': 'publish/description.txt', 'sha256': file_hash(notes)}, **meta}
+    record['shorts'] = make_shorts(jobs, project, out, data, render, (seo or {}).get('shorts') or [])
     jobs.store.update_artifact(project['id'], 'publish', record)
     return record
+
+
+SHORT_MAX_SECONDS = 90
+
+
+def make_shorts(jobs, project, out, data, render, specs):
+    """Render the requested vertical Shorts; a Short that cannot be made is skipped with a note."""
+    made = []
+    for number, spec in enumerate(specs, 1):
+        scenes = [data['scenes'][n - 1] for n in spec['scenes'] if n <= len(data['scenes'])]
+        if len(scenes) != len(spec['scenes']) or not all(s.get('canvas') for s in scenes):
+            made.append({'skipped': f"Short {number}: its scenes need hand-designed visuals"})
+            continue
+        if sum(s['duration'] for s in scenes) > SHORT_MAX_SECONDS:
+            made.append({'skipped': f"Short {number}: longer than {SHORT_MAX_SECONDS} seconds"})
+            continue
+        props = out/f'short-{number}-props.json'
+        write_json_atomic(props, {'videoData': {**data, 'scenes': scenes}, 'short': {'hook': spec['hook'], **({'title': spec['title']} if spec.get('title') else {})}})
+        pending, final = out/f'short-{number}.pending.mp4', out/f'short-{number}.mp4'
+        try:
+            render(['render', 'VisualForgeShort', pending, f'--props={props}'], 'shorts')
+            pending.replace(final)
+        except (RuntimeError, OSError) as exc:
+            made.append({'skipped': f'Short {number} could not be rendered: {str(exc)[:120]}'})
+            continue
+        made.append({'file': f'publish/short-{number}.mp4', 'sha256': file_hash(final), 'hook': spec['hook'], 'scenes': spec['scenes']})
+    return made
 
 
 def publish_safely(jobs, project, folder, data, render, profile, parts=None):
@@ -161,6 +189,14 @@ def present(jobs, project, result):
                          'description_url': f"/media/{project['id']}/description?v={record['description']['sha256'][:12]}",
                          'description': (base/record['description']['file']).read_text(encoding='utf-8'),
                          'chapters': record.get('chapters', 0), 'chapters_note': record.get('chapters_note')}
+    shorts = []
+    for number, short in enumerate(record.get('shorts') or [], 1):
+        target = (base/short['file']).resolve() if short.get('file') else None
+        if target and target.is_relative_to(base) and target.is_file() and file_hash(target) == short['sha256']:
+            shorts.append({'url': f"/media/{project['id']}/short/{number}?v={short['sha256'][:12]}", 'hook': short['hook'], 'scenes': short['scenes']})
+        elif short.get('skipped'):
+            shorts.append({'note': short['skipped']})
+    result['publish']['shorts'] = shorts
     if record.get('seo'):
         from backend.services.seo import title_notes
         result['publish']['titles'] = [{'text': t, 'chars': len(t), 'notes': title_notes(t)} for t in record['seo']['titles']]

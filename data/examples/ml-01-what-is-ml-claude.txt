@@ -305,6 +305,30 @@ visual
   "highlight": "Learn",
   "scene": 7,
   "badge": "Episode 1"
- }
+ },
+ "shorts": [
+  {
+   "scenes": [
+    2,
+    3
+   ],
+   "hook": "Why computers don't need rules anymore",
+   "title": "Machine Learning Flips Programming Upside Down #Shorts"
+  },
+  {
+   "scenes": [
+    7
+   ],
+   "hook": "Watch a machine learn in 10 seconds",
+   "title": "How a Model Finds the Best Fit Line #Shorts"
+  },
+  {
+   "scenes": [
+    15
+   ],
+   "hook": "Why memorizing fails in AI",
+   "title": "Overfitting Explained in 15 Seconds #Shorts"
+  }
+ ]
 }
 ```

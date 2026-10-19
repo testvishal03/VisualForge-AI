@@ -76,7 +76,7 @@ def main(argv=None):
         video = folder / ('draft.mp4' if args.quality == 'draft' else 'video.mp4')
         shutil.copy2(video, args.out / 'video.mp4')
         kit = folder / 'publish'
-        for name in ('thumbnail.png', 'description.txt'):
+        for name in ('thumbnail.png', 'description.txt', *[p.name for p in sorted(kit.glob('short-[0-9].mp4'))]):
             if (kit / name).is_file():
                 shutil.copy2(kit / name, args.out / name)
         report = {'project': project['id'], 'title': result.get('topic'), 'seconds': round(time.monotonic() - started),

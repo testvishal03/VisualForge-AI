@@ -46,7 +46,7 @@ def extract(text):
 
 def validate(block):
     """A clean copy of the publish block, or ValueError naming the problem."""
-    if not isinstance(block, dict) or set(block) - {'titles', 'description', 'tags', 'hashtags', 'thumbnail'}:
+    if not isinstance(block, dict) or set(block) - {'titles', 'description', 'tags', 'hashtags', 'thumbnail', 'shorts'}:
         raise ValueError('expected {"titles": [...], "description": "...", "tags": [...], "hashtags": [...], "thumbnail": {...}}')
     titles = block.get('titles', [])
     if not isinstance(titles, list) or not 1 <= len(titles) <= 8 or any(not isinstance(t, str) or not t.strip() for t in titles):
@@ -72,7 +72,34 @@ def validate(block):
     result = {'titles': titles, 'description': description.strip(), 'tags': tags, 'hashtags': hashtags}
     if 'thumbnail' in block:
         result['thumbnail'] = thumbnail(block['thumbnail'])
+    if 'shorts' in block:
+        result['shorts'] = shorts(block['shorts'])
     return result
+
+
+def shorts(specs):
+    """1-3 vertical Shorts: each 1-3 consecutive scenes, a hook line and an optional title."""
+    if not isinstance(specs, list) or not 1 <= len(specs) <= 3:
+        raise ValueError('shorts lists 1 to 3 shorts')
+    clean = []
+    for index, spec in enumerate(specs, 1):
+        where = f'short {index}'
+        if not isinstance(spec, dict) or set(spec) - {'scenes', 'hook', 'title'} or 'scenes' not in spec or 'hook' not in spec:
+            raise ValueError(f'{where} is {{"scenes": [3, 4], "hook": "a punchy question or claim", "title": "..."}}')
+        scenes = spec['scenes']
+        if not isinstance(scenes, list) or not 1 <= len(scenes) <= 3 or any(type(n) is not int or n < 1 for n in scenes) \
+                or scenes != list(range(scenes[0], scenes[0] + len(scenes))):
+            raise ValueError(f'{where}: scenes must be 1 to 3 consecutive scene numbers')
+        hook = spec['hook']
+        if not isinstance(hook, str) or not 3 <= len(hook) <= 70:
+            raise ValueError(f'{where}: hook must be 3 to 70 characters')
+        row = {'scenes': scenes, 'hook': hook.strip()}
+        if spec.get('title'):
+            if not isinstance(spec['title'], str) or len(spec['title']) > TITLE_LIMIT:
+                raise ValueError(f'{where}: title must be at most {TITLE_LIMIT} characters')
+            row['title'] = spec['title'].strip()
+        clean.append(row)
+    return clean
 
 
 def thumbnail(spec):
